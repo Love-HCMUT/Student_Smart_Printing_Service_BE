@@ -1,0 +1,22 @@
+{
+  "name": "be_ssps",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Love-HCMUT/Student_Smart_Printing_Service_BE.git"
+  },
+  "author": "Ho Gia Thang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Love-HCMUT/Student_Smart_Printing_Service_BE/issues"
+  },
+  "homepage": "https://github.com/Love-HCMUT/Student_Smart_Printing_Service_BE#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
