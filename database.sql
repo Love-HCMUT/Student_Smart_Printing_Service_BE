@@ -31,11 +31,14 @@ CREATE TABLE account (
     accountPassword VARCHAR(50) NOT NULL,
     fullName VARCHAR(100)
 );
+
 -- SPSO
 CREATE TABLE spso (
 	id INT PRIMARY KEY,
     FOREIGN KEY (id) REFERENCES account(id)
 );
+
+
 -- SPSO Phone Number
 CREATE TABLE spsoPhoneNumbers (
 	id INT NOT NULL,
@@ -43,6 +46,8 @@ CREATE TABLE spsoPhoneNumbers (
     PRIMARY KEY (id, phoneNumber),
     FOREIGN KEY (id) REFERENCES spso(id)
 );
+
+
 -- SPSO Manage Printer
 CREATE TABLE manage (
 	spsoID INT NOT NULL,
@@ -51,6 +56,7 @@ CREATE TABLE manage (
     FOREIGN KEY (spsoID) REFERENCES spso(id),
     FOREIGN KEY (printerID) REFERENCES printer(id)
 );
+
 -- SPSO Manage Printer - Manipulation
 CREATE TABLE manipulation (
 	spsoID INT NOT NULL,
@@ -60,6 +66,7 @@ CREATE TABLE manipulation (
     PRIMARY KEY (spsoID, printerID, spsoAction, actionTime),
     FOREIGN KEY (spsoID, printerID) REFERENCES manage(spsoID, printerID)
 );
+
 -- Student Lecturer
 CREATE TABLE customer (
 	id INT PRIMARY KEY,
