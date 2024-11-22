@@ -77,6 +77,7 @@ CREATE TABLE customer (
     balance INT,
     FOREIGN KEY (id) REFERENCES account(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 -- Printing Staff
 CREATE TABLE staff (
 	id INT PRIMARY KEY,

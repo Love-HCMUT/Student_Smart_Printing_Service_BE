@@ -1,6 +1,6 @@
 tags:
   name: PAYMENT
-  description: API for 
+  description: API for payment service
 
 
 # collection link payment to user 
@@ -56,3 +56,65 @@ paths:
                     type: number
                     example: 100000  # Corrected to number
                     description: "The amount of money added for the transaction."
+
+
+  /payment/balance/{money}:
+    patch:
+      tags:
+        - PAYMENT
+      summary: Update customer balance
+      description: API endpoint to update the balance of a customer by a fixed customer ID.
+      parameters:
+        - name: money
+          in: path
+          required: true
+          description: The amount of money to update the customer's balance.
+          schema:
+            type: number
+            example: 5000
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                    description: Indicates if the operation was successful.
+                  message:
+                    type: string
+                    example: "Update balance successfully"
+                    description: Message indicating the result of the operation.
+        400:
+          description: Balance update failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                    description: Indicates if the operation failed.
+                  message:
+                    type: string
+                    example: "Update balance fail"
+                    description: Message indicating the reason for failure.
+        401:
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                    description: Indicates the request was unauthorized or invalid.
+                  message:
+                    type: string
+                    example: "Missing required money parameter."
+                    description: Message indicating missing or invalid parameters.

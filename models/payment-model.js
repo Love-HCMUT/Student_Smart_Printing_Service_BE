@@ -63,8 +63,8 @@ async function createDepositLog(time, money, note, customerID, combo) {
 }
 
 export default {
-    insertPaymentlog,
-    insertDepositLog,
-    insertDepositCombo,
+    // insertPaymentlog,
+    // insertDepositLog,
+    // insertDepositCombo,
     createDepositLog
 }

@@ -5,7 +5,8 @@ import payment from '../services/payment-service.js'
 import config from '../config/load-config.js'
 import { createResponse } from '../config/api-response.js'
 import paymentModel from '../models/payment-model.js'
-
+import userModel from '../models/user-model.js'
+import { clearInterval } from 'timers'
 
 
 // get 
@@ -63,7 +64,7 @@ const createPaymentLink = async (req, res) => {
     //option for axios 
     const option = {
         method: "POST",
-        url: config.MOMO_GATEWAY_URL,
+        url: `${config.MOMO_GATEWAY_URL}/create`,
         headers: {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(requestBody)
@@ -77,6 +78,7 @@ const createPaymentLink = async (req, res) => {
         let result = await axios(option)
         const respone = createResponse(true, "Get payment link successfully", {
             "payUrl": result.data.payUrl,
+            "orderId": result.data.orderId,
             "money": result.data.amount
         })
         return res.status(200).json(respone)
@@ -110,9 +112,67 @@ const handleDataFromMomoService = async (req, res) => {
 }
 
 
+const checkStatusPayment = async (req, res) => {
+    const orderId = req.params.id
+
+    var secretKey = config.MOMO_SECRET_KEY
+    var accessKey = config.MOMO_ACCESS_KEY
+    const rawSignature = `accessKey=${accessKey}&orderId=${orderId}&partnerCode=MOMO&requestId=${orderId}`;
+
+    const signature = crypto
+        .createHmac('sha256', secretKey)
+        .update(rawSignature)
+        .digest('hex');
+
+    const requestBody = JSON.stringify({
+        partnerCode: 'MOMO',
+        requestId: orderId,
+        orderId: orderId,
+        signature: signature,
+        lang: 'vi',
+    });
+
+    // options for axios
+    const options = {
+        method: 'POST',
+        url: `${config.MOMO_GATEWAY_URL}/query`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        data: requestBody,
+    };
+
+    let statusCode = 1000
+    let result
+
+    while ([1000, 9000, 7002, 7000].includes(statusCode)) {
+        try {
+            result = await axios(options)
+            statusCode = result.data.resultCode
+        }
+        catch (error) {
+            console.log("Error when checking status payment")
+            res.status(400).json(createResponse(false, "Error when checking status payment"))
+        }
+    }
+    if (statusCode === 0)
+        return res.status(200).json(createResponse(true, "Success payment", result.data));
+    else return res.status(400).json(createResponse(false, "Fail to pay", result.data))
+}
+
+const updateBalance = async (req, res) => {
+    const money = req.params.money
+    if (!money) return res.status(401).json(createResponse(false, "Missing required money parameter"))
+    // fixed customer id
+    const check = await userModel.updateUserBalance(1, money)
+    if (check) return res.status(200).json(createResponse(true, "Update balance successfully"))
+    else return res.status(400).json(createResponse(false, "Update balance fail"))
+}
 
 
 export default {
     createPaymentLink,
-    handleDataFromMomoService
+    handleDataFromMomoService,
+    checkStatusPayment,
+    updateBalance
 }

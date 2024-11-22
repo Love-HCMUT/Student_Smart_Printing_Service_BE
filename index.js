@@ -6,7 +6,7 @@ import centralizeRouter from './routes/index.js'
 import { connectMysql } from './config/mysql-dbs.js'
 import swaggerOptions from './config/swagger-config.js'
 import { createResponse } from './config/api-response.js'
-import test from './models/payment-model.js'
+import test from './models/user-model.js'
 
 
 const app = express()
@@ -30,8 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/test', async (req, res) => {
     try {
         // await test.insertDepositLog('2024-11-22 10:30:00', 50000)
-        const now = new Date()
-        await test.createDepositLog(now, 62000, 'helloworld', 1, [{ combo_id: 1, quantity: 10 }, { combo_id: 5, quantity: 12 }])
+        await test.updateUserBalance(1, 900000)
 
         res.status(200).json({ "mess": "true" })
     }
