@@ -4,6 +4,9 @@ import crypto from 'crypto'
 import payment from '../services/payment-service.js'
 import config from '../config/load-config.js'
 import { createResponse } from '../config/api-response.js'
+import paymentModel from '../models/payment-model.js'
+
+
 
 // get 
 const createPaymentLink = async (req, res) => {
@@ -11,7 +14,7 @@ const createPaymentLink = async (req, res) => {
     //parameters
     var accessKey = config.MOMO_ACCESS_KEY;
     var secretKey = config.MOMO_SECRET_KEY
-    var orderInfo = 'pay with MoMo';
+    var orderInfo = req.body.note;
     var partnerCode = 'MOMO';
     var redirectUrl = config.MOMO_REDIRECT_URL
     var ipnUrl = `${config.MOMO_IPN_URL}/payment/result`
@@ -19,7 +22,7 @@ const createPaymentLink = async (req, res) => {
     var amount = req.body?.money ? req.body?.money : 0;
     var orderId = partnerCode + new Date().getTime();
     var requestId = orderId;
-    var extraData = req.body?.combo;
+    var extraData = JSON.stringify(req.body?.combo);
     var orderGroupId = '';
     var autoCapture = true;
     var lang = 'vi';
@@ -85,12 +88,28 @@ const createPaymentLink = async (req, res) => {
 }
 
 
-const handleDataFromMomoService = (req, res) => {
-    console.log("Call back::")
-    console.log(req.body)
-    // update database 
-    
+const handleDataFromMomoService = async (req, res) => {
+    try {
+        console.log("Call back::")
+        console.log(req.body)
+
+        const combo = JSON.parse(req.body?.extraData)
+        const note = req.body.orderInfo
+        const now = new Date()
+        const money = req.body.amount
+
+        console.log(combo, note, now, money)
+        // update database 
+        await paymentModel.createDepositLog(now, money, note, 1, combo)
+        console.log("insert completed")
+        return res.status(200)
+    }
+    catch (error) {
+        return res.status(400)
+    }
 }
+
+
 
 
 export default {
