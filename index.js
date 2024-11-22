@@ -7,6 +7,7 @@ import { connectMysql } from './config/mysql-dbs.js'
 import swaggerOptions from './config/swagger-config.js'
 import { createResponse } from './config/api-response.js'
 import test from './models/user-model.js'
+import file from './models/systemconfig-model.js'
 
 
 const app = express()
@@ -14,6 +15,8 @@ dotenv.config()
 
 connectMysql()
 
+const a = file.readData('filetype')
+file.writeData('paper_per_month', a)
 
 // Tạo Swagger docs
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
