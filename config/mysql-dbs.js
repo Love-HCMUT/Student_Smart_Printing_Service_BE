@@ -1,7 +1,7 @@
-import mysql from 'mysql'
+import mysql from 'mysql2'
 import config from './load-config.js'
 
-const connection = mysql.createConnection({
+const dbs = mysql.createConnection({
     host: config.DB_HOST,
     user: config.DB_USER,
     password: config.DB_PASS,
@@ -9,8 +9,8 @@ const connection = mysql.createConnection({
 })
 
 
-const connectMysql = () => {
-    connection.connect((err) => {
+export function connectMysql() {
+    dbs.connect((err) => {
         if (err) {
             console.error('Kết nối thất bại: ', err);
             return;
@@ -20,6 +20,6 @@ const connectMysql = () => {
 }
 
 
-export default connectMysql;
+export default dbs;
 
 

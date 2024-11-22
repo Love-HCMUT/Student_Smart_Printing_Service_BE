@@ -3,9 +3,10 @@ import dotenv from 'dotenv'
 import swaggerUi from 'swagger-ui-express'
 import swaggerJsDoc from 'swagger-jsdoc'
 import centralizeRouter from './routes/index.js'
-import connectMysql from './config/mysql-dbs.js'
+import { connectMysql } from './config/mysql-dbs.js'
 import swaggerOptions from './config/swagger-config.js'
 import { createResponse } from './config/api-response.js'
+import dbs from './config/mysql-dbs.js'
 
 const app = express()
 dotenv.config()
