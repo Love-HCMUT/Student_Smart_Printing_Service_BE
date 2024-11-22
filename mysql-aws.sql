@@ -23,20 +23,23 @@ CREATE TABLE printer (
     wireless BOOL,
     printingMethod VARCHAR(20),
     locationID INT,
-    FOREIGN KEY (locationID) REFERENCES location(id)
+    FOREIGN KEY (locationID) REFERENCES location(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 -- ACCOUNT
 CREATE TABLE account (
-	id INT PRIMARY KEY  ,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) UNIQUE NOT NULL,
     accountPassword VARCHAR(50) NOT NULL,
-    fullName VARCHAR(100)
+    fullName VARCHAR(100),
+    roles VARCHAR(20) NOT NULL DEFAULT 'user'
 );
 
 -- SPSO
 CREATE TABLE spso (
 	id INT PRIMARY KEY,
-    FOREIGN KEY (id) REFERENCES account(id)
+    FOREIGN KEY (id) REFERENCES account(id) 
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -45,7 +48,7 @@ CREATE TABLE spsoPhoneNumbers (
 	id INT NOT NULL,
     phoneNumber VARCHAR(20) NOT NULL,
     PRIMARY KEY (id, phoneNumber),
-    FOREIGN KEY (id) REFERENCES spso(id)
+    FOREIGN KEY (id) REFERENCES spso(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -54,8 +57,8 @@ CREATE TABLE manage (
 	spsoID INT NOT NULL,
     printerID INT NOT NULL,
     PRIMARY KEY (spsoID, printerID),
-    FOREIGN KEY (spsoID) REFERENCES spso(id),
-    FOREIGN KEY (printerID) REFERENCES printer(id)
+    FOREIGN KEY (spsoID) REFERENCES spso(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (printerID) REFERENCES printer(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- SPSO Manage Printer - Manipulation
@@ -65,14 +68,14 @@ CREATE TABLE manipulation (
     spsoAction varchar(20) NOT NULL,
     actionTime TIMESTAMP NOT NULL,
     PRIMARY KEY (spsoID, printerID, spsoAction, actionTime),
-    FOREIGN KEY (spsoID, printerID) REFERENCES manage(spsoID, printerID)
+    FOREIGN KEY (spsoID, printerID) REFERENCES manage(spsoID, printerID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Student Lecturer
 CREATE TABLE customer (
 	id INT PRIMARY KEY,
     balance INT,
-    FOREIGN KEY (id) REFERENCES account(id)
+    FOREIGN KEY (id) REFERENCES account(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Printing Staff
 CREATE TABLE staff (
@@ -80,25 +83,26 @@ CREATE TABLE staff (
     locationID INT NOT NULL,
     spsoID INT NOT NULL,
     mentorID INT,
-    FOREIGN KEY (id) REFERENCES account(id),
-    FOREIGN KEY (locationID) REFERENCES location(id),
-    FOREIGN KEY (spsoID) REFERENCES spso(id),
-    FOREIGN KEY (mentorID) REFERENCES staff(id)
+    FOREIGN KEY (id) REFERENCES account(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (locationID) REFERENCES location(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (spsoID) REFERENCES spso(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (mentorID) REFERENCES staff(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Staff Phone Number
 CREATE TABLE staffPhoneNumbers (
 	id INT NOT NULL,
     phoneNumber VARCHAR(20) NOT NULL,
     PRIMARY KEY (id, phoneNumber),
-    FOREIGN KEY (id) REFERENCES staff(id)
+    FOREIGN KEY (id) REFERENCES staff(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 -- Printer Operated by Staff
 CREATE TABLE operatedBy (
 	printerID INT NOT NULL,
     staffID INT NOT NULL,
     PRIMARY KEY (printerID, staffID),
-    FOREIGN KEY (printerID) REFERENCES printer(id),
-    FOREIGN KEY (staffID) REFERENCES staff(id)
+    FOREIGN KEY (printerID) REFERENCES printer(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (staffID) REFERENCES staff(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Pritner Repaired by Staff
 CREATE TABLE repairedBy (
@@ -108,8 +112,8 @@ CREATE TABLE repairedBy (
     cost INT,
     errorInfo VARCHAR(255),
     PRIMARY KEY (printerID, staffID),
-    FOREIGN KEY (printerID) REFERENCES printer(id),
-    FOREIGN KEY (staffID) REFERENCES staff(id)
+    FOREIGN KEY (printerID) REFERENCES printer(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (staffID) REFERENCES staff(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Order
 CREATE TABLE userOrders (
@@ -119,8 +123,8 @@ CREATE TABLE userOrders (
     completeTime TIMESTAMP,
     printerID INT,
     staffID INT,
-    FOREIGN KEY (printerID) REFERENCES printer(id),
-    FOREIGN KEY (staffID) REFERENCES staff(id)
+    FOREIGN KEY (printerID) REFERENCES printer(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (staffID) REFERENCES staff(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Package
 CREATE TABLE package (
@@ -135,7 +139,7 @@ CREATE TABLE package (
     glass BOOL,
     binding BOOL,
     orderID INT,
-    FOREIGN KEY (orderID) REFERENCES userOrders(id)
+    FOREIGN KEY (orderID) REFERENCES userOrders(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Package Printing Page
 CREATE TABLE packagePrintingPages (
@@ -144,7 +148,7 @@ CREATE TABLE packagePrintingPages (
     fromPage INT NOT NULL,
     toPage INT NOT NULL,
     PRIMARY KEY (packageID, color, fromPage, toPage),
-    FOREIGN KEY (packageID) REFERENCES package(id)
+    FOREIGN KEY (packageID) REFERENCES package(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- File
 CREATE TABLE fileMetadata (
@@ -154,7 +158,7 @@ CREATE TABLE fileMetadata (
     numPages INT,
     url VARCHAR(255) UNIQUE,
     packageID INT,
-    FOREIGN KEY (packageID) REFERENCES package(id)
+    FOREIGN KEY (packageID) REFERENCES package(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Printing Log
 CREATE TABLE printingLog (
@@ -164,8 +168,8 @@ CREATE TABLE printingLog (
     endTime TIMESTAMP,
     fileID INT,
     PRIMARY KEY (orderID, logNumber),
-    FOREIGN KEY (orderID) REFERENCES userOrders(id),
-    FOREIGN KEY (fileID) REFERENCES fileMetadata(id)
+    FOREIGN KEY (orderID) REFERENCES userOrders(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (fileID) REFERENCES fileMetadata(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Combo
 CREATE TABLE combo (
@@ -173,20 +177,21 @@ CREATE TABLE combo (
     price INT,
     numCoins INT
 );
+
 -- Payment Log
 CREATE TABLE paymentLog (
 	id INT PRIMARY KEY AUTO_INCREMENT,
     paymentTime TIMESTAMP,
     money INT
-);
+);  
 -- Deposit Log
 CREATE TABLE depositLog (
 	id INT PRIMARY KEY,
     method VARCHAR(50),
     note VARCHAR(255),
     customerID INT,
-    FOREIGN KEY (id) REFERENCES paymentLog(id),
-    FOREIGN KEY (customerID) REFERENCES customer(id)
+    FOREIGN KEY (id) REFERENCES paymentLog(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (customerID) REFERENCES customer(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Deposit Log Contain Combo
 CREATE TABLE depositCombo (
@@ -194,18 +199,18 @@ CREATE TABLE depositCombo (
     comboID INT NOT NULL,
     quantity INT,
     PRIMARY KEY (logID, comboID),
-    FOREIGN KEY (logID) REFERENCES depositLog(id),
-    FOREIGN KEY (comboID) REFERENCES combo(id)
+    FOREIGN KEY (logID) REFERENCES depositLog(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (comboID) REFERENCES combo(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Return Log
 CREATE TABLE returnLog (
 	id INT PRIMARY KEY,
-    FOREIGN KEY (id) REFERENCES paymentLog(id)
+    FOREIGN KEY (id) REFERENCES paymentLog(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Withdraw Log
 CREATE TABLE withdrawLog (
 	id INT PRIMARY KEY,
-    FOREIGN KEY (id) REFERENCES paymentLog(id)
+    FOREIGN KEY (id) REFERENCES paymentLog(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Make Student_Lecturer Order Withdraw
 CREATE TABLE makeOrders (
@@ -214,9 +219,9 @@ CREATE TABLE makeOrders (
     logID INT NOT NULL,
     note VARCHAR(255),
     PRIMARY KEY (customerID, orderID),
-    FOREIGN KEY (customerID) REFERENCES customer(id),
-    FOREIGN KEY (orderID) REFERENCES userOrders(id),
-    FOREIGN KEY (logID) REFERENCES withdrawLog(id)
+    FOREIGN KEY (customerID) REFERENCES customer(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (orderID) REFERENCES userOrders(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (logID) REFERENCES withdrawLog(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Cancel Student_Lecturer Order Return
 CREATE TABLE cancelOrders (
@@ -225,9 +230,9 @@ CREATE TABLE cancelOrders (
     logID INT NOT NULL,
     note VARCHAR(255),
     PRIMARY KEY (customerID, orderID),
-    FOREIGN KEY (customerID) REFERENCES customer(id),
-    FOREIGN KEY (orderID) REFERENCES userOrders(id),
-    FOREIGN KEY (logID) REFERENCES returnLog(id)
+    FOREIGN KEY (customerID) REFERENCES customer(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (orderID) REFERENCES userOrders(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (logID) REFERENCES returnLog(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Decline Student_Lecturer Order Return
 CREATE TABLE declineOrders (
@@ -236,7 +241,7 @@ CREATE TABLE declineOrders (
     logID INT NOT NULL,
     note VARCHAR(255),
     PRIMARY KEY (staffID, orderID),
-    FOREIGN KEY (staffID) REFERENCES staff(id),
-    FOREIGN KEY (orderID) REFERENCES userOrders(id),
-    FOREIGN KEY (logID) REFERENCES returnLog(id)
+    FOREIGN KEY (staffID) REFERENCES staff(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (orderID) REFERENCES userOrders(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (logID) REFERENCES returnLog(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
