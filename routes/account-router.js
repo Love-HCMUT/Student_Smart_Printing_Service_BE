@@ -1,17 +1,17 @@
-import  express  from "express"
+import express from "express";
+import { AccountController } from "../controllers/account-controller.js";
+import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.get('/', function(req,res) {
-    res.send('Hello Login and Register')
-})
+// Đăng ký
+router.post("/register", AccountController.Register);
 
-router.get('/si', function(req,res) {
-    res.send('Hello Login')
-})
+// Đăng nhập
+router.post("/login", AccountController.Login);
 
-router.get('/su', function(req,res) {
-    res.send('Hello Register')
-})
+// Đăng xuất
+router.post("/logout", isAuthenticated, AccountController.Logout);
+
 
 export default router;
