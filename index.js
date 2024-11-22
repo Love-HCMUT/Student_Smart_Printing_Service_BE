@@ -5,7 +5,7 @@ import swaggerJsDoc from 'swagger-jsdoc'
 import centralizeRouter from './routes/index.js'
 import connectMysql from './config/mysql-dbs.js'
 import swaggerOptions from './config/swagger-config.js'
-
+import { createResponse } from './config/api-response.js'
 
 const app = express()
 dotenv.config()
@@ -24,7 +24,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 app.use(express.json())
 // Middleware để xử lý dữ liệu URL-encoded
 app.use(express.urlencoded({ extended: true }));
-
 
 //routing 
 app.use(centralizeRouter)
