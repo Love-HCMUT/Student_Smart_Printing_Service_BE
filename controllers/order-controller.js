@@ -1,10 +1,6 @@
-// handle data from database 
-import order from '../services/order-service.js'
-
-const test = (res) => {
-    res.send("Hello world")
-}
+// handle data from database
+import { uploadFileToMinio } from "../services/index.js";
 
 export default {
-    test,
-}
+  uploadFileToMinio: uploadFileToMinio,
+};
