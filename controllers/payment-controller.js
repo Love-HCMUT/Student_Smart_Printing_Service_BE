@@ -92,14 +92,12 @@ const createPaymentLink = async (req, res) => {
 
 const handleDataFromMomoService = async (req, res) => {
     try {
-        console.log("Call back::")
         console.log(req.body)
-
+        const resultCode = req.body.resultCode
         const combo = JSON.parse(req.body?.extraData)
-        const note = req.body.orderInfo
+        const note = resultCode === 0 ? req.body.orderInfo : 'Giao dich that bai'
         const now = new Date()
-        const money = req.body.amount
-
+        const money = resultCode === 0 ? req.body.amount : 0
         console.log(combo, note, now, money)
         // update database 
         await paymentModel.createDepositLog(now, money, note, 1, combo)
@@ -170,9 +168,16 @@ const updateBalance = async (req, res) => {
 }
 
 
+const loadComboData = async (req, res) => {
+    const result = await paymentModel.loadCombo()
+    if (!result) return res.status(400).json(createResponse(false, "fail when loading combo"))
+    return res.status(200).json(createResponse(true, "Loading combo successfully", result))
+}
+
 export default {
     createPaymentLink,
     handleDataFromMomoService,
     checkStatusPayment,
-    updateBalance
+    updateBalance,
+    loadComboData
 }

@@ -6,17 +6,13 @@ import centralizeRouter from './routes/index.js'
 import { connectMysql } from './config/mysql-dbs.js'
 import swaggerOptions from './config/swagger-config.js'
 import { createResponse } from './config/api-response.js'
-import test from './models/user-model.js'
-import file from './models/systemconfig-model.js'
+import test from './models/payment-model.js'
 
 
 const app = express()
 dotenv.config()
 
 connectMysql()
-
-const a = file.readData('filetype')
-file.writeData('paper_per_month', a)
 
 // Tạo Swagger docs
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -33,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/test', async (req, res) => {
     try {
         // await test.insertDepositLog('2024-11-22 10:30:00', 50000)
-        await test.updateUserBalance(1, 900000)
+        await test.loadCombo()
 
         res.status(200).json({ "mess": "true" })
     }

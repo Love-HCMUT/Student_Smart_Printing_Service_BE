@@ -62,9 +62,24 @@ async function createDepositLog(time, money, note, customerID, combo) {
     }
 }
 
+
+async function loadCombo() {
+    try {
+        const sql = `SELECT * FROM combo`
+        const [result] = await dbs.promise().execute(sql)
+        if (result) return result
+        else return undefined
+    }
+    catch (error) {
+        console.log("Error when loading combo ", error)
+        return undefined
+    }
+}
+
 export default {
     // insertPaymentlog,
     // insertDepositLog,
     // insertDepositCombo,
-    createDepositLog
+    createDepositLog,
+    loadCombo
 }
