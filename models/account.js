@@ -10,6 +10,21 @@ export class AccountService {
         );
         return result.insertId; // Trả về ID của tài khoản vừa tạo
     }
+    static async findOrAddLocation(campus, building, room) {
+        // Kiểm tra xem vị trí có tồn tại trong bảng location không
+        const [rows] = await dbs.promise().query(
+            `SELECT id FROM location WHERE campus = ? AND building = ? AND room = ?`,
+            [campus, building, room]
+        );
+    
+        if (rows.length > 0) {
+            // Nếu vị trí tồn tại, trả về ID
+            return rows[0].id;
+        } else {
+            // Nếu không tồn tại, trả về 0
+            return 0;
+        }
+    }
 
     // Hàm để thêm một khách hàng
     static async addCustomer(id) {

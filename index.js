@@ -9,6 +9,7 @@ import { createResponse } from './config/api-response.js'
 import dbs from './config/mysql-dbs.js'
 import { sessionMiddleware } from './config/sessionConfig.js';
 import accountRouter from "./routes/account-router.js";
+import PrinterRouter from "./routes/manage_printer.js"
 
 const app = express()
 dotenv.config()
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 //routing 
 app.use(centralizeRouter)
 app.use("/api/account", accountRouter);
+app.use("/api/printer", PrinterRouter);
 
 
 const port = process.env.PORT

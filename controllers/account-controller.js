@@ -22,7 +22,8 @@ export class AccountController {
             }
 
             // Hash mật khẩu
-             const hashedPassword = await bcrypt.hash(password, 12);
+             const hashedPassword = await bcrypt.hash(password, 10);
+            // const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
 
             let accountId;
             // Thêm tài khoản vào database
@@ -48,7 +49,10 @@ export class AccountController {
                 }
 
                 // Thêm thông tin vị trí cho nhân viên in ấn
-                const locationID = await AccountService.addLocation(campus, building, room);
+                let locationID = await AccountService.findOrAddLocation(campus,building,room);
+                if (locationID == 0) {
+                    locationID = await AccountService.addLocation(campus, building, room);
+                }
                 await AccountService.addStaff(accountId, locationID);
 
                 if (phoneNumber) {
@@ -69,36 +73,37 @@ export class AccountController {
     static async Login(req, res) {
         try {
             const { username, password } = req.body;
-
+    
             // Kiểm tra đầu vào
             if (!username || !password) {
                 return res.status(400).json(createResponse(false, "Username and password are required"));
             }
-
+    
             // Tìm tài khoản
             const account = await AccountService.findAccountByUsername(username);
             if (!account) {
                 return res.status(401).json(createResponse(false, "Invalid username or password"));
             }
-
+    
+            // Kiểm tra mật khẩu với bcrypt.compare
             const isPasswordValid = await bcrypt.compare(password, account.accountPassword);
-            console.log(password);
-            console.log(account.accountPassword);
-            console.log(isPasswordValid);
-            console.log(typeof password);
-            console.log(typeof account.accountPassword);
-
+            console.log("Input password:", password);  // Debugging
+            console.log("Stored hashed password:", account.accountPassword);  // Debugging
+            console.log("Password comparison result:", isPasswordValid);  // Debugging
+    
+            // Kiểm tra kết quả so sánh
             if (!isPasswordValid) {
                 return res.status(401).json(createResponse(false, "Invalid username or password"));
             }
-
+            
+    
             // Lưu thông tin người dùng vào session
             req.session.user = {
                 id: account.id,
                 username: account.username,
                 roles: account.roles,
             };
-
+    
             return res.status(200).json(createResponse(true, "Login successful"));
         } catch (error) {
             console.error("Login error:", error);
