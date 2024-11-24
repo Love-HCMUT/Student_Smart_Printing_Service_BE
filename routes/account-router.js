@@ -7,8 +7,11 @@ const router = express.Router();
 // Đăng ký
 router.post("/register", AccountController.Register);
 
+
+
 // Đăng nhập
 router.post("/login", AccountController.Login);
+router.post("/login_gg", AccountController.Login_GG);
 
 // Đăng xuất
 router.post("/logout", isAuthenticated, AccountController.Logout);

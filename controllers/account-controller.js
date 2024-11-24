@@ -87,13 +87,40 @@ export class AccountController {
     
             // Kiểm tra mật khẩu với bcrypt.compare
             const isPasswordValid = await bcrypt.compare(password, account.accountPassword);
-            console.log("Input password:", password);  // Debugging
-            console.log("Stored hashed password:", account.accountPassword);  // Debugging
-            console.log("Password comparison result:", isPasswordValid);  // Debugging
     
             // Kiểm tra kết quả so sánh
             if (!isPasswordValid) {
                 return res.status(401).json(createResponse(false, "Invalid username or password"));
+            }
+            
+    
+            // Lưu thông tin người dùng vào session
+            req.session.user = {
+                id: account.id,
+                username: account.username,
+                roles: account.roles,
+            };
+    
+            return res.status(200).json(createResponse(true, "Login successful"));
+        } catch (error) {
+            console.error("Login error:", error);
+            return res.status(500).json(createResponse(false, "An error occurred during login"));
+        }
+    }
+
+    static async Login_GG(req, res) {
+        try {
+            const { username } = req.body;
+    
+            // Kiểm tra đầu vào
+            if (!username) {
+                return res.status(400).json(createResponse(false, "Username  are required"));
+            }
+    
+            // Tìm tài khoản
+            const account = await AccountService.findAccountByUsername(username);
+            if (!account) {
+                return res.status(401).json(createResponse(false, "Invalid username"));
             }
             
     
