@@ -1,0 +1,253 @@
+openapi: 3.0.0
+info:
+  title: Statistic API
+  version: 1.0.0
+  description: API Documentation for Statistic endpoints
+
+tags:
+  - name: Statistic
+    description: API liên quan đến thống kê
+
+paths:
+  /statistic/spso/get-recently-monthly-order:
+    post:
+      tags:
+        - Statistic
+      summary: Lấy các yêu cầu trong 3 tháng gần đây
+      description: Lấy danh sách đơn hàng trong vòng 3 tháng gần đây
+      responses:
+        200:
+          description: Danh sách đơn hàng hàng tháng gần đây được lấy thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  currentMonth:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        payment_date:
+                          type: string
+                          format: date-time
+                          example: "2024-11-19T17:00:00.000Z"
+                        total_orders:
+                          type: integer
+                          example: 5
+                  lastMonth:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        payment_date:
+                          type: string
+                          format: date-time
+                          example: "2024-10-19T17:00:00.000Z"
+                        total_orders:
+                          type: integer
+                          example: 3
+                  twoMonthsAgo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        payment_date:
+                          type: string
+                          format: date-time
+                          example: "2024-09-19T17:00:00.000Z"
+                        total_orders:
+                          type: integer
+                          example: 2
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý
+
+  /statistic/spso/get-current-monthly-order:
+    get:
+      tags:
+        - Statistic
+      summary: Lấy số lượng yêu cầu trong tháng hiện tại
+      description: Lấy danh sách đơn hàng trong tháng hiện tại
+      parameters:
+        - name: year
+          in: query
+          required: true
+          description: Năm muốn lấy thống kê.
+          schema:
+            type: integer
+            example: 2024
+        - name: month
+          in: query
+          required: true
+          description: Tháng muốn lấy thống kê (1-12).
+          schema:
+            type: integer
+            example: 11
+      responses:
+        200:
+          description: Danh sách đơn hàng hàng tháng hiện tại được lấy thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  currentMonth:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        payment_date:
+                          type: string
+                          format: date-time
+                          example: "2024-11-19T17:00:00.000Z"
+                        total_orders:
+                          type: integer
+                          example: 5
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý
+
+  /statistic/spso/get-total-count:
+    post:
+      tags:
+        - Statistic
+      summary: Lấy tổng số yêu cầu, giao dịch, và số yêu cầu bị hủy
+      description: Lấy tổng số yêu cầu, giao dịch, và số yêu cầu bị hủy
+      responses:
+        200:
+          description: Tổng số yêu cầu, giao dịch, và số yêu cầu bị hủy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOrder:
+                    type: integer
+                    example: 100
+                  totalTransaction:
+                    type: integer
+                    example: 150
+                  totalCanceledOrder:
+                    type: integer
+                    example: 10
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý
+
+  /statistic/spso/get-number-of-orders-by-month-year:
+    post:
+      tags:
+        - Statistic
+      summary: Lấy thông tin về tổng số yêu cầu theo tháng và năm
+      description:
+      parameters:
+        - name: year
+          in: query
+          required: true
+          description: Năm muốn lấy thống kê.
+          schema:
+            type: integer
+            example: 2024
+        - name: month
+          in: query
+          required: true
+          description: Tháng muốn lấy thống kê (1-12).
+          schema:
+            type: integer
+            example: 11
+      responses:
+        200:
+          description: Số lượng đơn hàng theo tháng và năm được lấy thành công.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  monthYear:
+                    type: string
+                    description: Tháng và năm dưới dạng chuỗi (yyyy-MM).
+                    example: "2024-11"
+                  orderCount:
+                    type: integer
+                    description: Tổng số yêu cầu trong tháng và năm chỉ định.
+                    example: 5
+        400:
+          description: Dữ liệu đầu vào không hợp lệ.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mô tả lỗi.
+                    example: "Tháng không hợp lệ. Vui lòng nhập giá trị từ 1 đến 12."
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mô tả lỗi.
+                    example: "Đã xảy ra lỗi không mong muốn trong hệ thống."
+
+  /statistic/spso/get-number-of-transaction-by-month-year:
+    post:
+      tags:
+        - Statistic
+      summary: Lấy số lượng giao dịch theo tháng và năm
+      description:
+      parameters:
+        - name: year
+          in: query
+          required: true
+          description: Năm muốn lấy thống kê.
+          schema:
+            type: integer
+            example: 2024
+        - name: month
+          in: query
+          required: true
+          description: Tháng muốn lấy thống kê (1-12).
+          schema:
+            type: integer
+            example: 11
+      responses:
+        200:
+          description: Số lượng giao dịch theo tháng và năm được lấy thành công.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  monthYear:
+                    type: string
+                    description: Tháng và năm dưới dạng chuỗi (yyyy-MM).
+                    example: "2024-11"
+                  transactionCount:
+                    type: integer
+                    description: Tổng số giao dịch trong tháng và năm chỉ định.
+                    example: 10
+        400:
+          description: Dữ liệu đầu vào không hợp lệ.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mô tả lỗi.
+                    example: "Tháng không hợp lệ. Vui lòng nhập giá trị từ 1 đến 12."
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mô tả lỗi.
+                    example: "Đã xảy ra lỗi không mong muốn trong hệ thống."

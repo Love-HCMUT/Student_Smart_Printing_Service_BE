@@ -1,0 +1,157 @@
+tags:
+  - name: Payment
+    description: API liên quan đến thanh toán
+
+paths:
+  /payment/get-balance/{customerId}:
+    get:
+      tags:
+        - Payment
+      summary: Lấy số lượng coin của người dùng
+      description: Lấy số lượng coin của một người dùng cụ thể theo customerId
+      parameters:
+        - name: customerId
+          in: path
+          description: ID của khách hàng
+          required: true
+          schema:
+            type: string
+            example: "123"
+      responses:
+        200:
+          description: Số lượng coin của khách hàng được lấy thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+                    example: 1000
+        400:
+          description: Lỗi đầu vào không hợp lệ
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý
+
+  /payment/get-recent-transition/{customerId}:
+    get:
+      tags:
+        - Payment
+      summary: Lấy 3 phiên giao dịch gần nhất của người dùng
+      description: Lấy giao dịch gần đây của một khách hàng cụ thể
+      parameters:
+        - name: customerId
+          in: path
+          description: ID của người dùng
+          required: true
+          schema:
+            type: string
+            example: "123"
+      responses:
+        200:
+          description: Danh sách 3 giao dịch gần nhất của khách hàng được lấy thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  money:
+                    type: number
+                    example: 1000
+                  time:
+                    type: string
+                    format: date-time
+                    example: "2024-11-23T03:26:18.000Z"
+                  paymentStatus:
+                    type: string
+                    example: "AddCoin"
+        400:
+          description: Lỗi đầu vào không hợp lệ
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý
+
+  /payment/get-payment-history/{customerId}:
+    get:
+      tags:
+        - Payment
+      summary: Lấy lịch sử thanh toán của người dùng
+      description: Lấy lịch sử thanh toán của một người dùng cụ thể theo customerId
+      parameters:
+        - name: customerId
+          in: path
+          description: ID của người dùng
+          required: true
+          schema:
+            type: string
+            example: "123"
+      responses:
+        200:
+          description: Lịch sử thanh toán của khách hàng được lấy thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date_of_transaction:
+                      type: string
+                      format: date-time
+                      example: "2024-11-20T01:30:00.000Z"
+                    number_of_coins:
+                      type: number
+                      example: 10
+                    method:
+                      type: string
+                      example: "Credit Card"
+                    combo_list:
+                      type: string
+                      example: "1,1,1,1,1"
+                    charge:
+                      type: number
+                      example: 500000
+                    note:
+                      type: string
+                      example: "Deposit for order"
+        400:
+          description: Lỗi đầu vào không hợp lệ
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý
+
+  /payment/spso/get-transaction/all:
+    post:
+      tags:
+        - Payment
+      summary: Lấy tất cả giao dịch
+      description: Lấy danh sách tất cả các giao dịch
+      responses:
+        200:
+          description: Danh sách giao dịch được lấy thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ID:
+                      type: integer
+                      example: 1
+                    dateOfTransaction:
+                      type: string
+                      format: date-time
+                      example: "2024-11-20T01:30:00.000Z"
+                    coins:
+                      type: string
+                      example: "20"
+                    charge:
+                      type: string
+                      example: "200"
+                    paymentMethod:
+                      type: string
+                      example: "Credit Card"
+                    note:
+                      type: string
+                      example: "Deposit for order"
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý

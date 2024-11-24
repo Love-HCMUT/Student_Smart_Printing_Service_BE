@@ -4,7 +4,7 @@ export class historyRepository {
     static getOrderHistoryFromDB = async (customerId) => {
         const query = 'CALL GetCustomerOrders(?)';
         const [rows] = await dbs.promise().query(query, [customerId]);
-        return rows;
+        return rows[0];
     };
 
     static cancelOrderFromDB = async (orderId, note) => {
@@ -19,7 +19,10 @@ export class historyRepository {
                     WHERE c.customerID = m.customerID
                         AND c.orderID = m.orderID);`;
         const [rows] = await dbs.promise().query(query, [note, orderId]);
-        return `Order ${orderId} has been canceled`;
+        return {
+            status: rows.affectedRows === 1 ? 'success' : 'failed',
+            message: rows.affectedRows === 1 ? 'Order has been canceled' : 'Order has been canceled before'
+        }
     };
 
     static getOrderAllFromDB = async (customerId) => {
