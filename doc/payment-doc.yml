@@ -118,3 +118,39 @@ paths:
                     type: string
                     example: "Missing required money parameter."
                     description: Message indicating missing or invalid parameters.
+
+/payment/combo:
+  get:
+    tags:
+      - PAYMENT
+    summary: Load combo from database
+    description: Retrieve a list of available combos and their quantities from the database.
+    responses:
+      200:
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                combo:
+                  type: array
+                  items:
+                    type: integer
+                  description: List of combos and their quantities.
+                  example: [5, 7, 8, 9]
+      400:
+        description: Failed to load combo data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  description: Indicates if the operation failed.
+                  example: false
+                message:
+                  type: string
+                  description: Message indicating the reason for failure.
+                  example: "Fail to load combo data"
