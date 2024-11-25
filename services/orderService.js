@@ -4,8 +4,12 @@ const addOrder = async (printerID = 1) => {
   return await orderModel.addOrder(printerID);
 };
 
-const getOrder = async (printerID = 1) => {
-  return await orderModel.getOrder(printerID);
+const getOrderByPrinterID = async (printerID = 1) => {
+  return await orderModel.getOrderByPrinterID(printerID);
 };
 
-export { addOrder, getOrder };
+const updateOrderStatus = async (id = 2, orderStatus = "completed") => {
+  return await orderModel.updateOrderStatus(id, orderStatus);
+};
+
+export { addOrder, getOrderByPrinterID, updateOrderStatus };

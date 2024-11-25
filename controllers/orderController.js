@@ -6,12 +6,17 @@ const uploadFileToMinio = (req, res) => {
 };
 
 const addOrder = async (req, res) => {
-  const { printerID } = req.body;
-  res.json(await orderService.addOrder(printerID));
+  res.json(await orderService.addOrder(req.params.printerID));
 };
 
-const getOrder = async (req, res) => {
-  res.json(await orderService.getOrder(req.params.printerID));
+const getOrderByPrinterID = async (req, res) => {
+  res.json(await orderService.getOrderByPrinterID(req.params.printerID));
 };
 
-export { uploadFileToMinio, addOrder, getOrder };
+const updateOrderStatus = async (req, res) => {
+  res.json(
+    await orderService.updateOrderStatus(req.params.id, req.params.status)
+  );
+};
+
+export { uploadFileToMinio, addOrder, getOrderByPrinterID, updateOrderStatus };
