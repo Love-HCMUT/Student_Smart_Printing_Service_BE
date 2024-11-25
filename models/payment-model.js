@@ -54,7 +54,7 @@ async function createDepositLog(time, money, note, customerID, combo) {
 
     if (Array.isArray(combo)) {
         combo.forEach(async e => {
-            await insertDepositCombo(paymentLogId, e.combo_id, e.quantity)
+            await insertDepositCombo(paymentLogId, e.id, e.quantity)
         })
     }
     else {

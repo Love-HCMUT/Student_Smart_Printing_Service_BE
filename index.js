@@ -1,5 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import swaggerJsDoc from 'swagger-jsdoc'
 import centralizeRouter from './routes/index.js'
@@ -8,8 +9,14 @@ import swaggerOptions from './config/swagger-config.js'
 import { createResponse } from './config/api-response.js'
 import test from './models/payment-model.js'
 
-
 const app = express()
+
+app.use(cors({
+    origin: '*', // Cho phép tất cả domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Các method HTTP được phép
+    allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép
+}));
+
 dotenv.config()
 
 connectMysql()

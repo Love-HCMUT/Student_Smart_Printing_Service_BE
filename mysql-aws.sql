@@ -13,7 +13,7 @@ CREATE TABLE printer (
 	id INT PRIMARY KEY AUTO_INCREMENT,
     printerStatus VARCHAR(10), -- enum
     printerDescription VARCHAR(255),
-    resolution VARCHAR(10),
+    resolution VARCHAR(30),
     colorPrinting BOOL,
     side ENUM('1', '2'),
     price INT,

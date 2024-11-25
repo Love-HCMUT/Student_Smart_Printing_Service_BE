@@ -11,6 +11,9 @@ import { clearInterval } from 'timers'
 
 // get 
 const createPaymentLink = async (req, res) => {
+
+    console.log(JSON.stringify(req.body))
+
     //https://developers.momo.vn/#/docs/en/aiov2/?id=payment-method
     //parameters
     var accessKey = config.MOMO_ACCESS_KEY;
@@ -85,6 +88,7 @@ const createPaymentLink = async (req, res) => {
 
     }
     catch (err) {
+        console.log(err)
         return res.status(500).json({ mess: `loi xay ra ${err}` })
     }
 }
@@ -142,14 +146,19 @@ const checkStatusPayment = async (req, res) => {
 
     let statusCode = 1000
     let result
+    let count = 0
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    while ([1000, 9000, 7002, 7000].includes(statusCode)) {
+    while ([1000, 9000, 7002, 7000].includes(statusCode) && count < 50) {
         try {
             result = await axios(options)
             statusCode = result.data.resultCode
+            count++
+            console.log(count)
+            await delay(2000)
         }
         catch (error) {
-            console.log("Error when checking status payment")
+            console.log("Error when checking status payment ", error)
             res.status(400).json(createResponse(false, "Error when checking status payment"))
         }
     }
