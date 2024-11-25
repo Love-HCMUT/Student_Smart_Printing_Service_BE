@@ -149,7 +149,7 @@ const checkStatusPayment = async (req, res) => {
     let count = 0
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    while ([1000, 9000, 7002, 7000].includes(statusCode) && count < 50) {
+    while ([1000, 9000, 7002, 7000].includes(statusCode) && count < 100) {
         try {
             result = await axios(options)
             statusCode = result.data.resultCode
