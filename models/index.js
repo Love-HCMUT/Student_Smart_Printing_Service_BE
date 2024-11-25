@@ -1,2 +1,2 @@
-export * from "./order.js";
-export * from "./minio.js";
+export * as orderModel from "./order.js";
+export * as minioModel from "./minio.js";

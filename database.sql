@@ -28,7 +28,7 @@ CREATE TABLE printer (
 CREATE TABLE account (
 	id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) UNIQUE NOT NULL,
-    accountPassword VARCHAR(50) NOT NULL,
+    accountPassword VARCHAR(100) NOT NULL,
     fullName VARCHAR(100)
 );
 

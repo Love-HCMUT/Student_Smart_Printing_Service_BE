@@ -1,10 +1,10 @@
 // MAIN ROUTER
 
 import { Router } from "express";
-import orderRouter from './order-route.js'
+import orderRouter from "./orderRoute.js";
 
-const router = Router()
+const router = Router();
 
-router.use('/order', orderRouter)
+router.use("/order", orderRouter);
 
-export default router
+export default router;
