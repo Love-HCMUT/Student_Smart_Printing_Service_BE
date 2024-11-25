@@ -12,7 +12,8 @@ router.post(
   orderController.uploadFileToMinio
 );
 router.post("/:printerID", orderController.addOrder);
-router.put("/:id/:status", orderController.updateOrderStatus);
+router.put("/status", orderController.updateOrderStatus);
+router.put("/completed", orderController.updateOrderCompleteTime);
 router.get("/:printerID", orderController.getOrderByPrinterID);
 
 export default router;

@@ -12,4 +12,13 @@ const updateOrderStatus = async (id = 2, orderStatus = "completed") => {
   return await orderModel.updateOrderStatus(id, orderStatus);
 };
 
-export { addOrder, getOrderByPrinterID, updateOrderStatus };
+const updateOrderCompleteTime = async (id = 2) => {
+  return await orderModel.updateOrderCompleteTime(id);
+};
+
+export {
+  addOrder,
+  getOrderByPrinterID,
+  updateOrderStatus,
+  updateOrderCompleteTime,
+};

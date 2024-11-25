@@ -12,7 +12,8 @@ const addOrder = async (printerID) => {
       );
     return res;
   } catch (err) {
-    console.error("Error in addOrder:", err);
+    console.log("Error in addOrder:", err);
+    return [];
   }
 };
 
@@ -26,7 +27,25 @@ const updateOrderStatus = async (id, orderStatus) => {
       ]);
     return res;
   } catch (err) {
-    console.error("Error in addOrder:", err);
+    console.log("Error in updateOrderStatus:", err);
+    return [];
+  }
+};
+
+const updateOrderCompleteTime = async (id) => {
+  try {
+    const orderStatus = "Completed";
+    const completeTime = new Date();
+    const res = await dbs
+      .promise()
+      .query(
+        `UPDATE userOrders SET orderStatus = ?, completeTime = ? WHERE id = ?`,
+        [orderStatus, completeTime, id]
+      );
+    return res;
+  } catch (err) {
+    console.log("Error in updateOrderCompleteTime:", err);
+    return [];
   }
 };
 
@@ -42,7 +61,8 @@ const addPackage = async (packageInfo) => {
       );
     return res;
   } catch (err) {
-    console.error("Error in addOrder:", err);
+    console.log("Error in addPackage:", err);
+    return [];
   }
 };
 
@@ -56,9 +76,14 @@ const getOrderByPrinterID = async (printerID) => {
       );
     return orders[0];
   } catch (err) {
-    console.error("Error in getOrder:", err);
+    console.log("Error in getOrderByPrinterID:", err);
     return [];
   }
 };
 
-export { addOrder, getOrderByPrinterID, updateOrderStatus };
+export {
+  addOrder,
+  getOrderByPrinterID,
+  updateOrderStatus,
+  updateOrderCompleteTime,
+};
