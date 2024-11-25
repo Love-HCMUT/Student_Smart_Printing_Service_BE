@@ -16,9 +16,14 @@ const updateOrderCompleteTime = async (id = 2) => {
   return await orderModel.updateOrderCompleteTime(id);
 };
 
+const updateOrderStaffID = async (id = 2, staffID = 1) => {
+  return await orderModel.updateOrderStaffID(id, staffID);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
   updateOrderStatus,
   updateOrderCompleteTime,
+  updateOrderStaffID,
 };

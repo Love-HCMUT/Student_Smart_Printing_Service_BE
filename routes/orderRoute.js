@@ -14,6 +14,7 @@ router.post(
 router.post("/:printerID", orderController.addOrder);
 router.put("/status", orderController.updateOrderStatus);
 router.put("/completed", orderController.updateOrderCompleteTime);
+router.put("/staff", orderController.updateOrderStaffID);
 router.get("/:printerID", orderController.getOrderByPrinterID);
 
 export default router;

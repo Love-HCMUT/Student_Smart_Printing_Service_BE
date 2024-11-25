@@ -21,10 +21,17 @@ const updateOrderCompleteTime = async (req, res) => {
   res.json(await orderService.updateOrderCompleteTime(req.body.id));
 };
 
+const updateOrderStaffID = async (req, res) => {
+  res.json(
+    await orderService.updateOrderStaffID(req.body.id, req.body.staffID)
+  );
+};
+
 export {
   uploadFileToMinio,
   addOrder,
   getOrderByPrinterID,
   updateOrderStatus,
   updateOrderCompleteTime,
+  updateOrderStaffID,
 };

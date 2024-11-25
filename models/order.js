@@ -49,6 +49,18 @@ const updateOrderCompleteTime = async (id) => {
   }
 };
 
+const updateOrderStaffID = async (id, staffID) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(`UPDATE userOrders SET staffID = ? WHERE id = ?`, [staffID, id]);
+    return res;
+  } catch (err) {
+    console.log("Error in updateOrderStaffID:", err);
+    return [];
+  }
+};
+
 const addPackage = async (packageInfo) => {
   try {
     const orderStatus = "Pending";
@@ -86,4 +98,5 @@ export {
   getOrderByPrinterID,
   updateOrderStatus,
   updateOrderCompleteTime,
+  updateOrderStaffID,
 };
