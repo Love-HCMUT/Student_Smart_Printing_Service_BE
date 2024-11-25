@@ -16,6 +16,7 @@ paths:
           description: Tên của file cần đọc dữ liệu
           schema:
             type: string
+          example: filetype or paper_per_month
       responses:
         200:
           description: File loaded successfully
