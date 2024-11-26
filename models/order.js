@@ -17,6 +17,21 @@ const addOrder = async (printerID) => {
   }
 };
 
+const getOrderByPrinterID = async (printerID) => {
+  try {
+    const orders = await dbs
+      .promise()
+      .query(
+        `SELECT * FROM userOrders WHERE printerID = ? AND lower(orderStatus) != 'completed'`,
+        [printerID]
+      );
+    return orders[0];
+  } catch (err) {
+    console.log("Error in getOrderByPrinterID:", err);
+    return [];
+  }
+};
+
 const updateOrderStatus = async (id, orderStatus) => {
   try {
     const res = await dbs
@@ -137,21 +152,6 @@ const getPackagePrintingPagesByPackageID = async (packageID) => {
     return res[0];
   } catch (err) {
     console.log("Error in getPackagePrintingPagesByPackageID:", err);
-    return [];
-  }
-};
-
-const getOrderByPrinterID = async (printerID) => {
-  try {
-    const orders = await dbs
-      .promise()
-      .query(
-        `SELECT * FROM userOrders WHERE printerID = ? AND lower(orderStatus) != 'completed'`,
-        [printerID]
-      );
-    return orders[0];
-  } catch (err) {
-    console.log("Error in getOrderByPrinterID:", err);
     return [];
   }
 };
