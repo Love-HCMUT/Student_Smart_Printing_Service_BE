@@ -63,13 +63,44 @@ const updateOrderStaffID = async (id, staffID) => {
 
 const addPackage = async (packageInfo) => {
   try {
-    const orderStatus = "Pending";
-    const orderDate = new Date();
+    // numOfCopies INT,
+    // side ENUM('1', '2'),
+    // colorAllPages BOOL,
+    // pagePerSheet INT,
+    // paperSize VARCHAR(10),
+    // scale DOUBLE,
+    // cover BOOL,
+    // glass BOOL,
+    // binding BOOL,
+    // orderID INT,
+    const {
+      numOfCopies,
+      side,
+      colorAllPages,
+      pagePerSheet,
+      paperSize,
+      scale,
+      cover,
+      glass,
+      binding,
+      orderID,
+    } = packageInfo;
     const res = await dbs
       .promise()
       .query(
-        `INSERT INTO userOrders (orderStatus, orderDate, printerID) VALUES (?, ?, ?)`,
-        [orderStatus, orderDate, printerID]
+        `INSERT INTO package (numOfCopies, side, colorAllPages, pagePerSheet, paperSize, scale, cover, glass, binding, orderID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          numOfCopies,
+          side,
+          colorAllPages,
+          pagePerSheet,
+          paperSize,
+          scale,
+          cover,
+          glass,
+          binding,
+          orderID,
+        ]
       );
     return res;
   } catch (err) {
@@ -99,4 +130,5 @@ export {
   updateOrderStatus,
   updateOrderCompleteTime,
   updateOrderStaffID,
+  addPackage,
 };

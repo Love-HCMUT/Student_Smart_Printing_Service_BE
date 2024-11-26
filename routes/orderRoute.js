@@ -11,7 +11,8 @@ router.post(
   upload.single("file"),
   orderController.uploadFileToMinio
 );
-router.post("/:printerID", orderController.addOrder);
+router.post("/addOrder/:printerID", orderController.addOrder);
+router.post("/addPackage", orderController.addPackage);
 router.put("/status", orderController.updateOrderStatus);
 router.put("/completed", orderController.updateOrderCompleteTime);
 router.put("/staff", orderController.updateOrderStaffID);

@@ -27,6 +27,10 @@ const updateOrderStaffID = async (req, res) => {
   );
 };
 
+const addPackage = async (req, res) => {
+  res.json(await orderService.addPackage(req.body));
+};
+
 export {
   uploadFileToMinio,
   addOrder,
@@ -34,4 +38,5 @@ export {
   updateOrderStatus,
   updateOrderCompleteTime,
   updateOrderStaffID,
+  addPackage,
 };
