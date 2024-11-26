@@ -115,6 +115,20 @@ const addPackagePrintingPages = async (printingPages) => {
   }
 };
 
+const getPackagePrintingPagesByPackageID = async (packageID) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(`SELECT * FROM packageprintingpages WHERE packageID = ?`, [
+        packageID,
+      ]);
+    return res[0];
+  } catch (err) {
+    console.log("Error in getPackagePrintingPagesByPackageID:", err);
+    return [];
+  }
+};
+
 const getOrderByPrinterID = async (printerID) => {
   try {
     const orders = await dbs
@@ -138,4 +152,5 @@ export {
   updateOrderStaffID,
   addPackage,
   addPackagePrintingPages,
+  getPackagePrintingPagesByPackageID,
 };

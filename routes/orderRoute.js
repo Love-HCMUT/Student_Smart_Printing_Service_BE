@@ -20,6 +20,10 @@ router.post("/addPackage", orderController.addPackage);
 router.put("/status", orderController.updateOrderStatus);
 router.put("/completed", orderController.updateOrderCompleteTime);
 router.put("/staff", orderController.updateOrderStaffID);
+router.get(
+  "/packagePrintingPages",
+  orderController.getPackagePrintingPagesByPackageID
+);
 router.get("/:printerID", orderController.getOrderByPrinterID);
 
 export default router;

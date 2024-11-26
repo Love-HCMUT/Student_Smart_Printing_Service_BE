@@ -43,6 +43,10 @@ const addPackagePrintingPages = async (
   return await orderModel.addPackagePrintingPages(printingPages);
 };
 
+const getPackagePrintingPagesByPackageID = async (packageID = 1) => {
+  return await orderModel.getPackagePrintingPagesByPackageID(packageID);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -51,4 +55,5 @@ export {
   updateOrderStaffID,
   addPackage,
   addPackagePrintingPages,
+  getPackagePrintingPagesByPackageID,
 };
