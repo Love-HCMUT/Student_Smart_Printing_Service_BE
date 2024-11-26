@@ -16,10 +16,11 @@ router.post(
   orderController.addPackagePrintingPages
 );
 router.post("/addOrder/:printerID", orderController.addOrder);
-router.post("/addPackage", orderController.addPackage);
+router.post("/package", orderController.addPackage);
 router.put("/status", orderController.updateOrderStatus);
 router.put("/completed", orderController.updateOrderCompleteTime);
 router.put("/staff", orderController.updateOrderStaffID);
+router.get("/package", orderController.getPackageByOrderID);
 router.get(
   "/packagePrintingPages",
   orderController.getPackagePrintingPagesByPackageID

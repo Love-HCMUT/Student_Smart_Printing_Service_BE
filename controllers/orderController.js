@@ -35,6 +35,10 @@ const addPackagePrintingPages = async (req, res) => {
   res.json(await orderService.addPackagePrintingPages(req.body));
 };
 
+const getPackageByOrderID = async (req, res) => {
+  res.json(await orderService.getPackageByOrderID(req.body.orderID));
+};
+
 const getPackagePrintingPagesByPackageID = async (req, res) => {
   res.json(
     await orderService.getPackagePrintingPagesByPackageID(req.body.packageID)
@@ -51,4 +55,5 @@ export {
   addPackage,
   addPackagePrintingPages,
   getPackagePrintingPagesByPackageID,
+  getPackageByOrderID,
 };
