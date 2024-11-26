@@ -99,6 +99,22 @@ const addPackage = async (packageInfo) => {
   }
 };
 
+const addPackagePrintingPages = async (printingPages) => {
+  try {
+    const { packageID, color, fromPage, toPage } = printingPages;
+    const res = await dbs
+      .promise()
+      .query(
+        `INSERT INTO packageprintingpages (packageID, color, fromPage, toPage) VALUES (?, ?, ?, ?)`,
+        [packageID, color, fromPage, toPage]
+      );
+    return res;
+  } catch (err) {
+    console.log("Error in addPackagePrintingPages:", err);
+    return [];
+  }
+};
+
 const getOrderByPrinterID = async (printerID) => {
   try {
     const orders = await dbs
@@ -121,4 +137,5 @@ export {
   updateOrderCompleteTime,
   updateOrderStaffID,
   addPackage,
+  addPackagePrintingPages,
 };

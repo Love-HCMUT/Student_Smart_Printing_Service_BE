@@ -34,8 +34,13 @@ const addPackage = async (
     orderID: 2,
   }
 ) => {
-  console.log("orderService:", packageInfo);
   return await orderModel.addPackage(packageInfo);
+};
+
+const addPackagePrintingPages = async (
+  printingPages = { packageID: 1, color: false, fromPage: 1, toPage: 100 }
+) => {
+  return await orderModel.addPackagePrintingPages(printingPages);
 };
 
 export {
@@ -45,4 +50,5 @@ export {
   updateOrderCompleteTime,
   updateOrderStaffID,
   addPackage,
+  addPackagePrintingPages,
 };
