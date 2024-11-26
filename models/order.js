@@ -63,16 +63,6 @@ const updateOrderStaffID = async (id, staffID) => {
 
 const addPackage = async (packageInfo) => {
   try {
-    // numOfCopies INT,
-    // side ENUM('1', '2'),
-    // colorAllPages BOOL,
-    // pagePerSheet INT,
-    // paperSize VARCHAR(10),
-    // scale DOUBLE,
-    // cover BOOL,
-    // glass BOOL,
-    // binding BOOL,
-    // orderID INT,
     const {
       numOfCopies,
       side,
