@@ -156,6 +156,22 @@ const getPackagePrintingPagesByPackageID = async (packageID) => {
   }
 };
 
+const addFileMetadata = async (fileMetadata) => {
+  try {
+    const { fileName, size, numPages, url, packageID } = fileMetadata;
+    const res = await dbs
+      .promise()
+      .query(
+        `INSERT INTO filemetadata (fileName, size, numPages, url, packageID) VALUES (?, ?, ?, ?, ?)`,
+        [fileName, size, numPages, url, packageID]
+      );
+    return res;
+  } catch (err) {
+    console.log("Error in addFileMetadata:", err);
+    return [];
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -166,4 +182,5 @@ export {
   addPackagePrintingPages,
   getPackagePrintingPagesByPackageID,
   getPackageByOrderID,
+  addFileMetadata,
 };

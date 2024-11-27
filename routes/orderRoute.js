@@ -15,6 +15,7 @@ router.post(
   "/addPackagePrintingPages",
   orderController.addPackagePrintingPages
 );
+router.post("/file", orderController.addFileMetadata);
 router.post("/addOrder/:printerID", orderController.addOrder);
 router.post("/package", orderController.addPackage);
 router.put("/status", orderController.updateOrderStatus);

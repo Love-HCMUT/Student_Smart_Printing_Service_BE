@@ -51,6 +51,18 @@ const getPackagePrintingPagesByPackageID = async (packageID = 1) => {
   return await orderModel.getPackagePrintingPagesByPackageID(packageID);
 };
 
+const addFileMetadata = async (
+  fileMetadata = {
+    fileName: "test",
+    size: "10 KB",
+    numPages: "100",
+    url: "testURL",
+    packageID: 5,
+  }
+) => {
+  return await orderModel.addFileMetadata(fileMetadata);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -61,4 +73,5 @@ export {
   addPackagePrintingPages,
   getPackagePrintingPagesByPackageID,
   getPackageByOrderID,
+  addFileMetadata,
 };

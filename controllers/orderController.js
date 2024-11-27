@@ -45,6 +45,10 @@ const getPackagePrintingPagesByPackageID = async (req, res) => {
   );
 };
 
+const addFileMetadata = async (req, res) => {
+  res.json(await orderService.addFileMetadata(req.body));
+};
+
 export {
   uploadFileToMinio,
   addOrder,
@@ -56,4 +60,5 @@ export {
   addPackagePrintingPages,
   getPackagePrintingPagesByPackageID,
   getPackageByOrderID,
+  addFileMetadata,
 };
