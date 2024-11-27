@@ -69,6 +69,10 @@ const addMakeOrders = async (req, res) => {
   res.json(await orderService.addMakeOrders(req.body));
 };
 
+const addCancelOrders = async (req, res) => {
+  res.json(await orderService.addCancelOrders(req.body));
+};
+
 export {
   uploadFileToMinio,
   addOrder,
@@ -86,4 +90,5 @@ export {
   addWithdrawLog,
   addReturnLog,
   addMakeOrders,
+  addCancelOrders,
 };

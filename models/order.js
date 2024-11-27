@@ -235,7 +235,23 @@ const addMakeOrders = async (makeOrders) => {
       );
     return res[0];
   } catch (err) {
-    console.log("Error in addReturnLog:", err);
+    console.log("Error in addMakeOrders:", err);
+    return [];
+  }
+};
+
+const addCancelOrders = async (cancelOrders) => {
+  const { customerID, orderID, logID, note } = cancelOrders;
+  try {
+    const res = await dbs
+      .promise()
+      .query(
+        `INSERT INTO cancelorders (customerID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
+        [customerID, orderID, logID, note]
+      );
+    return res[0];
+  } catch (err) {
+    console.log("Error in addCancelOrders:", err);
     return [];
   }
 };
@@ -256,4 +272,5 @@ export {
   addWithdrawLog,
   addReturnLog,
   addMakeOrders,
+  addCancelOrders,
 };
