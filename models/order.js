@@ -224,6 +224,22 @@ const addReturnLog = async (id) => {
   }
 };
 
+const addMakeOrders = async (makeOrders) => {
+  const { customerID, orderID, logID, note } = makeOrders;
+  try {
+    const res = await dbs
+      .promise()
+      .query(
+        `INSERT INTO makeorders (customerID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
+        [customerID, orderID, logID, note]
+      );
+    return res[0];
+  } catch (err) {
+    console.log("Error in addReturnLog:", err);
+    return [];
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -239,4 +255,5 @@ export {
   addPaymentLog,
   addWithdrawLog,
   addReturnLog,
+  addMakeOrders,
 };

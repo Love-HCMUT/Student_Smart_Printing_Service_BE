@@ -79,6 +79,12 @@ const addReturnLog = async (id = 3) => {
   return await orderModel.addReturnLog(id);
 };
 
+const addMakeOrders = async (
+  makeOrders = { customerID: 5, orderID: 5, logID: 5 }
+) => {
+  return await orderModel.addMakeOrders(makeOrders);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -94,4 +100,5 @@ export {
   addPaymentLog,
   addWithdrawLog,
   addReturnLog,
+  addMakeOrders,
 };

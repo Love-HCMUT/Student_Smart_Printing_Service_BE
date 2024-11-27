@@ -16,6 +16,7 @@ router.post(
   orderController.addPackagePrintingPages
 );
 router.post("/file", orderController.addFileMetadata);
+router.post("/makeOrders", orderController.addMakeOrders);
 router.post("/returnLog", orderController.addReturnLog);
 router.post("/withdrawLog", orderController.addWithdrawLog);
 router.post("/paymentLog", orderController.addPaymentLog);
