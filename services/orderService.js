@@ -91,6 +91,12 @@ const addCancelOrders = async (
   return await orderModel.addCancelOrders(cancelOrders);
 };
 
+const addDeclineOrders = async (
+  declineOrders = { staffID: 5, orderID: 5, logID: 5 }
+) => {
+  return await orderModel.addDeclineOrders(declineOrders);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -108,4 +114,5 @@ export {
   addReturnLog,
   addMakeOrders,
   addCancelOrders,
+  addDeclineOrders,
 };

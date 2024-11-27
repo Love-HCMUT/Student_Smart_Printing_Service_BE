@@ -256,6 +256,22 @@ const addCancelOrders = async (cancelOrders) => {
   }
 };
 
+const addDeclineOrders = async (declineOrders) => {
+  const { staffID, orderID, logID, note } = declineOrders;
+  try {
+    const res = await dbs
+      .promise()
+      .query(
+        `INSERT INTO declineorders (staffID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
+        [staffID, orderID, logID, note]
+      );
+    return res[0];
+  } catch (err) {
+    console.log("Error in addCanaddDeclineOrderscelOrders:", err);
+    return [];
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -273,4 +289,5 @@ export {
   addReturnLog,
   addMakeOrders,
   addCancelOrders,
+  addDeclineOrders,
 };

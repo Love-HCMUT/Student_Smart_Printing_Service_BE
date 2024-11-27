@@ -18,6 +18,7 @@ router.post(
 router.post("/file", orderController.addFileMetadata);
 router.post("/makeOrders", orderController.addMakeOrders);
 router.post("/cancelOrders", orderController.addCancelOrders);
+router.post("/declineOrders", orderController.addDeclineOrders);
 router.post("/returnLog", orderController.addReturnLog);
 router.post("/withdrawLog", orderController.addWithdrawLog);
 router.post("/paymentLog", orderController.addPaymentLog);
