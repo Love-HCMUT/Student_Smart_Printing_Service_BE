@@ -75,6 +75,10 @@ const addWithdrawLog = async (id = 2) => {
   return await orderModel.addWithdrawLog(id);
 };
 
+const addReturnLog = async (id = 3) => {
+  return await orderModel.addReturnLog(id);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -89,4 +93,5 @@ export {
   getFileMetadataByPackageID,
   addPaymentLog,
   addWithdrawLog,
+  addReturnLog,
 };

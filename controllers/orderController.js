@@ -61,6 +61,10 @@ const addWithdrawLog = async (req, res) => {
   res.json(await orderService.addWithdrawLog(req.body.id));
 };
 
+const addReturnLog = async (req, res) => {
+  res.json(await orderService.addReturnLog(req.body.id));
+};
+
 export {
   uploadFileToMinio,
   addOrder,
@@ -76,4 +80,5 @@ export {
   getFileMetadataByPackageID,
   addPaymentLog,
   addWithdrawLog,
+  addReturnLog,
 };
