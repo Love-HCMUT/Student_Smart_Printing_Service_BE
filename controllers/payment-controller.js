@@ -3,7 +3,6 @@ import { paymentService } from '../services/payment-service.js';
 export const getBalance = async (req, res) => {
     const { customerId } = req.params;
     try {
-        console.log('customerId', customerId);
         const balance = await paymentService.getBalanceService(customerId);
         res.status(200).send(balance);
     } catch (error) {

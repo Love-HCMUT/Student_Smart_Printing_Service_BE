@@ -18,7 +18,7 @@ export class statisticRepository {
             ORDER BY payment_date;
         `;
         const [rows] = await dbs.promise().query(query, [month, year]);
-        return rows;
+        return rows
     };
 
     static getTotalOrderFromDB = async () => {

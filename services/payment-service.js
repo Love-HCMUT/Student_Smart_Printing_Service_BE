@@ -15,7 +15,7 @@ export class paymentService {
     static getRecentTransitionService = async (customerId) => {
         try {
             const recentTransition = await paymentRepository.getRecentTransitionFromDB(customerId);
-            return recentTransition ? recentTransition : `No recent transition found for customer ${customerId}`;
+            return recentTransition ? recentTransition : [];
         } catch (error) {
             throw new Error('Error fetching recent transition');
         }
@@ -24,7 +24,7 @@ export class paymentService {
     static getPaymentHistoryService = async (customerId) => {
         try {
             const paymentHistory = await paymentRepository.getPaymentHistoryFromDB(customerId);
-            return paymentHistory.length ? paymentHistory : `No payment history found for customer ${customerId}`;
+            return paymentHistory.length ? paymentHistory : [];
         } catch (error) {
             throw new Error('Error fetching payment history');
         }

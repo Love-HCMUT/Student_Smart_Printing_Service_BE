@@ -3,7 +3,13 @@ import { statisticService } from '../services/statistic-service.js';
 
 export const getRecentlyMonthlyOrder = async (req, res) => {
     try {
-        res.status(200).send(await statisticService.getRecentlyMonthlyOrderService());
+        const listCurrentMonth = await statisticService.getRecentlyMonthlyOrderService();
+        const monthYear = await statisticService.getNumberOfOrdersByMonthYearService();
+        res.status(200).send({
+            listCurrentMonth: listCurrentMonth,
+            monthYear: monthYear
+        });
+
     } catch (error) {
         res.status(500).send({ error: 'Internal Server Error' });
     }

@@ -15,11 +15,7 @@ export class statisticService {
             const lastMonthData = await statisticRepository.getRecentlyMonthlyOrderFromDB(lastMonth, lastMonthYear);
             const twoMonthsAgoData = await statisticRepository.getRecentlyMonthlyOrderFromDB(twoMonthsAgo, twoMonthsAgoYear);
 
-            return {
-                currentMonth: currentMonthData,
-                lastMonth: lastMonthData,
-                twoMonthsAgo: twoMonthsAgoData
-            };
+            return [currentMonthData, lastMonthData, twoMonthsAgoData];
 
         } catch (error) {
             throw new Error('Internal Server Error');

@@ -16,27 +16,23 @@ export class paymentRepository {
     static getPaymentHistoryFromDB = async (customerId) => {
         const query = `
             SELECT 
-                p.paymentTime AS date_of_transaction,
-                c.numCoins AS number_of_coins,
-                d.method AS method,
-                GROUP_CONCAT(dc.comboID) AS combo_list,
-                p.money AS charge,
-                d.note AS note
-            FROM 
-                depositLog AS d
-            JOIN 
-                paymentLog AS p
-            ON d.id = p.id
-            JOIN 
-                depositCombo AS dc
-                ON d.id = dc.comboID
-            JOIN
-                combo AS c
-                ON c.id = dc.comboID
-            WHERE 
-                d.customerID = 1
-            GROUP BY 
-                p.paymentTime, c.numCoins, d.method, p.money;
+    p.paymentTime AS date_of_transaction,
+    c.numCoins AS number_of_coins,
+    d.method AS method,
+    GROUP_CONCAT(dc.comboID) AS combo_list,
+    p.money AS charge,
+    d.note AS note
+FROM
+    depositLog AS d
+        JOIN
+    paymentLog AS p ON d.id = p.id
+        JOIN
+    depositCombo AS dc ON d.id = dc.comboID
+        JOIN
+    combo AS c ON c.id = dc.comboID
+WHERE
+    d.customerID = 1
+GROUP BY p.paymentTime , c.numCoins , d.method , p.money, d.note;
         `;
         const [rows] = await dbs.promise().query(query, [customerId]);
         return rows;

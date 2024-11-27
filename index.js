@@ -7,8 +7,15 @@ import { connectMysql } from './config/mysql-dbs.js'
 import swaggerOptions from './config/swagger-config.js'
 import { createResponse } from './config/api-response.js'
 import dbs from './config/mysql-dbs.js'
-
+import cors from 'cors'
 const app = express()
+
+app.use(cors({
+    origin: '*', // Cho phép tất cả domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Các method HTTP được phép
+    allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép
+}));
+
 dotenv.config()
 
 connectMysql()
