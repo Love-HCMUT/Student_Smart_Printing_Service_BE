@@ -63,6 +63,10 @@ const addFileMetadata = async (
   return await orderModel.addFileMetadata(fileMetadata);
 };
 
+const getFileMetadataByPackageID = async (packageID = 5) => {
+  return await orderModel.getFileMetadataByPackageID(packageID);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -74,4 +78,5 @@ export {
   getPackagePrintingPagesByPackageID,
   getPackageByOrderID,
   addFileMetadata,
+  getFileMetadataByPackageID,
 };

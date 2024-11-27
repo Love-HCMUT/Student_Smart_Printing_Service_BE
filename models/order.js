@@ -172,6 +172,18 @@ const addFileMetadata = async (fileMetadata) => {
   }
 };
 
+const getFileMetadataByPackageID = async (packageID) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(`SELECT * FROM filemetadata WHERE packageID = ?`, [packageID]);
+    return res[0];
+  } catch (err) {
+    console.log("Error in getPackagePrintingPagesByPackageID:", err);
+    return [];
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -183,4 +195,5 @@ export {
   getPackagePrintingPagesByPackageID,
   getPackageByOrderID,
   addFileMetadata,
+  getFileMetadataByPackageID,
 };
