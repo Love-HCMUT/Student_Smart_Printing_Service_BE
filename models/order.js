@@ -200,6 +200,18 @@ const addPaymentLog = async (money) => {
   }
 };
 
+const addWithdrawLog = async (id) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(`INSERT INTO withdrawlog (id) VALUES (?)`, [id]);
+    return res[0];
+  } catch (err) {
+    console.log("Error in addWithdrawLog:", err);
+    return [];
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -213,4 +225,5 @@ export {
   addFileMetadata,
   getFileMetadataByPackageID,
   addPaymentLog,
+  addWithdrawLog,
 };

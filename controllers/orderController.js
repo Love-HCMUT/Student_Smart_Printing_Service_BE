@@ -57,6 +57,10 @@ const addPaymentLog = async (req, res) => {
   res.json(await orderService.addPaymentLog(req.body.money));
 };
 
+const addWithdrawLog = async (req, res) => {
+  res.json(await orderService.addWithdrawLog(req.body.id));
+};
+
 export {
   uploadFileToMinio,
   addOrder,
@@ -71,4 +75,5 @@ export {
   addFileMetadata,
   getFileMetadataByPackageID,
   addPaymentLog,
+  addWithdrawLog,
 };

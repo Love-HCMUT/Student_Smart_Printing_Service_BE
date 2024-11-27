@@ -71,6 +71,10 @@ const addPaymentLog = async (money = 100000) => {
   return await orderModel.addPaymentLog(money);
 };
 
+const addWithdrawLog = async (id = 2) => {
+  return await orderModel.addWithdrawLog(id);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -84,4 +88,5 @@ export {
   addFileMetadata,
   getFileMetadataByPackageID,
   addPaymentLog,
+  addWithdrawLog,
 };
