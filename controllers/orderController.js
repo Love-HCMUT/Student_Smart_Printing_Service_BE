@@ -53,6 +53,10 @@ const getFileMetadataByPackageID = async (req, res) => {
   res.json(await orderService.getFileMetadataByPackageID(req.body.packageID));
 };
 
+const addPaymentLog = async (req, res) => {
+  res.json(await orderService.addPaymentLog(req.body.money));
+};
+
 export {
   uploadFileToMinio,
   addOrder,
@@ -66,4 +70,5 @@ export {
   getPackageByOrderID,
   addFileMetadata,
   getFileMetadataByPackageID,
+  addPaymentLog,
 };

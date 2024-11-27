@@ -67,6 +67,10 @@ const getFileMetadataByPackageID = async (packageID = 5) => {
   return await orderModel.getFileMetadataByPackageID(packageID);
 };
 
+const addPaymentLog = async (money = 100000) => {
+  return await orderModel.addPaymentLog(money);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -79,4 +83,5 @@ export {
   getPackageByOrderID,
   addFileMetadata,
   getFileMetadataByPackageID,
+  addPaymentLog,
 };

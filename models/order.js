@@ -10,7 +10,7 @@ const addOrder = async (printerID) => {
         `INSERT INTO userOrders (orderStatus, orderDate, printerID) VALUES (?, ?, ?)`,
         [orderStatus, orderDate, printerID]
       );
-    return res;
+    return res[0];
   } catch (err) {
     console.log("Error in addOrder:", err);
     return [];
@@ -19,13 +19,13 @@ const addOrder = async (printerID) => {
 
 const getOrderByPrinterID = async (printerID) => {
   try {
-    const orders = await dbs
+    const res = await dbs
       .promise()
       .query(
         `SELECT * FROM userOrders WHERE printerID = ? AND lower(orderStatus) != 'completed'`,
         [printerID]
       );
-    return orders[0];
+    return res[0];
   } catch (err) {
     console.log("Error in getOrderByPrinterID:", err);
     return [];
@@ -40,7 +40,7 @@ const updateOrderStatus = async (id, orderStatus) => {
         orderStatus,
         id,
       ]);
-    return res;
+    return res[0];
   } catch (err) {
     console.log("Error in updateOrderStatus:", err);
     return [];
@@ -57,7 +57,7 @@ const updateOrderCompleteTime = async (id) => {
         `UPDATE userOrders SET orderStatus = ?, completeTime = ? WHERE id = ?`,
         [orderStatus, completeTime, id]
       );
-    return res;
+    return res[0];
   } catch (err) {
     console.log("Error in updateOrderCompleteTime:", err);
     return [];
@@ -69,7 +69,7 @@ const updateOrderStaffID = async (id, staffID) => {
     const res = await dbs
       .promise()
       .query(`UPDATE userOrders SET staffID = ? WHERE id = ?`, [staffID, id]);
-    return res;
+    return res[0];
   } catch (err) {
     console.log("Error in updateOrderStaffID:", err);
     return [];
@@ -107,7 +107,7 @@ const addPackage = async (packageInfo) => {
           orderID,
         ]
       );
-    return res;
+    return res[0];
   } catch (err) {
     console.log("Error in addPackage:", err);
     return [];
@@ -135,7 +135,7 @@ const addPackagePrintingPages = async (printingPages) => {
         `INSERT INTO packageprintingpages (packageID, color, fromPage, toPage) VALUES (?, ?, ?, ?)`,
         [packageID, color, fromPage, toPage]
       );
-    return res;
+    return res[0];
   } catch (err) {
     console.log("Error in addPackagePrintingPages:", err);
     return [];
@@ -165,7 +165,7 @@ const addFileMetadata = async (fileMetadata) => {
         `INSERT INTO filemetadata (fileName, size, numPages, url, packageID) VALUES (?, ?, ?, ?, ?)`,
         [fileName, size, numPages, url, packageID]
       );
-    return res;
+    return res[0];
   } catch (err) {
     console.log("Error in addFileMetadata:", err);
     return [];
@@ -179,7 +179,23 @@ const getFileMetadataByPackageID = async (packageID) => {
       .query(`SELECT * FROM filemetadata WHERE packageID = ?`, [packageID]);
     return res[0];
   } catch (err) {
-    console.log("Error in getPackagePrintingPagesByPackageID:", err);
+    console.log("Error in getFileMetadataByPackageID:", err);
+    return [];
+  }
+};
+
+const addPaymentLog = async (money) => {
+  try {
+    const paymentTime = new Date();
+    const res = await dbs
+      .promise()
+      .query(`INSERT INTO paymentLog (paymentTime, money) VALUES (?, ?)`, [
+        paymentTime,
+        money,
+      ]);
+    return res[0];
+  } catch (err) {
+    console.log("Error in addPaymentLog:", err);
     return [];
   }
 };
@@ -196,4 +212,5 @@ export {
   getPackageByOrderID,
   addFileMetadata,
   getFileMetadataByPackageID,
+  addPaymentLog,
 };
