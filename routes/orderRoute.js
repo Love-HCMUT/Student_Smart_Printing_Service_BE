@@ -27,6 +27,7 @@ router.post("/package", orderController.addPackage);
 router.put("/status", orderController.updateOrderStatus);
 router.put("/completed", orderController.updateOrderCompleteTime);
 router.put("/staff", orderController.updateOrderStaffID);
+router.get("/customer", orderController.getCustomer);
 router.get("/printer", orderController.getAllActivePrinter);
 router.get("/fileMetadata", orderController.getFileMetadataByPackageID);
 router.get("/package", orderController.getPackageByOrderID);

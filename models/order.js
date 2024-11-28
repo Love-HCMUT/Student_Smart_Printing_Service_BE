@@ -289,6 +289,18 @@ const getAllActivePrinter = async (condition) => {
   }
 };
 
+const getCustomer = async (customerID) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(`SELECT * FROM customer WHERE id = ?`, [customerID]);
+    return res[0];
+  } catch (err) {
+    console.log("Error in getCustomer:", err);
+    return [];
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -308,4 +320,5 @@ export {
   addCancelOrders,
   addDeclineOrders,
   getAllActivePrinter,
+  getCustomer,
 };

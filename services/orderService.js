@@ -106,6 +106,10 @@ const getAllActivePrinter = async (
   return await orderModel.getAllActivePrinter(condition);
 };
 
+const getCustomer = async (customerID = 2) => {
+  return await orderModel.getCustomer(customerID);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -125,4 +129,5 @@ export {
   addCancelOrders,
   addDeclineOrders,
   getAllActivePrinter,
+  getCustomer,
 };

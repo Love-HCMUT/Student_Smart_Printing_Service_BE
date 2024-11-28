@@ -81,6 +81,10 @@ const getAllActivePrinter = async (req, res) => {
   res.json(await orderService.getAllActivePrinter(req.body));
 };
 
+const getCustomer = async (req, res) => {
+  res.json(await orderService.getCustomer(req.body.customerID));
+};
+
 export {
   uploadFileToMinio,
   addOrder,
@@ -101,4 +105,5 @@ export {
   addCancelOrders,
   addDeclineOrders,
   getAllActivePrinter,
+  getCustomer,
 };
