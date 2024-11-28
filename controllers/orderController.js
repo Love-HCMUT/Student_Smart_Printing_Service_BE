@@ -1,8 +1,8 @@
 // handle data from database
 import { minioService, orderService } from "../services/index.js";
 
-const uploadFileToMinio = (req, res) => {
-  minioService.uploadFileToMinio(req, res);
+const uploadFileToMinio = async (req, res) => {
+  res.json(await minioService.uploadFileToMinio(req.file));
 };
 
 const addOrder = async (req, res) => {
@@ -77,6 +77,10 @@ const addDeclineOrders = async (req, res) => {
   res.json(await orderService.addDeclineOrders(req.body));
 };
 
+const getAllActivePrinter = async (req, res) => {
+  res.json(await orderService.getAllActivePrinter(req.body));
+};
+
 export {
   uploadFileToMinio,
   addOrder,
@@ -96,4 +100,5 @@ export {
   addMakeOrders,
   addCancelOrders,
   addDeclineOrders,
+  getAllActivePrinter,
 };

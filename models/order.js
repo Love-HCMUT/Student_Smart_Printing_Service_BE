@@ -272,6 +272,23 @@ const addDeclineOrders = async (declineOrders) => {
   }
 };
 
+const getAllActivePrinter = async (condition) => {
+  try {
+    const printerStatus = "active";
+    const { colorPrinting, side } = condition;
+    const res = await dbs
+      .promise()
+      .query(
+        `SELECT * FROM printer WHERE printerStatus = ? AND colorPrinting = ? AND side = ?`,
+        [printerStatus, colorPrinting, side]
+      );
+    return res[0];
+  } catch (err) {
+    console.log("Error in getAllActivePrinter:", err);
+    return [];
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -290,4 +307,5 @@ export {
   addMakeOrders,
   addCancelOrders,
   addDeclineOrders,
+  getAllActivePrinter,
 };

@@ -97,6 +97,15 @@ const addDeclineOrders = async (
   return await orderModel.addDeclineOrders(declineOrders);
 };
 
+const getAllActivePrinter = async (
+  condition = {
+    colorPrinting: true,
+    side: "2",
+  }
+) => {
+  return await orderModel.getAllActivePrinter(condition);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -115,4 +124,5 @@ export {
   addMakeOrders,
   addCancelOrders,
   addDeclineOrders,
+  getAllActivePrinter,
 };
