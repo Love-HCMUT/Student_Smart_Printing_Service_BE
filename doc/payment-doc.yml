@@ -2,7 +2,6 @@ tags:
   name: PAYMENT
   description: API for payment service
 
-
 # collection link payment to user 
 paths:
   /payment/momo:
