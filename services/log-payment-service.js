@@ -1,5 +1,4 @@
-// payment-service.js
-import { paymentRepository } from "../models/payment-repository.js";
+import { paymentRepository } from "../models/log-payment-repository.js";
 
 export class paymentService {
 

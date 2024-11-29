@@ -2,7 +2,7 @@ import { Router } from "express"
 import {
     getOrderHistory, cancelOrder, getOrderAll,
     getOrderPagination, getOrderCount
-} from '../controllers/order-controller.js'
+} from '../controllers/log-order-controller.js'
 
 const router = Router()
 

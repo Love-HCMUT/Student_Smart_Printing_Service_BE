@@ -1,8 +1,8 @@
 // MAIN ROUTER
 
 import { Router } from "express";
-import orderRouter from './order-route.js'
-import makePaymentRouter from './payment-route.js'
+import orderRouter from './log-order-route.js'
+import makePaymentRouter from './log-payment-route.js'
 import statisticRouter from './statistic-route.js'
 
 const router = Router()

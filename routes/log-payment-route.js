@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getBalance, getRecentTransition, getPaymentHistory, getTransactionAll, getTransactionPagination, getTransactionCount } from "../controllers/payment-controller.js"; // Import các hàm controller một cách chính xác
+import { getBalance, getRecentTransition, getPaymentHistory, getTransactionAll, getTransactionPagination, getTransactionCount } from "../controllers/log-payment-controller.js"; // Import các hàm controller một cách chính xác
 
 const router = Router();
 

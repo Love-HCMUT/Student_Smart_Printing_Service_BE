@@ -1,4 +1,4 @@
-import { paymentService } from '../services/payment-service.js';
+import { paymentService } from '../services/log-payment-service.js';
 
 export const getBalance = async (req, res) => {
     const { customerId } = req.params;

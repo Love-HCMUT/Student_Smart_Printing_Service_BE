@@ -1,4 +1,4 @@
-import { historyRepository } from "../models/order-repository.js";
+import { historyRepository } from "../models/log-order-repository.js";
 import redis from "../config/redis-dbs.js";
 
 export class historyService {

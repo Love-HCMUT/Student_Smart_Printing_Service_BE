@@ -1,4 +1,4 @@
-import { historyService } from "../services/order-service.js";
+import { historyService } from "../services/log-order-service.js";
 
 export const getOrderHistory = async (req, res) => {
     const { customerId } = req.params;
