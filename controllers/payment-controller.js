@@ -97,19 +97,20 @@ const createPaymentLink = async (req, res) => {
 const handleDataFromMomoService = async (req, res) => {
     try {
         console.log(req.body)
-        const resultCode = req.body.resultCode
-        const combo = JSON.parse(req.body?.extraData)
+        const resultCode = req.body?.resultCode
+        const combo = req.body?.extraData
         const note = resultCode === 0 ? req.body.orderInfo : 'Giao dich that bai'
         const now = new Date()
         const money = resultCode === 0 ? req.body.amount : 0
+        const id = req.body.id
         console.log(combo, note, now, money)
         // update database 
-        await paymentModel.createDepositLog(now, money, note, 1, combo)
+        await paymentModel.createDepositLog(now, money, note, id, combo)
         console.log("insert completed")
-        return res.status(200)
+        return res.status(200).json(createResponse(true, "update payment logs"))
     }
     catch (error) {
-        return res.status(400)
+        return res.status(400).json(createResponse(false, "fail when updating payment logs"))
     }
 }
 
@@ -168,10 +169,11 @@ const checkStatusPayment = async (req, res) => {
 }
 
 const updateBalance = async (req, res) => {
-    const money = req.params.money
+    const money = req.body.money
     if (!money) return res.status(401).json(createResponse(false, "Missing required money parameter"))
     // fixed customer id
-    const check = await userModel.updateUserBalance(1, money)
+    const id = req.body.id
+    const check = await userModel.updateUserBalance(id, money)
     if (check) return res.status(200).json(createResponse(true, "Update balance successfully"))
     else return res.status(400).json(createResponse(false, "Update balance fail"))
 }

@@ -1,13 +1,26 @@
 import dbs from '../config/mysql-dbs.js'
 
-async function updateUserBalance(customerId, newBalance) {
+async function updateUserBalance(customerId, addedBalance) {
     try {
-        const sql = `UPDATE customer SET balance = ? WHERE id = ?`
-        const [result] = await dbs.promise().execute(sql, [newBalance, customerId]);
-        console.log('Update user balance successfuly:', result);
-        return true
+        // 1. Lấy giá trị balance hiện tại
+        const getBalanceSql = `SELECT balance FROM customer WHERE id = ?`;
+        const [rows] = await dbs.promise().execute(getBalanceSql, [customerId]);
+
+        if (rows.length === 0) {
+            throw new Error(`Customer with ID ${customerId} not found`);
+        }
+
+        const currentBalance = rows[0].balance;
+
+        const newBalance = currentBalance + addedBalance;
+
+        const updateBalanceSql = `UPDATE customer SET balance = ? WHERE id = ?`;
+        const [result] = await dbs.promise().execute(updateBalanceSql, [newBalance, customerId]);
+
+        console.log('Update user balance successful:', result);
+        return true;
     } catch (error) {
-        console.error('Error update user balance:', error.message);
+        console.error('Error updating user balance:', error.message);
         throw error;
     }
 }

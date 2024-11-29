@@ -13,16 +13,14 @@ import dbs from './config/mysql-dbs.js'
 import { sessionMiddleware } from './config/sessionConfig.js';
 import accountRouter from "./routes/account-router.js";
 import PrinterRouter from "./routes/manage_printer.js"
-import cors from "cors"
-
 
 const app = express()
 
-app.use(cors({
-    origin: '*', // Cho phép tất cả domain
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Các method HTTP được phép
-    allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép
-}));
+// app.use(cors({
+//     origin: '*', // Cho phép tất cả domain
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Các method HTTP được phép
+//     allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép
+// }));
 
 dotenv.config()
 
@@ -33,7 +31,7 @@ connectRedis()
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://ebc7-171-247-146-191.ngrok-free.app'],
+    origin: ['http://localhost:5173', 'https://ebc7-171-247-146-191.ngrok-free.app',],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Các method HTTP được phép
     allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép
     credentials: true,
@@ -53,7 +51,6 @@ app.post('/test', async (req, res) => {
     try {
         // await test.insertDepositLog('2024-11-22 10:30:00', 50000)
         await test.loadCombo()
-
         res.status(200).json({ "mess": "true" })
     }
     catch (err) {

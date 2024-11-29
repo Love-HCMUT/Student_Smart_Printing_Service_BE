@@ -15,6 +15,7 @@ export class AccountController {
         campus,
         building,
         room,
+        id,
       } = req.body;
 
       // Kiểm tra các trường bắt buộc
@@ -81,7 +82,7 @@ export class AccountController {
         if (locationID == 0) {
           locationID = await AccountService.addLocation(campus, building, room);
         }
-        await AccountService.addStaff(accountId, locationID);
+        await AccountService.addStaff(accountId, id, locationID);
 
         if (phoneNumber) {
           await AccountService.addStaffPhoneNumber(accountId, phoneNumber);
