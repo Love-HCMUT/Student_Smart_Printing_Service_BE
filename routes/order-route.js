@@ -1,5 +1,8 @@
 import { Router } from "express"
-import { getOrderHistory, cancelOrder, getOrderAll } from '../controllers/order-controller.js'
+import {
+    getOrderHistory, cancelOrder, getOrderAll,
+    getOrderPagination, getOrderCount
+} from '../controllers/order-controller.js'
 
 const router = Router()
 
@@ -8,5 +11,6 @@ router.post("/cancel-order/:orderId", cancelOrder)
 
 
 router.get("/spso/get-all-orders", getOrderAll)
+router.get("/spso/get-all-orders-pagination", getOrderPagination)
+router.get("/spso/get-order-count", getOrderCount)
 export default router
-

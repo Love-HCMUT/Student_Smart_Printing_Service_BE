@@ -27,3 +27,20 @@ export const getOrderAll = async (req, res) => {
         res.status(500).send({ error: 'Internal Server Error' });
     }
 };
+
+export const getOrderPagination = async (req, res) => {
+    const { page, limit } = req.query
+    try {
+        res.status(200).send(await historyService.getOrderPaginationService(page, limit));
+    } catch (error) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+}
+
+export const getOrderCount = async (req, res) => {
+    try {
+        res.status(200).send(await historyService.getOrderCountService());
+    } catch (error) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+}

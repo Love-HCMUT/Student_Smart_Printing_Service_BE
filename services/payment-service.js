@@ -38,4 +38,22 @@ export class paymentService {
             throw new Error('Error fetching balance');
         }
     }
+
+    static getTransactionPaginationService = async (page, limit) => {
+        try {
+            const balanceAll = await paymentRepository.getTransactionPaginationFromDB(page, limit)
+            return balanceAll;
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
+    static getTransactionCountService = async () => {
+        try {
+            const balanceAll = await paymentRepository.getTransactionCountFromDB()
+            return balanceAll;
+        } catch (error) {
+            throw new Error('Error fetching balance');
+        }
+    }
 }

@@ -1,19 +1,14 @@
-import { createClient } from 'redis';
-import config from './load-config';
-const client = createClient({
-    password: config.REDIS_PASS,
-    socket: {
-        host: config.REDIS_HOST,
-        port: config.REDIS_PORT
-    }
-});
+import Valkey from "ioredis";
+import config from "./load-config.js";
+
+const redis = new Valkey(config.REDIS_URI);
 
 export function connectRedis() {
-    client.on('error', (err) => {
+    redis.on('error', (err) => {
         console.error(`An error occurred with Redis: ${err}`)
         return
     })
-    console.log('Connected to Redis!');
+    console.log('Kết nối thành công đến Redis!');
 }
 
-export default client;
+export default redis

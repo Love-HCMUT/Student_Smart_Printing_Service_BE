@@ -58,4 +58,34 @@ GROUP BY p.paymentTime , c.numCoins , d.method , p.money, d.note;
         const [rows] = await dbs.promise().query(query);
         return rows;
     }
+
+    static getTransactionPaginationFromDB = async (page, limit) => {
+        const query = ` SELECT 
+                            customerID AS ID,
+                            paymentTime AS dateOfTransaction,
+                            SUM(depositCombo.quantity * combo.numCoins) AS coins,
+                            SUM(depositCombo.quantity * combo.price) 	AS charge, 
+                            method AS paymentMethod,
+                            note
+                        FROM
+                            depositLog
+                        JOIN
+                            paymentLog ON depositLog.id = paymentLog.id
+                        JOIN
+                            depositCombo ON depositLog.id = depositCombo.logID
+                        JOIN
+                            combo ON depositCombo.comboID = combo.id
+                        GROUP BY paymentLog.id
+                        ORDER BY paymentTime DESC
+                        LIMIT ? OFFSET ?`
+
+        const [rows] = await dbs.promise().query(query, [parseInt(limit), (parseInt(page) - 1) * parseInt(limit)])
+        return rows
+    }
+
+    static getTransactionCountFromDB = async () => {
+        const query = ` SELECT COUNT(*) AS totalTransaction FROM depositLog`
+        const [rows] = await dbs.promise().query(query)
+        return rows[0]
+    }
 }

@@ -38,3 +38,22 @@ export const getTransactionAll = async (req, res) => {
         res.status(500).send({ error: 'Internal Server Error' });
     }
 }
+
+export const getTransactionPagination = async (req, res) => {
+    const { page, limit } = req.query
+    try {
+        const balanceAll = await paymentService.getTransactionPaginationService(page, limit);
+        res.status(200).send(balanceAll);
+    } catch (error) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+}
+
+export const getTransactionCount = async (req, res) => {
+    try {
+        const balanceAll = await paymentService.getTransactionCountService();
+        res.status(200).send(balanceAll);
+    } catch (error) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+}

@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express'
 import swaggerJsDoc from 'swagger-jsdoc'
 import centralizeRouter from './routes/index.js'
 import { connectMysql } from './config/mysql-dbs.js'
+import { connectRedis } from './config/redis-dbs.js'
 import swaggerOptions from './config/swagger-config.js'
 import { createResponse } from './config/api-response.js'
 import dbs from './config/mysql-dbs.js'
@@ -23,6 +24,7 @@ app.use(cors({
 dotenv.config()
 
 connectMysql()
+connectRedis()
 
 
 // Tạo Swagger docs
@@ -54,5 +56,5 @@ app.use("/api/printer", PrinterRouter);
 const port = process.env.PORT
 
 app.listen(port, () => {
-    console.log(`Example app on port http://localhost:${port}`)
+    console.log(`App listening on port http://localhost:${port}`)
 })
