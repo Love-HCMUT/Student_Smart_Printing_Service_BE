@@ -1,0 +1,213 @@
+info:
+  title: Printer Management API
+  description: API for managing printers and their locations.
+  version: 1.0.0
+tags:
+  - name: Printer Management
+
+paths:
+  /api/printer/add:
+    post:
+      tags:
+        - Printer Management
+      summary: Add a new printer
+      requestBody:
+        description: Printer details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                printerStatus:
+                  type: string
+                  example: active
+                printerDescription:
+                  type: string
+                  example: High-quality color printer
+                resolution:
+                  type: string
+                  example: 1200x1200 dpi
+                colorPrinting:
+                  type: boolean
+                  example: true
+                side:
+                  type: string
+                  example: duplex
+                price:
+                  type: number
+                  example: 0.10
+                model:
+                  type: string
+                  example: HP LaserJet Pro MFP
+                speed:
+                  type: string
+                  example: 30 ppm
+                brand:
+                  type: string
+                  example: HP
+                wireless:
+                  type: boolean
+                  example: true
+                printingMethod:
+                  type: string
+                  example: laser
+                campus:
+                  type: string
+                  example: Main Campus
+                building:
+                  type: string
+                  example: Building A
+                room:
+                  type: string
+                  example: Room 101
+      responses:
+        201:
+          description: Printer added successfully
+        500:
+          description: Error adding printer
+
+  /api/printer/update-status:
+    put:
+      tags:
+        - Printer Management
+      summary: Update printer statuses
+      requestBody:
+        description: Printer status and list of printer IDs
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                printerStatus:
+                  type: string
+                  example: inactive
+                printerIds:
+                  type: array
+                  items:
+                    type: integer
+                    example: 1
+      responses:
+        200:
+          description: Printer statuses updated successfully
+        400:
+          description: Invalid input
+        500:
+          description: Error updating printer statuses
+
+  /api/printer/update/{id}:
+    put:
+      tags:
+        - Printer Management
+      summary: Update a specific printer
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Printer ID
+      requestBody:
+        description: Updated printer details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                printerStatus:
+                  type: string
+                  example: active
+                printerDescription:
+                  type: string
+                  example: Updated printer description
+                resolution:
+                  type: string
+                  example: 2400x2400 dpi
+                colorPrinting:
+                  type: boolean
+                  example: false
+                side:
+                  type: string
+                  example: single
+                price:
+                  type: number
+                  example: 0.08
+                model:
+                  type: string
+                  example: Canon Pixma TS9120
+                speed:
+                  type: string
+                  example: 20 ppm
+                brand:
+                  type: string
+                  example: Canon
+                wireless:
+                  type: boolean
+                  example: false
+                printingMethod:
+                  type: string
+                  example: inkjet
+                campus:
+                  type: string
+                  example: Main Campus
+                building:
+                  type: string
+                  example: Building B
+                room:
+                  type: string
+                  example: Room 203
+      responses:
+        200:
+          description: Printer updated successfully
+        500:
+          description: Error updating printer
+
+  /api/printer/get_printer:
+    get:
+      tags:
+        - Printer Management
+      summary: Get all printers of spso
+      requestBody:
+        description: get printer details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                spsoID:
+                  type: string
+                  example: 123
+      responses:
+        200:
+          description: List of printers
+        500:
+          description: Error fetching printers
+
+  /api/printer/update_printer:
+    post:
+      tags:
+        - Printer Management
+      summary: Get printers by IDs
+      requestBody:
+        description: List of printer IDs
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: integer
+                    example: 1
+      responses:
+        200:
+          description: Printer details
+        404:
+          description: Printer not found
+        500:
+          description: Error fetching printer

@@ -1,0 +1,196 @@
+info:
+  title: Account Management API
+  description: API for managing accounts including registration, login, and logout.
+  version: "1.0.0"
+
+tags:
+  - name: Account
+    description: Operations related to user accounts
+
+paths:
+  /api/account/register:
+    post:
+      tags:
+        - Account
+      summary: Đăng ký tài khoản
+      description: Endpoint dùng để đăng ký một tài khoản mới.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Tên đăng nhập
+                  example: "john_doe"
+                password:
+                  type: string
+                  description: Mật khẩu
+                  example: "password123"
+                fullName:
+                  type: string
+                  description: Họ và tên đầy đủ
+                  example: "John Doe"
+                roles:
+                  type: string
+                  description: Vai trò của người dùng
+                  example: "Student"
+                phoneNumber:
+                  type: string
+                  description: Số điện thoại (nếu có)
+                  example: "0123456789"
+                campus:
+                  type: string
+                  description: Khuôn viên làm việc (chỉ áp dụng với Printing Staff)
+                  example: "Campus A"
+                building:
+                  type: string
+                  description: Tòa nhà làm việc (chỉ áp dụng với Printing Staff)
+                  example: "Building B"
+                room:
+                  type: string
+                  description: Phòng làm việc (chỉ áp dụng với Printing Staff)
+                  example: "Room 101"
+      responses:
+        201:
+          description: Tài khoản được tạo thành công.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Account registered successfully"
+        400:
+          description: Lỗi đầu vào không hợp lệ.
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý.
+
+  /api/account/login:
+    post:
+      tags:
+        - Account
+      summary: Đăng nhập tài khoản
+      description: Endpoint để đăng nhập bằng tên người dùng và mật khẩu.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Tên đăng nhập
+                  example: "john_doe"
+                password:
+                  type: string
+                  description: Mật khẩu
+                  example: "password123"
+      responses:
+        200:
+          description: Đăng nhập thành công.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Login successful"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 17
+                      username:
+                        type: string
+                        example: "john_doe"
+                      roles:
+                        type: string
+                        example: "User"
+        401:
+          description: Thông tin đăng nhập không hợp lệ.
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý.
+
+  /api/account/login_gg:
+    post:
+      tags:
+        - Account
+      summary: Đăng nhập bằng Google
+      description: Endpoint để đăng nhập bằng tài khoản Google.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Tên tài khoản Google
+                  example: "john_doe@gmail.com"
+      responses:
+        200:
+          description: Đăng nhập thành công.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Login successful"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 17
+                      username:
+                        type: string
+                        example: "john_doe"
+                      roles:
+                        type: string
+                        example: "User"
+        401:
+          description: Thông tin không hợp lệ.
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý.
+
+  /api/account/logout:
+    post:
+      tags:
+        - Account
+      summary: Đăng xuất tài khoản
+      description: Endpoint dùng để đăng xuất.
+      responses:
+        200:
+          description: Đăng xuất thành công.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Logout successful"
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý.
