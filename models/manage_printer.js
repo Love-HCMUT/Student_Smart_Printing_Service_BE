@@ -31,6 +31,15 @@ export class PrinterService {
     return result.insertId; // Trả về ID của vị trí vừa tạo
   }
 
+  static async addManage(spsoID, printerID) {
+    const [result] = await dbs.promise().query(
+      `INSERT INTO manage (spsoID, printerID)
+             VALUES (?, ?)`,
+      [spsoID, printerID]
+    );
+    return result.insertId; // Trả về ID của vị trí vừa tạo
+  }
+
   static async findOrAddLocation(campus, building, room) {
     // Kiểm tra xem vị trí có tồn tại trong bảng location không
     const [rows] = await dbs

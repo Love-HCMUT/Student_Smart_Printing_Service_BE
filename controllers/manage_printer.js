@@ -5,6 +5,7 @@ export class PrinterController {
   // Thêm máy in mới
   static async addPrinter(req, res) {
     try {
+      const { spsoID } = req.query;
       const {
         printerStatus,
         printerDescription,
@@ -45,6 +46,7 @@ export class PrinterController {
         printingMethod,
         locationID
       );
+      const manage = await PrinterService.addManage(spsoID, printer.printerID)
       res
         .status(201)
         .json(createResponse(true, "Printer added successfully", printer));
