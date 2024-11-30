@@ -12,13 +12,13 @@ const checkBucket = async () => {
   }
 };
 
-const uploadFileToMinio = async (file) => {
+const uploadFileToMinio = async (file, minioName) => {
   await checkBucket();
 
   try {
     const info = await minioClient.putObject(
       config.MINIO_BUCKET_NAME,
-      file.originalname,
+      minioName,
       file.buffer,
       file.size
     );

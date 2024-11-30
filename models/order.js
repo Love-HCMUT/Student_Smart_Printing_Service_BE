@@ -128,12 +128,12 @@ const getPackageByOrderID = async (orderID) => {
 
 const addPackagePrintingPages = async (printingPages) => {
   try {
-    const { packageID, color, fromPage, toPage } = printingPages;
+    const { packageID, color, fromPage, toPage, orientation } = printingPages;
     const res = await dbs
       .promise()
       .query(
-        `INSERT INTO packageprintingpages (packageID, color, fromPage, toPage) VALUES (?, ?, ?, ?)`,
-        [packageID, color, fromPage, toPage]
+        `INSERT INTO packageprintingpages (packageID, color, fromPage, toPage, orientation) VALUES (?, ?, ?, ?, ?)`,
+        [packageID, color, fromPage, toPage, orientation]
       );
     return res[0];
   } catch (err) {
@@ -279,7 +279,7 @@ const getAllActivePrinter = async (condition) => {
     const res = await dbs
       .promise()
       .query(
-        `SELECT * FROM printer WHERE printerStatus = ? AND colorPrinting = ? AND side = ?`,
+        `SELECT printer.id AS id, printingMethod, campus, building, room FROM printer JOIN location ON locationID = location.id WHERE printerStatus = ? AND colorPrinting = ? AND side = ?`,
         [printerStatus, colorPrinting, side]
       );
     return res[0];
@@ -294,7 +294,7 @@ const getCustomer = async (customerID) => {
     const res = await dbs
       .promise()
       .query(`SELECT * FROM customer WHERE id = ?`, [customerID]);
-    return res[0];
+    return res[0][0];
   } catch (err) {
     console.log("Error in getCustomer:", err);
     return [];

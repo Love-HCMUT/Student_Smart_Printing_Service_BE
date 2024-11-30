@@ -1,4 +1,7 @@
+import bcrypt from "bcrypt";
 import { orderModel } from "../models/index.js";
+
+const SALT_ROUNDS = 10;
 
 const addOrder = async (printerID = 1) => {
   return await orderModel.addOrder(printerID);
@@ -38,7 +41,13 @@ const addPackage = async (
 };
 
 const addPackagePrintingPages = async (
-  printingPages = { packageID: 1, color: false, fromPage: 1, toPage: 100 }
+  printingPages = {
+    packageID: 1,
+    color: false,
+    fromPage: 1,
+    toPage: 100,
+    orientation: "landscape",
+  }
 ) => {
   return await orderModel.addPackagePrintingPages(printingPages);
 };
@@ -80,7 +89,7 @@ const addReturnLog = async (id = 3) => {
 };
 
 const addMakeOrders = async (
-  makeOrders = { customerID: 5, orderID: 5, logID: 5 }
+  makeOrders = { customerID: 5, orderID: 5, logID: 5, note: "test" }
 ) => {
   return await orderModel.addMakeOrders(makeOrders);
 };
@@ -103,11 +112,42 @@ const getAllActivePrinter = async (
     side: "2",
   }
 ) => {
-  return await orderModel.getAllActivePrinter(condition);
+  try {
+    const printers = await orderModel.getAllActivePrinter(condition);
+    const res = await Promise.all(
+      printers.map(async (printer) => {
+        const orders = await orderModel.getOrderByPrinterID(printer.id);
+        printer.requests = orders.length;
+        return printer;
+      })
+    );
+    return res;
+  } catch (err) {
+    console.log("Error in orderService - getAllActivePrinter:", err);
+    return [];
+  }
 };
 
 const getCustomer = async (customerID = 2) => {
   return await orderModel.getCustomer(customerID);
+};
+
+const generateMinioName = async (originalName) => {
+  const lastPeriodIndex = originalName.lastIndexOf(".");
+  if (lastPeriodIndex === -1) {
+    return `${originalName}-${"error"}.txt`;
+  }
+
+  const fileExtension = originalName.slice(lastPeriodIndex);
+  const baseFileName = originalName.slice(0, lastPeriodIndex);
+
+  const timestamp = new Date().getTime().toString();
+  const combinedString = `${baseFileName}${timestamp}`;
+  const hash = bcrypt.hashSync(combinedString, SALT_ROUNDS);
+
+  const uniqueFileName = `${hash}${fileExtension}`;
+
+  return uniqueFileName;
 };
 
 export {
@@ -130,4 +170,5 @@ export {
   addDeclineOrders,
   getAllActivePrinter,
   getCustomer,
+  generateMinioName,
 };
