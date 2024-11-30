@@ -16,7 +16,7 @@ export function connectMysql() {
             console.error('Kết nối thất bại: ', err);
             return;
         }
-        console.log('Kết nối thành công đến MySQL trên AWS!');
+        console.log('Kết nối thành công đến MySQL trên BúThắngAI!');
     });
 }
 

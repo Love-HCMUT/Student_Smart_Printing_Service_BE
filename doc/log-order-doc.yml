@@ -1,0 +1,134 @@
+tags:
+  - name: Order
+    description: Các API liên quan đến lịch sử yêu cầu in tài liệu
+
+paths:
+  /order/order-history/{customerId}:
+    get:
+      tags:
+        - Order
+      summary: Lịch sử yêu cầu in tài liệu của người dùng
+      description: Lấy lịch sử yêu cầu in tài liệu của một người dùng cụ thể theo customerId
+      parameters:
+        - name: customerId
+          in: path
+          description: ID của khách hàng
+          required: true
+          schema:
+            type: string
+            example: "123"
+      responses:
+        200:
+          description: Lịch sử yêu cầu in tài liệu của khách hàng được lấy thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    orderId:
+                      type: string
+                      example: "1"
+                    orderDate:
+                      type: string
+                      example: "2024-11-19T07:00:00.000Z"
+                    orderStatus:
+                      type: string
+                      example: "Cancelled"
+                    completeAt:
+                      type: string
+                      example: "2024-11-19T09:00:00.000Z"
+                    note:
+                      type: string
+                      example: "Request to cancelled order"
+        400:
+          description: Lỗi đầu vào không hợp lệ
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý
+
+  /order/cancel-order/{orderId}:
+    post:
+      tags:
+        - Order
+      summary: Hủy đơn hàng
+      description: Hủy một đơn hàng cụ thể
+      parameters:
+        - name: orderId
+          in: path
+          description: ID của đơn hàng
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  description: Ghi chú về lý do hủy đơn hàng
+                  example: "Khách hàng yêu cầu hủy"
+      responses:
+        200:
+          description: Đơn hàng đã được hủy thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Order has been cancelled"
+        400:
+          description: Lỗi đầu vào không hợp lệ
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý
+
+  /order/spso/get-all-orders:
+    get:
+      tags:
+        - Order
+      summary: Lấy tất cả đơn hàng
+      description: Lấy danh sách tất cả các đơn hàng
+      responses:
+        200:
+          description: Danh sách đơn hàng được lấy thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    userID:
+                      type: integer
+                      example: 1
+                    printerID:
+                      type: integer
+                      example: 1
+                    printingStaffID:
+                      type: integer
+                      example: 1
+                    fileName:
+                      type: string
+                      example: "File1.pdf"
+                    startTime:
+                      type: string
+                      format: date-time
+                      example: "2024-11-19T07:05:00.000Z"
+                    endTime:
+                      type: string
+                      format: date-time
+                      example: "2024-11-19T07:30:00.000Z"
+                    numberOfPage:
+                      type: integer
+                      example: 10
+        500:
+          description: Lỗi xảy ra trong quá trình xử lý

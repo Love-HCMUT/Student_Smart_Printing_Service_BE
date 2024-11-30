@@ -16,7 +16,7 @@ export class AccountService {
             `SELECT id FROM location WHERE campus = ? AND building = ? AND room = ?`,
             [campus, building, room]
         );
-    
+
         if (rows.length > 0) {
             // Nếu vị trí tồn tại, trả về ID
             return rows[0].id;
@@ -39,20 +39,21 @@ export class AccountService {
     // Hàm để thêm số điện thoại SPSO
     static async addSPSOPhoneNumber(id, phoneNumbers) {
         for (let phoneNumber of phoneNumbers) {
-        await dbs.promise().query(
-            `INSERT INTO spsoPhoneNumbers (id, phoneNumber) VALUES (?, ?)`,
-            [id, phoneNumber]
-        );
-    }
+            await dbs.promise().query(
+                `INSERT INTO spsoPhoneNumbers (id, phoneNumber) VALUES (?, ?)`,
+                [id, phoneNumber]
+            );
+        }
     }
 
     // Hàm để thêm số điện thoại nhân viên
     static async addStaffPhoneNumber(id, phoneNumbers) {
-        for (let phoneNumber of phoneNumbers){
-        await dbs.promise().query(
-            `INSERT INTO staffPhoneNumbers (id, phoneNumber) VALUES (?, ?)`,
-            [id, phoneNumber]
-        );}
+        for (let phoneNumber of phoneNumbers) {
+            await dbs.promise().query(
+                `INSERT INTO staffPhoneNumbers (id, phoneNumber) VALUES (?, ?)`,
+                [id, phoneNumber]
+            );
+        }
     }
 
     // Hàm để thêm vị trí

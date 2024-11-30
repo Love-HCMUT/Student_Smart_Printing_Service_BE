@@ -100,3 +100,5 @@ dist
 # IntelliJ IDEA
 .idea/
 *.iml
+
+test.env

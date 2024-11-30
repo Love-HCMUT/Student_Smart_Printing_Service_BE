@@ -1,0 +1,75 @@
+tags:
+  name: System
+  description: API to get set system data
+
+paths:
+  /systemconfig/load-file/{filename}:
+    get:
+      tags: 
+        - System
+      summary: Load file data
+      description:
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          description: Tên của file cần đọc dữ liệu
+          schema:
+            type: string
+          example: filetype or paper_per_month
+      responses:
+        200:
+          description: File loaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: string
+                    example: ['doc', 'docx', 'pdf', 'ppt', 'png', 'jpeg']
+        400:
+          description: Bad request, filename is empty or failed to load file
+
+  /systemconfig/update:
+    put:
+      tags: 
+        - System
+      summary: Update data system 
+      description: 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filename:
+                  type: string
+                  description: "choose filetype or paper_per_month"
+                  example: "filetype"  # Corrected to number
+                content:
+                  type: array
+                  description: "Information to save"
+                  items:
+                    - type: string
+                  example: ['1', '2', '45']
+                
+      responses:
+        200:
+          description: File loaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    description: "result of request"
+                  message: 
+                    type: string 
+                    description: "message from sever"
+        400:
+          description: Bad request, filename is empty or failed to load file

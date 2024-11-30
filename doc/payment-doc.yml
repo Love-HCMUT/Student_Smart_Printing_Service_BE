@@ -1,0 +1,155 @@
+tags:
+  name: PAYMENT
+  description: API for payment service
+
+# collection link payment to user 
+paths:
+  /payment/momo:
+    post:
+      tags:
+        - PAYMENT
+      summary: Create payment link to use MoMo service
+      description: Endpoint for creating payment link to redirect user to MoMo service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                money:
+                  type: number
+                  description: "The amount of money to be paid."
+                  example: 50000  # Corrected to number
+                note:
+                  type: string
+                  description: "Information note about the payment."
+                  example: "Thanh toán hóa đơn A"
+                combo: 
+                  type: array
+                  description: "List of combos and their quantity."
+                  items:
+                    type: object
+                    properties:
+                      combo_id:
+                        type: number
+                        description: "The ID of the combo."
+                        example: 2
+                      quantity:
+                        type: integer
+                        description: "The quantity of the combo."
+                        example: 2
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payUrl:
+                    type: string
+                    example: "https://test-payment.momo.vn/v2/gateway/pay"
+                    description: "URL to redirect user to MoMo payment gateway."
+                  money:
+                    type: number
+                    example: 100000  # Corrected to number
+                    description: "The amount of money added for the transaction."
+
+
+  /payment/balance/{money}:
+    patch:
+      tags:
+        - PAYMENT
+      summary: Update customer balance
+      description: API endpoint to update the balance of a customer by a fixed customer ID.
+      parameters:
+        - name: money
+          in: path
+          required: true
+          description: The amount of money to update the customer's balance.
+          schema:
+            type: number
+            example: 5000
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                    description: Indicates if the operation was successful.
+                  message:
+                    type: string
+                    example: "Update balance successfully"
+                    description: Message indicating the result of the operation.
+        400:
+          description: Balance update failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                    description: Indicates if the operation failed.
+                  message:
+                    type: string
+                    example: "Update balance fail"
+                    description: Message indicating the reason for failure.
+        401:
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                    description: Indicates the request was unauthorized or invalid.
+                  message:
+                    type: string
+                    example: "Missing required money parameter."
+                    description: Message indicating missing or invalid parameters.
+
+/payment/combo:
+  get:
+    tags:
+      - PAYMENT
+    summary: Load combo from database
+    description: Retrieve a list of available combos and their quantities from the database.
+    responses:
+      200:
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                combo:
+                  type: array
+                  items:
+                    type: integer
+                  description: List of combos and their quantities.
+                  example: [5, 7, 8, 9]
+      400:
+        description: Failed to load combo data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  description: Indicates if the operation failed.
+                  example: false
+                message:
+                  type: string
+                  description: Message indicating the reason for failure.
+                  example: "Fail to load combo data"
