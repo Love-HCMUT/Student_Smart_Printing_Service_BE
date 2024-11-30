@@ -7,7 +7,7 @@ router.post("/add", PrinterController.addPrinter);
 
 router.put("/update-status", PrinterController.updatePrinterStatus);
 
-router.put("/update/:id", PrinterController.updatePrinter);
+router.put("/update/:spsoID/:id", PrinterController.updatePrinter);
 
 router.get("/get_printer", PrinterController.getAllPrinters);
 

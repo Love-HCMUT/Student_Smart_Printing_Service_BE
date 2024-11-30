@@ -3,7 +3,10 @@ import dbs from "../config/mysql-dbs.js";
 export class PrinterService {
   // Lấy danh sách máy in mà SPSO quản lý
   // Lấy danh sách máy in mà SPSO quản lý
-  static async getPrintersBySPSO(spsoId) {
+
+
+
+  static async getPrintersBySPSO() {
     const query = `
           SELECT 
             printer.id AS printer_id,
@@ -14,10 +17,8 @@ export class PrinterService {
             printer.printerStatus AS status
           FROM printer
           JOIN location ON printer.locationID = location.id
-          JOIN manage ON manage.printerID = printer.id
-          WHERE manage.spsoID = ?
         `;
-    const [rows] = await dbs.promise().query(query, [spsoId]);
+    const [rows] = await dbs.promise().query(query);
     return rows;
   }
 
@@ -30,6 +31,17 @@ export class PrinterService {
     );
     return result.insertId; // Trả về ID của vị trí vừa tạo
   }
+
+    // Hàm để them manipulation
+    static async addManipulation(spsoID, printerID, spsoAction) {
+      const actionTime = new Date();
+      const [result] = await dbs.promise().query(
+        `INSERT INTO manipulation (spsoID, printerID, spsoAction, actionTime)
+               VALUES (?, ?, ?, ?)`,
+        [spsoID, printerID, spsoAction, actionTime]
+      );
+      return result.insertId; // Trả về ID của vị trí vừa tạo
+    }
 
   static async addManage(spsoID, printerID) {
     const [result] = await dbs.promise().query(
@@ -52,6 +64,24 @@ export class PrinterService {
     if (rows.length > 0) {
       // Nếu vị trí tồn tại, trả về ID
       return rows[0].id;
+    } else {
+      // Nếu không tồn tại, trả về 0
+      return 0;
+    }
+  }
+
+  static async findOrAddManage(spsoID,printerID) {
+    // Kiểm tra xem vị trí có tồn tại không
+    const rows = await dbs
+      .promise()
+      .query(
+        `SELECT spsoID FROM manage WHERE spsoID = ? AND printerID = ?`,
+        [spsoID,printerID]
+      );
+
+    if (rows[0].length > 0) {
+      // Nếu vị trí tồn tại, trả về ID
+      return 1;
     } else {
       // Nếu không tồn tại, trả về 0
       return 0;
