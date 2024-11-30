@@ -17,7 +17,8 @@ export const getRecentlyMonthlyOrder = async (req, res) => {
 
 
 export const getCurrentMonthlyOrder = async (req, res) => {
-    const { month, year } = req.query;
+    const { month, year } = req.params;
+
     try {
         res.status(200).send(await statisticService.getCurrentMonthlyOrderService(month, year));
     } catch (error) {

@@ -18,11 +18,8 @@ export class historyRepository {
                     FROM cancelOrders AS c
                     WHERE c.customerID = m.customerID
                         AND c.orderID = m.orderID);`;
-        const [rows] = await dbs.promise().query(query, [note, orderId]);
-        return {
-            status: rows.affectedRows === 1 ? 'success' : 'failed',
-            message: rows.affectedRows === 1 ? 'Order has been canceled' : 'Order has been canceled before'
-        }
+        const rows = await dbs.promise().query(query, [note, orderId]);
+        return rows
     };
 
     static getOrderAllFromDB = async (customerId) => {

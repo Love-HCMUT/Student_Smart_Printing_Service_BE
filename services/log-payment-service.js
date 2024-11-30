@@ -1,5 +1,5 @@
 import { paymentRepository } from "../models/log-payment-repository.js";
-
+import redis from '../config/redis-dbs.js';
 export class paymentService {
 
     static getBalanceService = async (customerId) => {
@@ -31,7 +31,18 @@ export class paymentService {
 
     static getTransactionAllService = async () => {
         try {
+            const key = `transaction-all`;
+            const cache = await redis.get(key);
+            if (cache) {
+                return JSON.parse(cache);
+            }
+
             const balanceAll = await paymentRepository.getTransactionAllFromDB();
+
+            if (balanceAll) {
+                await redis.set(key, JSON.stringify(balanceAll));
+                redis.expire(key, 60 * 60)
+            }
             return balanceAll;
         } catch (error) {
             throw new Error('Error fetching balance');
@@ -40,16 +51,39 @@ export class paymentService {
 
     static getTransactionPaginationService = async (page, limit) => {
         try {
+            const key = `transaction-pagination-${page}-${limit}`;
+            const cache = await redis.get(key)
+            if (cache) {
+                return JSON.parse(cache)
+            }
+
             const balanceAll = await paymentRepository.getTransactionPaginationFromDB(page, limit)
+
+            if (balanceAll) {
+                await redis.set(key, JSON.stringify(balanceAll));
+                redis.expire(key, 60 * 30);
+            }
             return balanceAll;
-        } catch (error) {
-            throw new Error(error);
+        }
+        catch (error) {
+            throw new Error('Error fetching balance');
         }
     }
 
+
     static getTransactionCountService = async () => {
         try {
+            const key = `transaction-count`;
+            const cache = await redis.get(key);
+            if (cache) {
+                return JSON.parse(cache);
+            }
+
             const balanceAll = await paymentRepository.getTransactionCountFromDB()
+            if (balanceAll) {
+                await redis.set(key, JSON.stringify(balanceAll));
+                redis.expire(key, 60 * 60 * 24);
+            }
             return balanceAll;
         } catch (error) {
             throw new Error('Error fetching balance');
