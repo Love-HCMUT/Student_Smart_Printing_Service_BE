@@ -67,8 +67,8 @@ export class AccountService {
     }
 
     // Hàm để thêm nhân viên
-    static async addStaff(id, spsoID, locationID) {
-        await dbs.promise().query(`INSERT INTO staff (id, spsoID, locationID) VALUES (?, ?, ?)`, [id, spsoID, locationID]);
+    static async addStaff(id ,spsoID , locationID) {
+        await dbs.promise().query(`INSERT INTO staff (id,spsoID , locationID) VALUES (?, ?, ?)`, [id ,spsoID , locationID]);
     }
 
     // Hàm tìm tài khoản theo tên người dùng

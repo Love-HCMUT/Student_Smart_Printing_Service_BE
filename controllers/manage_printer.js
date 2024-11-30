@@ -47,6 +47,8 @@ export class PrinterController {
         locationID
       );
       const manage = await PrinterService.addManage(spsoID, printer.printerID)
+      const spsoAction = "ADD";
+      const manipulation = await PrinterService.addManipulation(spsoID, printer.printerID, spsoAction)
       res
         .status(201)
         .json(createResponse(true, "Printer added successfully", printer));
@@ -60,8 +62,10 @@ export class PrinterController {
   // Cập nhật trạng thái cho danh sách máy in
   static async updatePrinterStatus(req, res) {
     try {
+      const {spsoID} = req.query
       const { printerStatus } = req.body;
       const { printerIds } = req.body; // Expecting an array of IDs
+      
 
       if (!Array.isArray(printerIds) || printerIds.length === 0) {
         return res
@@ -70,6 +74,11 @@ export class PrinterController {
       }
 
       await PrinterService.updatePrinterStatus(printerStatus, printerIds);
+      printerIds.forEach(async(id) =>  {
+        let x = await PrinterService.findOrAddManage(spsoID, id)
+        if (x == 0) { await PrinterService.addManage(spsoID, id) } 
+        await PrinterService.addManipulation(spsoID, id, printerStatus)
+      })
       res
         .status(200)
         .json(createResponse(true, "Printer statuses updated successfully"));
@@ -83,7 +92,8 @@ export class PrinterController {
   // Cập nhật toàn bộ dữ liệu của một máy in
   static async updatePrinter(req, res) {
     try {
-      const { id } = req.params; // Printer ID from the URL
+      const spsoID = req.params.spsoID;
+      const  id  = req.params.id; // Printer ID from the URL
       const {
         printerStatus,
         printerDescription,
@@ -125,6 +135,11 @@ export class PrinterController {
         printingMethod,
         locationID
       );
+      let x = await PrinterService.findOrAddManage(spsoID, id)
+    
+        if (x == 0) { await PrinterService.addManage(spsoID, id) } 
+      const S = "UPDATE"
+        await PrinterService.addManipulation(spsoID, id, S)
       res
         .status(200)
         .json(createResponse(true, "Printer updated successfully"));
@@ -136,8 +151,8 @@ export class PrinterController {
   // Lấy thông tin tất cả máy in
   static async getAllPrinters(req, res) {
     try {
-        const { spsoID } = req.query; // Lấy từ query string
-        const printers = await PrinterService.getPrintersBySPSO(spsoID);
+        // const { spsoID } = req.query; // Lấy từ query string
+        const printers = await PrinterService.getPrintersBySPSO();
         res
             .status(200)
             .json(createResponse(true, "Successful fetching printers", printers));
