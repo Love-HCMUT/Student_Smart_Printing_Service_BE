@@ -358,6 +358,7 @@ const getOrderCost = async (orderID) => {
         `SELECT * FROM makeOrders JOIN paymentLog ON logID = id where orderID = ?`,
         [orderID]
       );
+      
     return res[0];
   } catch (err) {
     console.log("Error in getOrderCost:", err);
