@@ -90,6 +90,39 @@ const createOrder = async (req, res) => {
   }
 };
 
+const declineOrder = async (req, res) => {
+  try {
+    const { orderID, staffID, note } = req.body;
+    // update order status
+    await orderService.updateOrderStatus(orderID, "Declined");
+
+    // get order cost
+    const orderCostInfo = (await orderService.getOrderCost(orderID))[0];
+    const { customerID, money } = orderCostInfo;
+
+    // add return log
+    const paymentLogID = (await orderService.addPaymentLog(money)).insertId;
+    await orderService.addReturnLog(paymentLogID);
+    await orderService.increaseCustomerBalance(customerID, money);
+
+    // add decline orders
+    await orderService.addDeclineOrders({
+      staffID: staffID,
+      orderID: orderID,
+      logID: paymentLogID,
+      note: note,
+    });
+    res.status(200).json(createResponse(true, "Decline order successfully."));
+  } catch (err) {
+    console.log("Error in declineOrder:", err);
+    res
+      .status(500)
+      .json(
+        createResponse(false, "An error occurred while declining an order")
+      );
+  }
+};
+
 const addOrder = async (req, res) => {
   res.json(await orderService.addOrder(req.params.printerID));
 };
@@ -187,7 +220,7 @@ const getPrinterAndOrder = async (req, res) => {
   res.json(printerss);
 };
 
-const getOrderDetails = async (req, res) => {
+const acceptOrder = async (req, res) => {
   const packages = await orderService.getPackageByOrderID(req.params.orderID);
   const packagess = await Promise.all(
     packages.map(async (p) => {
@@ -198,7 +231,22 @@ const getOrderDetails = async (req, res) => {
       return p;
     })
   );
+  await orderService.updateOrderStatus(req.params.orderID, "In progress");
+  await orderService.updateOrderStaffID(req.params.orderID, req.params.staffID);
   res.json(packagess);
+};
+
+const printFile = async (req, res) => {
+  try {
+    await minioService.getFileFromMinio(req, res);
+    const { orderID, logNumber, fileID } = req.params;
+    await orderService.addPrintingLog({ orderID, logNumber, fileID });
+  } catch (err) {
+    console.log("Error in printFile:", err);
+    res
+      .status(500)
+      .json(createResponse(false, "An error occurred while printing a file"));
+  }
 };
 
 export {
@@ -224,5 +272,7 @@ export {
   getCustomer,
   getPrinterByStaffID,
   getPrinterAndOrder,
-  getOrderDetails,
+  acceptOrder,
+  declineOrder,
+  printFile,
 };

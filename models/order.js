@@ -350,6 +350,51 @@ const increaseCustomerBalance = async (customerID, amount) => {
   }
 };
 
+const getOrderCost = async (orderID) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(
+        `SELECT * FROM makeOrders JOIN paymentLog ON logID = id where orderID = ?`,
+        [orderID]
+      );
+    return res[0];
+  } catch (err) {
+    console.log("Error in getOrderCost:", err);
+  }
+};
+
+const addPrintingLog = async (printingLog) => {
+  try {
+    const { orderID, logNumber, fileID } = printingLog;
+    const startTime = new Date();
+    const res = await dbs
+      .promise()
+      .query(
+        `INSERT INTO printingLog (orderID, logNumber, startTime, fileID) VALUES (?, ?, ?, ?)`,
+        [orderID, logNumber, startTime, fileID]
+      );
+    return res[0];
+  } catch (err) {
+    console.log("Error in addPrintingLog:", err);
+  }
+};
+
+const updatePrintingLogEndTime = async (fileID) => {
+  try {
+    const endTime = new Date();
+    const res = await dbs
+      .promise()
+      .query(`UPDATE printingLog SET endTime = ? WHERE fileID = ?`, [
+        endTime,
+        fileID,
+      ]);
+    return res[0];
+  } catch (err) {
+    console.log("Error in updatePrintingLogEndTime:", err);
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -373,4 +418,7 @@ export {
   getPrinterByStaffID,
   decreaseCustomerBalance,
   increaseCustomerBalance,
+  getOrderCost,
+  addPrintingLog,
+  updatePrintingLogEndTime,
 };
