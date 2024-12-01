@@ -324,6 +324,32 @@ const getPrinterByStaffID = async (staffID) => {
   }
 };
 
+const decreaseCustomerBalance = async (customerID, amount) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(`UPDATE customer SET balance = balance - ?  WHERE id = ?`, [
+        amount,
+        customerID,
+      ]);
+  } catch (err) {
+    console.log("Error in updateCustomerBalance:", err);
+  }
+};
+
+const increaseCustomerBalance = async (customerID, amount) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(`UPDATE customer SET balance = balance + ?  WHERE id = ?`, [
+        amount,
+        customerID,
+      ]);
+  } catch (err) {
+    console.log("Error in updateCustomerBalance:", err);
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -345,4 +371,6 @@ export {
   getAllActivePrinter,
   getCustomer,
   getPrinterByStaffID,
+  decreaseCustomerBalance,
+  increaseCustomerBalance,
 };

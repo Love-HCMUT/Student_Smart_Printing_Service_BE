@@ -1,88 +1,93 @@
 // handle data from database
 import { minioService, orderService } from "../services/index.js";
 import { generateMinioName } from "../services/orderService.js";
+import { createResponse } from "../config/api-response.js";
 
 const createOrder = async (req, res) => {
-  try{const files = req.files;
-  const { pages, customerID, printerID, note, totalCost, ...configs } =
-    req.body;
-  const numPages = JSON.parse(pages);
-  const configArr = [];
-  for (const key in configs) {
-    configArr.push(JSON.parse(configs[key]));
-  }
-  // add order
-  const insertedOrderInfo = await orderService.addOrder(printerID);
-  const orderID = insertedOrderInfo.insertId;
+  try {
+    const files = req.files;
+    const { pages, customerID, printerID, note, totalCost, ...configs } =
+      req.body;
+    const numPages = JSON.parse(pages);
+    const configArr = [];
+    for (const key in configs) {
+      configArr.push(JSON.parse(configs[key]));
+    }
+    // add order
+    const insertedOrderInfo = await orderService.addOrder(printerID);
+    const orderID = insertedOrderInfo.insertId;
 
-  // add package
-  const packageIDs = await Promise.all(
-    configArr.map(async (config, index) => {
-      const insertedPackageInfo = await orderService.addPackage({
-        numOfCopies: config.copy,
-        side: config.sides,
-        colorAllPages: config.color_all,
-        colorCover: config.color_cover,
-        pagePerSheet: config.pages_per_sheet,
-        paperSize: config.paper,
-        scale: config.scale,
-        cover: config.cover,
-        glass: config.glass,
-        binding: config.binding,
-        orderID: orderID,
-      });
-
-      if (config.pages[0]) {
-        // add package pages
-        const { from_to, color, orientation } = config.pages[0];
-
-        const from_tos = from_to.split(", ");
-        from_tos.forEach((range) => {
-          const [fromPage, toPage] = range.split("-");
-          orderService.addPackagePrintingPages({
-            packageID: insertedPackageInfo.insertId,
-            color: color,
-            fromPage: fromPage,
-            toPage: toPage || fromPage,
-            orientation: orientation,
-          });
+    // add package
+    const packageIDs = await Promise.all(
+      configArr.map(async (config, index) => {
+        const insertedPackageInfo = await orderService.addPackage({
+          numOfCopies: config.copy,
+          side: config.sides,
+          colorAllPages: config.color_all,
+          colorCover: config.color_cover,
+          pagePerSheet: config.pages_per_sheet,
+          paperSize: config.paper,
+          scale: config.scale,
+          cover: config.cover,
+          glass: config.glass,
+          binding: config.binding,
+          orderID: orderID,
         });
-      }
-      return insertedPackageInfo.insertId;
-    })
-  );
 
-  // add withdraw log
-  const paymentLogID = (await orderService.addPaymentLog(Number(totalCost)))
-    .insertId;
-  await orderService.addWithdrawLog(paymentLogID);
+        if (config.pages[0]) {
+          // add package pages
+          const { from_to, color, orientation } = config.pages[0];
 
-  // add make orders
-  const makeOrdersInfo = await orderService.addMakeOrders({
-    customerID: customerID,
-    orderID: orderID,
-    logID: paymentLogID,
-    note: JSON.parse(note),
-  });
+          const from_tos = from_to.split(", ");
+          from_tos.forEach((range) => {
+            const [fromPage, toPage] = range.split("-");
+            orderService.addPackagePrintingPages({
+              packageID: insertedPackageInfo.insertId,
+              color: color,
+              fromPage: fromPage,
+              toPage: toPage || fromPage,
+              orientation: orientation,
+            });
+          });
+        }
+        return insertedPackageInfo.insertId;
+      })
+    );
 
-  // add file
-  files.forEach(async (file) => {
-    const minioName = await generateMinioName(file.originalname);
-    const [i, j] = file.fieldname.split("-").map(Number);
-    await minioService.uploadFileToMinio(file, minioName);
-    await orderService.addFileMetadata({
-      fileName: Buffer.from(file.originalname, "latin1").toString("utf8"),
-      size: file.size,
-      numPages: numPages[i][j],
-      url: minioName,
-      packageID: packageIDs[i],
+    // add withdraw log
+    const paymentLogID = (await orderService.addPaymentLog(Number(totalCost)))
+      .insertId;
+    await orderService.addWithdrawLog(paymentLogID);
+    await orderService.decreaseCustomerBalance(customerID, totalCost);
+
+    // add make orders
+    const makeOrdersInfo = await orderService.addMakeOrders({
+      customerID: customerID,
+      orderID: orderID,
+      logID: paymentLogID,
+      note: JSON.parse(note),
     });
-  });
-  res.json("ok");}
-  catch (err) {
-    console.log()
+
+    // add file
+    files.forEach(async (file) => {
+      const minioName = await generateMinioName(file.originalname);
+      const [i, j] = file.fieldname.split("-").map(Number);
+      await minioService.uploadFileToMinio(file, minioName);
+      await orderService.addFileMetadata({
+        fileName: Buffer.from(file.originalname, "latin1").toString("utf8"),
+        size: file.size,
+        numPages: numPages[i][j],
+        url: minioName,
+        packageID: packageIDs[i],
+      });
+    });
+    res.status(200).json(createResponse(true, "Create order successfully."));
+  } catch (err) {
+    console.log("Error in orderController - createOrder:", err);
+    res
+      .status(500)
+      .json(createResponse(false, "An error occurred while creating an order"));
   }
-  // res.json(await minioService.createOrder(req.files));
 };
 
 const addOrder = async (req, res) => {

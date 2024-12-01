@@ -155,6 +155,14 @@ const getPrinterByStaffID = async (staffID = 1) => {
   return await orderModel.getPrinterByStaffID(staffID);
 };
 
+const decreaseCustomerBalance = async (customerID = 1, amount = 0) => {
+  return await orderModel.decreaseCustomerBalance(customerID, amount);
+};
+
+const increaseCustomerBalance = async (customerID = 1, amount = 0) => {
+  return await orderModel.increaseCustomerBalance(customerID, amount);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -177,4 +185,6 @@ export {
   getCustomer,
   generateMinioName,
   getPrinterByStaffID,
+  decreaseCustomerBalance,
+  increaseCustomerBalance,
 };

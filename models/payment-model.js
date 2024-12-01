@@ -44,7 +44,6 @@ async function insertPaymentlog(time, money) {
         VALUES (?, ?)
         `;
     const [result] = await dbs.promise().execute(sql, [time, money]);
-    console.log("Insert payment logs successfuly:", result);
     return result.insertId;
   } catch (error) {
     console.error("Error inserting into paymentlog:", error.message);
@@ -61,7 +60,7 @@ async function createDepositLog(time, money, note, customerID, combo) {
       await insertDepositCombo(paymentLogId, e.id, e.quantity);
     });
   } else {
-    console.log("combo khong phai la mang");
+    console.log("Error: Combo khong phai la mang");
   }
 }
 
