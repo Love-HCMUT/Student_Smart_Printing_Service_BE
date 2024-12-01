@@ -8,18 +8,10 @@ export class historyRepository {
     };
 
     static cancelOrderFromDB = async (orderId, note) => {
-        const query = `
-            INSERT INTO cancelOrders (customerID, orderID, logID, note)
-            SELECT m.customerID, m.orderID, m.logID, ? AS note
-            FROM makeOrders AS m
-                WHERE m.orderID = ?
-                AND NOT EXISTS (   
-                    SELECT c.customerID, c.orderID
-                    FROM cancelOrders AS c
-                    WHERE c.customerID = m.customerID
-                        AND c.orderID = m.orderID);`;
-        const rows = await dbs.promise().query(query, [note, orderId]);
-        return rows
+        if (note === undefined) note = null
+        const query = `CALL CancelOrder(?)`;
+        const rows = await dbs.promise().query(query, [orderId]);
+        return 'hello'
     };
 
     static getOrderAllFromDB = async (customerId) => {

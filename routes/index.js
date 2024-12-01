@@ -10,10 +10,10 @@ import statisticRouter from './statistic-route.js'
 
 const router = Router()
 
-router.use('/order', orderRouter)
+router.use('/logOrder', orderRouter)
 router.use('/payment', paymentRouter)
 router.use('/systemconfig', systemconfigRouter)
-router.use('/payment', makePaymentRouter)
+router.use('/logPayment', makePaymentRouter)
 router.use('/statistic', statisticRouter)
 
 export default router

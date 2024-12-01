@@ -17,7 +17,7 @@ export class paymentRepository {
         const query = `
             SELECT 
     p.paymentTime AS date_of_transaction,
-    c.numCoins AS number_of_coins,
+    SUM(c.numCoins) AS number_of_coins,
     d.method AS method,
     GROUP_CONCAT(dc.comboID) AS combo_list,
     p.money AS charge,
@@ -27,12 +27,12 @@ FROM
         JOIN
     paymentLog AS p ON d.id = p.id
         JOIN
-    depositCombo AS dc ON d.id = dc.comboID
+    depositCombo AS dc ON d.id = dc.logID
         JOIN
     combo AS c ON c.id = dc.comboID
 WHERE
-    d.customerID = 1
-GROUP BY p.paymentTime , c.numCoins , d.method , p.money, d.note;
+    d.customerID = ?
+GROUP BY p.paymentTime, d.method, d.note;
         `;
         const [rows] = await dbs.promise().query(query, [customerId]);
         return rows;
