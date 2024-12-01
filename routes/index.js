@@ -16,7 +16,7 @@ router.use("/printing", printingRoute);
 router.use("/logOrder", logOrderRouter);
 router.use("/payment", paymentRouter);
 router.use("/systemconfig", systemconfigRouter);
-router.use("/payment", makePaymentRouter);
+router.use("/logPayment", makePaymentRouter);
 router.use("/statistic", statisticRouter);
 
 export default router;

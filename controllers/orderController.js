@@ -3,7 +3,7 @@ import { minioService, orderService } from "../services/index.js";
 import { generateMinioName } from "../services/orderService.js";
 
 const createOrder = async (req, res) => {
-  const files = req.files;
+  try{const files = req.files;
   const { pages, customerID, printerID, note, totalCost, ...configs } =
     req.body;
   const numPages = JSON.parse(pages);
@@ -78,7 +78,10 @@ const createOrder = async (req, res) => {
       packageID: packageIDs[i],
     });
   });
-  res.json("ok");
+  res.json("ok");}
+  catch (err) {
+    console.log()
+  }
   // res.json(await minioService.createOrder(req.files));
 };
 
