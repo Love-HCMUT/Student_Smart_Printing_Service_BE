@@ -19,4 +19,6 @@ router.use("/systemconfig", systemconfigRouter);
 router.use("/logPayment", makePaymentRouter);
 router.use("/statistic", statisticRouter);
 
-export default router;
+
+
+export default router
