@@ -1,20 +1,20 @@
 import dbs from "../config/mysql-dbs.js";
 
 export class paymentRepository {
-    static getCustomerBalance = async (customerId) => {
-        const query = 'SELECT balance FROM customer WHERE id = ?';
-        const [rows] = await dbs.promise().query(query, [customerId]);
-        return rows.length ? rows[0].balance : null;
-    };
+  static getCustomerBalance = async (customerId) => {
+    const query = "SELECT balance FROM customer WHERE id = ?";
+    const [rows] = await dbs.promise().query(query, [customerId]);
+    return rows.length ? rows[0].balance : null;
+  };
 
-    static getRecentTransitionFromDB = async (customerId) => {
-        const query = 'CALL GetPaymentActionLog(?)';
-        const [rows] = await dbs.promise().query(query, [customerId]);
-        return rows.length ? rows[0] : null;
-    };
+  static getRecentTransitionFromDB = async (customerId) => {
+    const query = "CALL GetPaymentActionLog(?)";
+    const [rows] = await dbs.promise().query(query, [customerId]);
+    return rows.length ? rows[0] : null;
+  };
 
-    static getPaymentHistoryFromDB = async (customerId) => {
-        const query = `
+  static getPaymentHistoryFromDB = async (customerId) => {
+    const query = `
             SELECT 
     p.paymentTime AS date_of_transaction,
     SUM(c.numCoins) AS number_of_coins,
@@ -34,12 +34,12 @@ WHERE
     d.customerID = ?
 GROUP BY p.paymentTime, d.method, d.note;
         `;
-        const [rows] = await dbs.promise().query(query, [customerId]);
-        return rows;
-    };
+    const [rows] = await dbs.promise().query(query, [customerId]);
+    return rows;
+  };
 
-    static getTransactionAllFromDB = async () => {
-        const query = ` SELECT 
+  static getTransactionAllFromDB = async () => {
+    const query = ` SELECT 
                             customerID AS ID,
                             paymentTime AS dateOfTransaction,
                             SUM(depositCombo.quantity * combo.numCoins) AS coins,
@@ -55,12 +55,12 @@ GROUP BY p.paymentTime, d.method, d.note;
                         JOIN
                             combo ON depositCombo.comboID = combo.id
                         GROUP BY paymentLog.id`;
-        const [rows] = await dbs.promise().query(query);
-        return rows;
-    }
+    const [rows] = await dbs.promise().query(query);
+    return rows;
+  };
 
-    static getTransactionPaginationFromDB = async (page, limit) => {
-        const query = ` SELECT 
+  static getTransactionPaginationFromDB = async (page, limit) => {
+    const query = ` SELECT 
                             customerID AS ID,
                             paymentTime AS dateOfTransaction,
                             SUM(depositCombo.quantity * combo.numCoins) AS coins,
@@ -77,15 +77,17 @@ GROUP BY p.paymentTime, d.method, d.note;
                             combo ON depositCombo.comboID = combo.id
                         GROUP BY paymentLog.id
                         ORDER BY paymentTime DESC
-                        LIMIT ? OFFSET ?`
+                        LIMIT ? OFFSET ?`;
 
-        const [rows] = await dbs.promise().query(query, [parseInt(limit), (parseInt(page) - 1) * parseInt(limit)])
-        return rows
-    }
+    const [rows] = await dbs
+      .promise()
+      .query(query, [parseInt(limit), (parseInt(page) - 1) * parseInt(limit)]);
+    return rows;
+  };
 
-    static getTransactionCountFromDB = async () => {
-        const query = ` SELECT COUNT(*) AS totalTransaction FROM depositLog`
-        const [rows] = await dbs.promise().query(query)
-        return rows[0]
-    }
+  static getTransactionCountFromDB = async () => {
+    const query = ` SELECT COUNT(*) AS totalTransaction FROM depositLog`;
+    const [rows] = await dbs.promise().query(query);
+    return rows[0];
+  };
 }

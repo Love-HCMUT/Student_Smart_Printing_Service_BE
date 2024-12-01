@@ -1,5 +1,5 @@
-import dotenv from 'dotenv'
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
 
 const config = {
     DB_HOST: process.env.DB_HOST,
@@ -15,6 +15,12 @@ const config = {
     MOMO_REDIRECT_URL: process.env.MOMO_REDIRECT_URL,
     MOMO_IPN_URL: process.env.MOMO_IPN_URL,
     MOMO_GATEWAY_URL: process.env.MOMO_GATEWAY_URL,
+  // Thêm các biến môi trường khác nếu cần
+  MINIO_ENDPOINT: process.env.MINIO_ENDPOINT,
+  MINIO_PORT: process.env.MINIO_PORT,
+  MINIO_ACCESSKEY: process.env.MINIO_ACCESSKEY,
+  MINIO_SECRETKEY: process.env.MINIO_SECRETKEY,
+  MINIO_BUCKET_NAME: process.env.MINIO_BUCKET_NAME,
 };
 
 export default config;
