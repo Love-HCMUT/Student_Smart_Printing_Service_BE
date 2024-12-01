@@ -22,6 +22,7 @@ const createOrder = async (req, res) => {
         numOfCopies: config.copy,
         side: config.sides,
         colorAllPages: config.color_all,
+        colorCover: config.color_cover,
         pagePerSheet: config.pages_per_sheet,
         paperSize: config.paper,
         scale: config.scale,
@@ -67,11 +68,10 @@ const createOrder = async (req, res) => {
   // add file
   files.forEach(async (file) => {
     const minioName = await generateMinioName(file.originalname);
-    console.log(minioName);
     const [i, j] = file.fieldname.split("-").map(Number);
     await minioService.uploadFileToMinio(file, minioName);
     await orderService.addFileMetadata({
-      fileName: file.originalname,
+      fileName: Buffer.from(file.originalname, "latin1").toString("utf8"),
       size: file.size,
       numPages: numPages[i][j],
       url: minioName,
@@ -162,6 +162,37 @@ const getCustomer = async (req, res) => {
   res.json(await orderService.getCustomer(req.params.customerID));
 };
 
+const getPrinterByStaffID = async (req, res) => {
+  res.json(await orderService.getPrinterByStaffID(req.params.staffID));
+};
+
+const getPrinterAndOrder = async (req, res) => {
+  const printers = await orderService.getPrinterByStaffID(req.params.staffID);
+  const printerss = await Promise.all(
+    printers.map(async (printer) => {
+      printer.orders = await orderService.getOrderByPrinterID(
+        printer.printerID
+      );
+      return printer;
+    })
+  );
+  res.json(printerss);
+};
+
+const getOrderDetails = async (req, res) => {
+  const packages = await orderService.getPackageByOrderID(req.params.orderID);
+  const packagess = await Promise.all(
+    packages.map(async (p) => {
+      p.printingPages = await orderService.getPackagePrintingPagesByPackageID(
+        p.id
+      );
+      p.files = await orderService.getFileMetadataByPackageID(p.id);
+      return p;
+    })
+  );
+  res.json(packagess);
+};
+
 export {
   createOrder,
   addOrder,
@@ -183,4 +214,7 @@ export {
   addDeclineOrders,
   getAllActivePrinter,
   getCustomer,
+  getPrinterByStaffID,
+  getPrinterAndOrder,
+  getOrderDetails,
 };

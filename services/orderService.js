@@ -28,6 +28,7 @@ const addPackage = async (
     numOfCopies: 1,
     side: "1",
     colorAllPages: false,
+    colorCover: false,
     pagePerSheet: 1,
     paperSize: "A4",
     scale: 1,
@@ -147,7 +148,11 @@ const generateMinioName = async (originalName) => {
 
   const uniqueFileName = `${hash}${fileExtension}`;
 
-  return uniqueFileName;
+  return uniqueFileName.replace(/\//g, ".");
+};
+
+const getPrinterByStaffID = async (staffID = 1) => {
+  return await orderModel.getPrinterByStaffID(staffID);
 };
 
 export {
@@ -171,4 +176,5 @@ export {
   getAllActivePrinter,
   getCustomer,
   generateMinioName,
+  getPrinterByStaffID,
 };

@@ -22,7 +22,7 @@ const getOrderByPrinterID = async (printerID) => {
     const res = await dbs
       .promise()
       .query(
-        `SELECT * FROM userOrders WHERE printerID = ? AND lower(orderStatus) != 'completed'`,
+        `SELECT * FROM userOrders WHERE printerID = ? AND lower(orderStatus) = 'pending'`,
         [printerID]
       );
     return res[0];
@@ -82,6 +82,7 @@ const addPackage = async (packageInfo) => {
       numOfCopies,
       side,
       colorAllPages,
+      colorCover,
       pagePerSheet,
       paperSize,
       scale,
@@ -93,7 +94,7 @@ const addPackage = async (packageInfo) => {
     const res = await dbs
       .promise()
       .query(
-        `INSERT INTO package (numOfCopies, side, colorAllPages, pagePerSheet, paperSize, scale, cover, glass, binding, orderID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO package (numOfCopies, side, colorAllPages, pagePerSheet, paperSize, scale, cover, glass, binding, orderID, colorCover) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           numOfCopies,
           side,
@@ -105,6 +106,7 @@ const addPackage = async (packageInfo) => {
           glass,
           binding,
           orderID,
+          colorCover,
         ]
       );
     return res[0];
@@ -163,7 +165,13 @@ const addFileMetadata = async (fileMetadata) => {
       .promise()
       .query(
         `INSERT INTO filemetadata (fileName, size, numPages, url, packageID) VALUES (?, ?, ?, ?, ?)`,
-        [fileName, size, numPages, url, packageID]
+        [
+          Buffer.from(fileName, "utf8").toString("utf8"),
+          size,
+          numPages,
+          url,
+          packageID,
+        ]
       );
     return res[0];
   } catch (err) {
@@ -301,6 +309,21 @@ const getCustomer = async (customerID) => {
   }
 };
 
+const getPrinterByStaffID = async (staffID) => {
+  try {
+    const res = await dbs
+      .promise()
+      .query(
+        `SELECT * FROM operatedby JOIN printer ON id = printerID WHERE staffID = ?`,
+        [staffID]
+      );
+    return res[0];
+  } catch (err) {
+    console.log("Error in getPrinterByStaffID:", err);
+    return [];
+  }
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -321,4 +344,5 @@ export {
   addDeclineOrders,
   getAllActivePrinter,
   getCustomer,
+  getPrinterByStaffID,
 };

@@ -13,9 +13,12 @@ const checkBucket = async () => {
 };
 
 const uploadFileToMinio = async (file, minioName) => {
-  await checkBucket();
-
   try {
+    try {
+      await checkBucket();
+    } catch (err) {
+      console.log("Error in checkBucket", err);
+    }
     const info = await minioClient.putObject(
       config.MINIO_BUCKET_NAME,
       minioName,
@@ -30,8 +33,6 @@ const uploadFileToMinio = async (file, minioName) => {
 };
 
 const getFileFromMinio = async (req, res) => {
-  await checkBucket();
-
   // try {
   //   const fileName = req.body.fileName;
   //   const dataStream = await minioClient.getObject(
@@ -59,6 +60,11 @@ const getFileFromMinio = async (req, res) => {
   const { fileName } = req.params;
   const bucketName = config.MINIO_BUCKET_NAME;
   try {
+    try {
+      await checkBucket();
+    } catch (err) {
+      console.log("Error in checkBucket", err);
+    }
     // Fetch the file from MinIO
     const fileStream = await minioClient.getObject(bucketName, fileName);
 
@@ -77,9 +83,12 @@ const getFileFromMinio = async (req, res) => {
 };
 
 const getFileURLFromMinio = async (fileName) => {
-  await checkBucket();
-
   try {
+    try {
+      await checkBucket();
+    } catch (err) {
+      console.log("Error in checkBucket", err);
+    }
     const url = await minioClient.presignedGetObject(
       config.MINIO_BUCKET_NAME,
       fileName,
@@ -93,9 +102,12 @@ const getFileURLFromMinio = async (fileName) => {
 };
 
 const removeFileFromMinio = async (fileName) => {
-  await checkBucket();
-
   try {
+    try {
+      await checkBucket();
+    } catch (err) {
+      console.log("Error in checkBucket", err);
+    }
     await minioClient.removeObject(envs.MINIO_BUCKET_NAME, fileName);
   } catch (err) {
     console.log("Error in removeFileFromMinio:", err);
@@ -103,9 +115,12 @@ const removeFileFromMinio = async (fileName) => {
 };
 
 const isFileExistInMinio = async (fileName) => {
-  await checkBucket();
-
   try {
+    try {
+      await checkBucket();
+    } catch (err) {
+      console.log("Error in checkBucket", err);
+    }
     await minioClient.statObject(bucketName, fileName);
     return true;
   } catch (err) {
