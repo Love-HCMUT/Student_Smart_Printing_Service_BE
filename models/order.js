@@ -134,7 +134,7 @@ const addPackagePrintingPages = async (printingPages) => {
     const res = await dbs
       .promise()
       .query(
-        `INSERT INTO packageprintingpages (packageID, color, fromPage, toPage, orientation) VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO packagePrintingPages (packageID, color, fromPage, toPage, orientation) VALUES (?, ?, ?, ?, ?)`,
         [packageID, color, fromPage, toPage, orientation]
       );
     return res[0];
@@ -148,7 +148,7 @@ const getPackagePrintingPagesByPackageID = async (packageID) => {
   try {
     const res = await dbs
       .promise()
-      .query(`SELECT * FROM packageprintingpages WHERE packageID = ?`, [
+      .query(`SELECT * FROM packagePrintingPages WHERE packageID = ?`, [
         packageID,
       ]);
     return res[0];
@@ -164,7 +164,7 @@ const addFileMetadata = async (fileMetadata) => {
     const res = await dbs
       .promise()
       .query(
-        `INSERT INTO filemetadata (fileName, size, numPages, url, packageID) VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO fileMetadata (fileName, size, numPages, url, packageID) VALUES (?, ?, ?, ?, ?)`,
         [
           Buffer.from(fileName, "utf8").toString("utf8"),
           size,
@@ -184,7 +184,7 @@ const getFileMetadataByPackageID = async (packageID) => {
   try {
     const res = await dbs
       .promise()
-      .query(`SELECT * FROM filemetadata WHERE packageID = ?`, [packageID]);
+      .query(`SELECT * FROM fileMetadata WHERE packageID = ?`, [packageID]);
     return res[0];
   } catch (err) {
     console.log("Error in getFileMetadataByPackageID:", err);
@@ -212,7 +212,7 @@ const addWithdrawLog = async (id) => {
   try {
     const res = await dbs
       .promise()
-      .query(`INSERT INTO withdrawlog (id) VALUES (?)`, [id]);
+      .query(`INSERT INTO withdrawLog (id) VALUES (?)`, [id]);
     return res[0];
   } catch (err) {
     console.log("Error in addWithdrawLog:", err);
@@ -224,7 +224,7 @@ const addReturnLog = async (id) => {
   try {
     const res = await dbs
       .promise()
-      .query(`INSERT INTO returnlog (id) VALUES (?)`, [id]);
+      .query(`INSERT INTO returnLog (id) VALUES (?)`, [id]);
     return res[0];
   } catch (err) {
     console.log("Error in addReturnLog:", err);
@@ -238,7 +238,7 @@ const addMakeOrders = async (makeOrders) => {
     const res = await dbs
       .promise()
       .query(
-        `INSERT INTO makeorders (customerID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO makeOrders (customerID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
         [customerID, orderID, logID, note]
       );
     return res[0];
@@ -254,7 +254,7 @@ const addCancelOrders = async (cancelOrders) => {
     const res = await dbs
       .promise()
       .query(
-        `INSERT INTO cancelorders (customerID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO cancelOrders (customerID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
         [customerID, orderID, logID, note]
       );
     return res[0];
@@ -270,7 +270,7 @@ const addDeclineOrders = async (declineOrders) => {
     const res = await dbs
       .promise()
       .query(
-        `INSERT INTO declineorders (staffID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO declineOrders (staffID, orderID, logID, note) VALUES (?, ?, ?, ?)`,
         [staffID, orderID, logID, note]
       );
     return res[0];
@@ -282,12 +282,12 @@ const addDeclineOrders = async (declineOrders) => {
 
 const getAllActivePrinter = async (condition) => {
   try {
-    const printerStatus = "active";
+    const printerStatus = "available";
     const { colorPrinting, side } = condition;
     const res = await dbs
       .promise()
       .query(
-        `SELECT printer.id AS id, printingMethod, campus, building, room FROM printer JOIN location ON locationID = location.id WHERE printerStatus = ? AND colorPrinting = ? AND side = ?`,
+        `SELECT printer.id AS id, printingMethod, campus, building, room FROM printer JOIN location ON locationID = location.id WHERE lower(printerStatus) = ? AND colorPrinting = ? AND side = ?`,
         [printerStatus, colorPrinting, side]
       );
     return res[0];
@@ -314,7 +314,7 @@ const getPrinterByStaffID = async (staffID) => {
     const res = await dbs
       .promise()
       .query(
-        `SELECT * FROM operatedby JOIN printer ON id = printerID WHERE staffID = ?`,
+        `SELECT * FROM operatedBy JOIN printer ON id = printerID WHERE staffID = ?`,
         [staffID]
       );
     return res[0];
