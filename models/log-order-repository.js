@@ -67,7 +67,7 @@ FROM
         LEFT JOIN
     declineOrders AS d ON m.orderID = d.orderID
 GROUP BY startTime , endTime , fileName , numberOfPage , printerID , printingStaffID , userID , status
-LIMIT 10 OFFSET 0`;
+LIMIT ? OFFSET ?`;
         const [rows] = await dbs.promise().query(query, [parseInt(limit), (parseInt(page) - 1) * parseInt(limit)]);
         return rows
     }

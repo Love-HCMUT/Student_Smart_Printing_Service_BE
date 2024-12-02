@@ -31,7 +31,7 @@ export class statisticService {
                 keys[2], JSON.stringify(twoMonthsAgoData)
             );
 
-            keys.forEach(key => redis.expire(key, 60 * 60 * 24));
+            keys.forEach(key => redis.expire(key, 60 * 60));
 
             return [currentMonthData, lastMonthData, twoMonthsAgoData];
         } catch (error) {
@@ -72,66 +72,49 @@ export class statisticService {
         }
     };
 
-    static getTotalCountService = async () => {
+    static getCurrentYearlyStatictisService = async (currentYear) => {
         try {
-            const key = `total-count`;
+            const key = `current-yearly-order-${currentYear}`;
             const cache = await redis.get(key);
             if (cache) {
                 return JSON.parse(cache);
             }
 
-            const [totalOrder, totalTransaction, totalUserCanceledOrder, totalPSCanceledOrder] = await Promise.all([
-                statisticRepository.getTotalOrderFromDB(),
-                statisticRepository.getTotalTransactionFromDB(),
-                statisticRepository.getTotalUserCanceledOrderFromDB(),
-                statisticRepository.getTotalPSCanceledOrderFromDB()
+            const [yearOrderData, yearTransactionData, getCountYearOrderData, getCountYearTransactionData, getCountYearCancelData] = await Promise.all([
+                statisticRepository.getRecentlyYearlyOrderFromDB(currentYear),
+                statisticRepository.getRecentlyYearlyTransactionFromDB(currentYear),
+                statisticRepository.getCountYearOrderDataFromDB(currentYear),
+                statisticRepository.getCountYearTransactionrDataFromDB(currentYear),
+                statisticRepository.getTotalCancelOrderByYearFromDB(currentYear)
             ]);
 
-            const totalCanceledOrder = totalUserCanceledOrder[0].totalCanceledOrder + totalPSCanceledOrder[0].totalCanceledOrder;
-
-            const total = {
-                totalOrder: totalOrder[0].totalOrder,
-                totalTransaction: totalTransaction[0].totalTransaction,
-                totalCanceledOrder: totalCanceledOrder
+            const currentYearData = {
+                order: yearOrderData,
+                transaction: yearTransactionData,
+                countOrder: getCountYearOrderData,
+                countTransaction: getCountYearTransactionData,
+                countCancel: getCountYearCancelData
             };
 
-            await redis.set(key, JSON.stringify(total));
-            redis.expire(key, 60 * 60 * 24);
+            await redis.set(key, JSON.stringify(currentYearData));
+            redis.expire(key, 60 * 60);
 
-            return total;
+            return currentYearData;
         } catch (error) {
             throw new Error(error);
         }
-    };
+    }
 
     static getNumberOfOrdersByMonthYearService = async () => {
         try {
-            const key = `number-of-orders-by-month-year`;
+            const currentYear = new Date().getFullYear()
+            const key = `number-of-orders-by-month-year-${currentYear}`;
             const cache = await redis.get(key);
             if (cache) {
                 return JSON.parse(cache);
             }
 
-            const data = await statisticRepository.getNumberOfOrdersByMonthYearFromDB();
-
-            await redis.set(key, JSON.stringify(data));
-            redis.expire(key, 60 * 60 * 24);
-
-            return data;
-        } catch (error) {
-            throw new Error(error);
-        }
-    };
-
-    static getNumberOfTransactionByMonthYearService = async () => {
-        try {
-            const key = `number-of-transaction-by-month-year`;
-            const cache = await redis.get(key);
-            if (cache) {
-                return JSON.parse(cache);
-            }
-
-            const data = await statisticRepository.getNumberOfTransactionByMonthYearFromDB();
+            const data = await statisticRepository.getRecentlyYearlyOrderFromDB(currentYear);
 
             await redis.set(key, JSON.stringify(data));
             redis.expire(key, 60 * 60 * 24);
