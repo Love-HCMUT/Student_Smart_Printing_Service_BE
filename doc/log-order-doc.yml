@@ -1,12 +1,12 @@
 tags:
-  - name: Order
+  - name: Order Log
     description: Các API liên quan đến lịch sử yêu cầu in tài liệu
 
 paths:
-  /order/order-history/{customerId}:
+  /logOrder/order-history/{customerId}:
     get:
       tags:
-        - Order
+        - Order Log
       summary: Lịch sử yêu cầu in tài liệu của người dùng
       description: Lấy lịch sử yêu cầu in tài liệu của một người dùng cụ thể theo customerId
       parameters:
@@ -47,10 +47,10 @@ paths:
         500:
           description: Lỗi xảy ra trong quá trình xử lý
 
-  /order/cancel-order/{orderId}:
+  /logOrder/cancel-order/{orderId}:
     post:
       tags:
-        - Order
+        - Order Log
       summary: Hủy đơn hàng
       description: Hủy một đơn hàng cụ thể
       parameters:
@@ -91,10 +91,10 @@ paths:
         500:
           description: Lỗi xảy ra trong quá trình xử lý
 
-  /order/spso/get-all-orders:
+  /logOrder/spso/get-all-orders:
     get:
       tags:
-        - Order
+        - Order Log
       summary: Lấy tất cả đơn hàng
       description: Lấy danh sách tất cả các đơn hàng
       responses:

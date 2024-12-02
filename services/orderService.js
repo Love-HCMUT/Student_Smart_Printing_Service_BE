@@ -102,7 +102,7 @@ const addCancelOrders = async (
 };
 
 const addDeclineOrders = async (
-  declineOrders = { staffID: 5, orderID: 5, logID: 5 }
+  declineOrders = { staffID: 5, orderID: 5, logID: 5, note: "Decline order" }
 ) => {
   return await orderModel.addDeclineOrders(declineOrders);
 };
@@ -163,6 +163,20 @@ const increaseCustomerBalance = async (customerID = 1, amount = 0) => {
   return await orderModel.increaseCustomerBalance(customerID, amount);
 };
 
+const getOrderCost = async (orderID = 1) => {
+  return await orderModel.getOrderCost(orderID);
+};
+
+const addPrintingLog = async (
+  printingLog = { orderID: 1, logNumber: 1, fileID: 10 }
+) => {
+  return await orderModel.addPrintingLog(printingLog);
+};
+
+const updatePrintingLogEndTime = async (fileID) => {
+  return await orderModel.updatePrintingLogEndTime(fileID);
+};
+
 export {
   addOrder,
   getOrderByPrinterID,
@@ -187,4 +201,7 @@ export {
   getPrinterByStaffID,
   decreaseCustomerBalance,
   increaseCustomerBalance,
+  getOrderCost,
+  addPrintingLog,
+  updatePrintingLogEndTime,
 };

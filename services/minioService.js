@@ -57,7 +57,7 @@ const getFileFromMinio = async (req, res) => {
   //   console.log("Error in getFileFromMinio:", err);
   //   return [];
   // }
-  const { fileName } = req.params;
+  const fileName = req.params.fileName;
   const bucketName = config.MINIO_BUCKET_NAME;
   try {
     try {

@@ -1,12 +1,12 @@
 tags:
-  - name: Payment
-    description: API liên quan đến thanh toán
+  - name: Payment Log
+    description: API liên quan đến lịch sử thanh toán
 
 paths:
-  /payment/get-balance/{customerId}:
+  /logPayment/get-balance/{customerId}:
     get:
       tags:
-        - Payment
+        - Payment Log
       summary: Lấy số lượng coin của người dùng
       description: Lấy số lượng coin của một người dùng cụ thể theo customerId
       parameters:
@@ -33,10 +33,10 @@ paths:
         500:
           description: Lỗi xảy ra trong quá trình xử lý
 
-  /payment/get-recent-transition/{customerId}:
+  /logPayment/get-recent-transition/{customerId}:
     get:
       tags:
-        - Payment
+        - Payment Log
       summary: Lấy 3 phiên giao dịch gần nhất của người dùng
       description: Lấy giao dịch gần đây của một khách hàng cụ thể
       parameters:
@@ -70,10 +70,10 @@ paths:
         500:
           description: Lỗi xảy ra trong quá trình xử lý
 
-  /payment/get-payment-history/{customerId}:
+  /logPayment/get-payment-history/{customerId}:
     get:
       tags:
-        - Payment
+        - Payment Log
       summary: Lấy lịch sử thanh toán của người dùng
       description: Lấy lịch sử thanh toán của một người dùng cụ thể theo customerId
       parameters:
@@ -118,10 +118,10 @@ paths:
         500:
           description: Lỗi xảy ra trong quá trình xử lý
 
-  /payment/spso/get-transaction/all:
+  /logPayment/spso/get-transaction/all:
     post:
       tags:
-        - Payment
+        - Payment Log
       summary: Lấy tất cả giao dịch
       description: Lấy danh sách tất cả các giao dịch
       responses:
