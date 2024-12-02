@@ -15,17 +15,6 @@ export const getRecentlyMonthlyOrder = async (req, res) => {
     }
 };
 
-
-export const getCurrentMonthlyOrder = async (req, res) => {
-    const { month, year } = req.params;
-
-    try {
-        res.status(200).send(await statisticService.getCurrentMonthlyOrderService(month, year));
-    } catch (error) {
-        res.status(500).send({ error: 'Internal Server Error' });
-    }
-};
-
 export const getTotalCount = async (req, res) => {
     try {
         res.status(200).send(await statisticService.getTotalCountService());
@@ -49,3 +38,13 @@ export const getNumberOfTransactionByMonthYear = async (req, res) => {
         res.status(500).send({ error });
     }
 }
+
+export const getCurrentMonthlyStatictis = async (req, res) => {
+    const { month, year } = req.params;
+
+    try {
+        res.status(200).send(await statisticService.getMonthlyOrderService(month, year));
+    } catch (error) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+};

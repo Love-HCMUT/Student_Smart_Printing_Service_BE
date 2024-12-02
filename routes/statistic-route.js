@@ -1,13 +1,13 @@
 import { Router } from "express";
 import {
-    getRecentlyMonthlyOrder, getCurrentMonthlyOrder,
+    getRecentlyMonthlyOrder, getCurrentMonthlyStatictis,
     getTotalCount, getNumberOfOrdersByMonthYear, getNumberOfTransactionByMonthYear
 } from '../controllers/statistic-controller.js';
 
 const router = Router();
 
 router.post('/spso/get-recently-monthly-order', getRecentlyMonthlyOrder);
-router.get('/spso/get-current-monthly-order/:month/:year', getCurrentMonthlyOrder)
+router.get('/spso/get-current-monthly-order/:month/:year', getCurrentMonthlyStatictis)
 router.post('/spso/get-total-count', getTotalCount);
 router.post('/spso/get-number-of-orders-by-month-year', getNumberOfOrdersByMonthYear);
 router.post('/spso/get-number-of-transaction-by-month-year', getNumberOfTransactionByMonthYear);
