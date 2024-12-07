@@ -67,5 +67,5 @@ app.use("/api", centralizeRouter)
 const port = process.env.PORT
 
 app.listen(port, () => {
-    console.log(`App thang ai listening on port http://localhost:${port}`)
+    console.log(`App TEST-DEPLOY listening on port http://localhost:${port}`)
 })
