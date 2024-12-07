@@ -1,0 +1,43 @@
+name: test SSH EC2 
+run-name: ${{ github.actor }} is trying to SSH to EC2
+
+on: 
+    push:
+        branches: [test-deploy]
+
+jobs: 
+    SSH-to-server: 
+        runs-on: ubuntu-latest
+        steps: 
+            # - name: checkout repository 
+            #   uses: actions/checkout@v3
+
+            # - name: login dockerhub
+            #   uses: docker/login-action@v2
+            #   with:
+            #     username: kietcse 
+            #     password: ${{ secrets.DOCKER_TOKEN }} 
+            
+            # - name: build docker image 
+            #   run: docker build -t kietcse/tracker . 
+            
+            # - name: push docker hub 
+            #   run: docker push kietcse/tracker
+
+            - name: create pem file 
+              env:
+                EC2_PEM_KEY: ${{ secrets.EC2_PEM_KEY }} 
+              run: | 
+                echo "$EC2_PEM_KEY" | base64 -d > my-server.pem
+                chmod 400 my-server.pem
+                
+            - name: ssh to server 
+              run: | 
+                ssh -o StrictHostKeyChecking=no -i "my-server.pem" ubuntu@ec2-52-194-193-253.ap-northeast-1.compute.amazonaws.com << EOF
+                  cd /home/ubuntu/
+                  sudo docker-compose down 
+                  sudo docker-compose pull 
+                  sudo docker-compose up -d
+                  sudo docker system prune -f
+                EOF
+              
