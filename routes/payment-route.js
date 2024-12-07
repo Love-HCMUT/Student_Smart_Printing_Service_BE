@@ -1,6 +1,7 @@
 import { Router } from "express"
 import paymentController from "../controllers/payment-controller.js"
 
+
 const router = Router()
 
 router.post('/momo', paymentController.createPaymentLink)
@@ -10,4 +11,3 @@ router.patch('/balance', paymentController.updateBalance)
 router.get('/combo', paymentController.loadComboData)
 
 export default router
-

@@ -82,7 +82,7 @@ export class AccountController {
         if (locationID == 0) {
           locationID = await AccountService.addLocation(campus, building, room);
         }
-        await AccountService.addStaff(accountId ,id ,locationID);
+        await AccountService.addStaff(accountId, id, locationID);
 
         if (phoneNumber) {
           await AccountService.addStaffPhoneNumber(accountId, phoneNumber);
