@@ -25,6 +25,32 @@ export class AccountController {
           .json(createResponse(false, "Missing required fields"));
       }
 
+
+      const fullNamePattern = /^[A-Za-zÀ-ỹ\s]{2,}$/;
+      if (!fullNamePattern.test(fullName)) {
+        return res
+          .status(400)
+          .json(createResponse(false, "Full name is invalid. Must contain only letters and spaces, at least 2 characters."));
+      }
+      const usernamePattern = /^.{8,20}$/;
+      if (!usernamePattern.test(username)) {
+        return res
+          .status(400)
+          .json(createResponse(false, "Username is invalid. Must be between 8 and 20 characters."));
+      }
+      const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,20}$/;
+
+      if (!password || !passwordPattern.test(password)) {
+        return res.status(400).json({
+          success: false,
+          message: "Password must include at least 1 uppercase character, 1 lowercase character, 1 number, and be between 8 and 20 characters long without spaces."
+        });
+      }
+      const phonePattern = /[0-9]{10,11}/;
+
+
+
+
       // Kiểm tra tài khoản đã tồn tại
       const existingAccount = await AccountService.findAccountByUsername(
         username
@@ -63,6 +89,12 @@ export class AccountController {
         await AccountService.addCustomer(accountId);
       } else if (roles === "SPSO") {
         await AccountService.addSPSO(accountId);
+        if (!phoneNumber || !phonePattern.test(phoneNumber)) {
+          return res.status(400).json({
+            success: false,
+            message: "Phone number must contain exactly 10 or 11 digits.",
+          });
+        }
         if (phoneNumber) {
           await AccountService.addSPSOPhoneNumber(accountId, phoneNumber);
         }
@@ -83,7 +115,12 @@ export class AccountController {
           locationID = await AccountService.addLocation(campus, building, room);
         }
         await AccountService.addStaff(accountId ,id ,locationID);
-
+        if (!phoneNumber || !phonePattern.test(phoneNumber)) {
+          return res.status(400).json({
+            success: false,
+            message: "Phone number must contain exactly 10 or 11 digits.",
+          });
+        }
         if (phoneNumber) {
           await AccountService.addStaffPhoneNumber(accountId, phoneNumber);
         }
@@ -149,7 +186,7 @@ export class AccountController {
 
       const data = {
         id: account.id,
-        username: account.username,
+        username: account.fullName,
         roles: account.roles,
       };
 
