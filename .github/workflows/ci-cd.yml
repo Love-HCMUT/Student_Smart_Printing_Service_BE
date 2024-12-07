@@ -6,23 +6,23 @@ on:
         branches: [test-deploy]
 
 jobs: 
-    SSH-to-server: 
+    push-images-to-server: 
         runs-on: ubuntu-latest
         steps: 
-            # - name: checkout repository 
-            #   uses: actions/checkout@v3
+            - name: checkout repository 
+              uses: actions/checkout@v3
 
-            # - name: login dockerhub
-            #   uses: docker/login-action@v2
-            #   with:
-            #     username: kietcse 
-            #     password: ${{ secrets.DOCKER_TOKEN }} 
+            - name: login dockerhub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: build docker image 
+              run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ssps-be . 
             
-            # - name: build docker image 
-            #   run: docker build -t kietcse/tracker . 
-            
-            # - name: push docker hub 
-            #   run: docker push kietcse/tracker
+            - name: push docker hub 
+              run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ssps-be
 
             - name: create pem file 
               env:
@@ -34,7 +34,7 @@ jobs:
             - name: ssh to server 
               run: | 
                 ssh -o StrictHostKeyChecking=no -i "my-server.pem" ubuntu@ec2-54-169-143-19.ap-southeast-1.compute.amazonaws.com << EOF
-                  cd /home/ubuntu/
+                  cd /home/ubuntu
                   sudo docker-compose down 
                   sudo docker-compose pull 
                   sudo docker-compose up -d

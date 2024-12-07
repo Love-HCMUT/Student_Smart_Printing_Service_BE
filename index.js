@@ -40,7 +40,7 @@ app.use(cors({
 // app.use(cors())
 
 // Sử dụng Swagger UICross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://backend:300
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+app.use('/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
 
 // parse json
