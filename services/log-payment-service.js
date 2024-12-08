@@ -41,7 +41,7 @@ export class paymentService {
 
             if (balanceAll) {
                 await redis.set(key, JSON.stringify(balanceAll));
-                redis.expire(key, 60 * 60)
+                redis.expire(key, 60 * 10)
             }
             return balanceAll;
         } catch (error) {
@@ -61,7 +61,7 @@ export class paymentService {
 
             if (balanceAll) {
                 await redis.set(key, JSON.stringify(balanceAll));
-                redis.expire(key, 60 * 30);
+                redis.expire(key, 60 * 10);
             }
             return balanceAll;
         }
@@ -83,7 +83,7 @@ export class paymentService {
             const balanceAll = await paymentRepository.getTransactionCountFromDB()
             if (balanceAll) {
                 await redis.set(key, JSON.stringify(balanceAll));
-                redis.expire(key, 60 * 60 * 24);
+                redis.expire(key, 60 * 10);
             }
             return balanceAll;
         } catch (error) {
