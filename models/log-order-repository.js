@@ -10,8 +10,12 @@ export class historyRepository {
     static cancelOrderFromDB = async (orderId, note) => {
         if (note === undefined) note = null
         const query = `CALL CancelOrder(?)`;
-        const rows = await dbs.promise().query(query, [orderId]);
-        return 'hello'
+        try {
+            await dbs.promise().query(query, [orderId]);
+        } catch (error) {
+            throw new Error(error.message);
+        }
+        return 'Order has been cancelled';
     };
 
     static getOrderAllFromDB = async (customerId) => {

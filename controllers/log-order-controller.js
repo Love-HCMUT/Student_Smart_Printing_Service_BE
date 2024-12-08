@@ -15,7 +15,7 @@ export const cancelOrder = async (req, res) => {
     try {
         res.status(200).send(await historyService.cancelOrderService(orderId, note))
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).send({ error: error.message });
     }
 };
 
