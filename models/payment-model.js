@@ -52,15 +52,23 @@ async function insertPaymentlog(time, money) {
 }
 
 async function createDepositLog(time, money, note, customerID, combo) {
-  const paymentLogId = await insertPaymentlog(time, money);
-  const depositLogId = await insertDepositLog(paymentLogId, note, customerID);
+  try {
+    const paymentLogId = await insertPaymentlog(time, money);
+    const depositLogId = await insertDepositLog(paymentLogId, note, customerID);
 
-  if (Array.isArray(combo)) {
-    combo.forEach(async (e) => {
-      await insertDepositCombo(paymentLogId, e.id, e.quantity);
-    });
-  } else {
-    console.log("Error: Combo khong phai la mang");
+    if (Array.isArray(combo)) {
+      combo.forEach(async (e) => {
+        await insertDepositCombo(paymentLogId, e.id, e.quantity);
+      });
+      return true
+    } else {
+      console.log("Error: Combo khong phai la mang");
+      return false
+    }
+  }
+  catch (error) {
+    throw error
+    console.log("fail when update payment data")
   }
 }
 
