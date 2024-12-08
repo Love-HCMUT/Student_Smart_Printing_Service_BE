@@ -10,8 +10,12 @@ export class historyRepository {
     static cancelOrderFromDB = async (orderId, note) => {
         if (note === undefined) note = null
         const query = `CALL CancelOrder(?)`;
-        const rows = await dbs.promise().query(query, [orderId]);
-        return 'hello'
+        try {
+            await dbs.promise().query(query, [orderId]);
+        } catch (error) {
+            throw new Error(error.message);
+        }
+        return 'Order has been cancelled';
     };
 
     static getOrderAllFromDB = async (customerId) => {
@@ -67,7 +71,7 @@ FROM
         LEFT JOIN
     declineOrders AS d ON m.orderID = d.orderID
 GROUP BY startTime , endTime , fileName , numberOfPage , printerID , printingStaffID , userID , status
-LIMIT 10 OFFSET 0`;
+LIMIT ? OFFSET ?`;
         const [rows] = await dbs.promise().query(query, [parseInt(limit), (parseInt(page) - 1) * parseInt(limit)]);
         return rows
     }
