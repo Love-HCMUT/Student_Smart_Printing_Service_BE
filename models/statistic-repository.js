@@ -1,12 +1,11 @@
 import dbs from "../config/mysql-dbs.js";
 
 export class statisticRepository {
-
     static getRecentlyMonthlyOrderFromDB = async (month, year) => {
         const query = `
             SELECT 
-                DATE(paymentLog.paymentTime) AS payment_date,
-                COUNT(*) AS total_orders
+                DATE(paymentLog.paymentTime) AS Date,
+                COUNT(*) AS OrderCount
             FROM
                 makeOrders
             JOIN
@@ -15,57 +14,152 @@ export class statisticRepository {
                 MONTH(paymentLog.paymentTime) = ?
                 AND YEAR(paymentLog.paymentTime) = ?
             GROUP BY DATE(paymentLog.paymentTime)
-            ORDER BY payment_date;
+            ORDER BY Date;
         `;
         const [rows] = await dbs.promise().query(query, [month, year]);
-        return rows
-    };
-
-    static getTotalOrderFromDB = async () => {
-        const query = `
-            SELECT 
-                COUNT(*) AS totalOrder
-            FROM
-                makeOrders;
-        `;
-        const [rows] = await dbs.promise().query(query);
         return rows;
     };
 
-    static getTotalTransactionFromDB = async () => {
+    static getRecentlyMonthlyTransactionFromDB = async (currentMonth, currentYear) => {
+        const query = `
+            SELECT
+                DATE(paymentLog.paymentTime) AS Date, 
+                COUNT(*) AS TransactionCount
+            FROM 
+                depositLog 
+            JOIN 
+                paymentLog ON depositLog.id = paymentLog.id
+            WHERE
+                MONTH(paymentLog.paymentTime) = ?
+                AND YEAR(paymentLog.paymentTime) = ?
+            GROUP BY DATE(paymentLog.paymentTime)
+            ORDER BY Date;
+        `;
+        const [rows] = await dbs.promise().query(query, [currentMonth, currentYear]);
+        return rows;
+    };
+
+    static getCountMonthOrderDataFromDB = async (currentMonth, currentYear) => {
         const query = `
             SELECT 
-                COUNT(*) AS totalTransaction
+                COUNT(*) AS totalOrders
             FROM
-                depositLog;
+                makeOrders
+            JOIN
+                paymentLog ON makeOrders.logID = paymentLog.id
+            WHERE
+                MONTH(paymentLog.paymentTime) = ?
+                AND YEAR(paymentLog.paymentTime) = ?
         `;
-        const [rows] = await dbs.promise().query(query);
+        const [rows] = await dbs.promise().query(query, [currentMonth, currentYear]);
+        return rows;
+    };
+
+    static getCountMonthTransactionrDataFromDB = async (currentMonth, currentYear) => {
+        const query = `
+            SELECT 
+                COUNT(*) AS totalTransactions
+            FROM 
+                depositLog 
+            JOIN 
+                paymentLog ON depositLog.id = paymentLog.id
+            WHERE
+                MONTH(paymentLog.paymentTime) = ?
+                AND YEAR(paymentLog.paymentTime) = ?
+        `;
+        const [rows] = await dbs.promise().query(query, [currentMonth, currentYear]);
+        return rows;
+    };
+
+    static getTotalCancelOrderFromDB = async (currentMonth, currentYear) => {
+        const query = `
+            SELECT 
+                SUM(totalCanceledOrder) AS totalCanceledOrder
+            FROM
+                (SELECT 
+                    COUNT(*) AS totalCanceledOrder
+                FROM
+                    cancelOrders 
+                JOIN 
+                    paymentLog ON cancelOrders.logID = paymentLog.id
+                WHERE 
+                    MONTH(paymentLog.paymentTime) = ?
+                    AND YEAR(paymentLog.paymentTime) = ?
+                UNION ALL 
+                SELECT 
+                    COUNT(*) AS totalCanceledOrder
+                FROM
+                    declineOrders 
+                JOIN 
+                    paymentLog ON declineOrders.logID = paymentLog.id
+                WHERE 
+                    MONTH(paymentLog.paymentTime) = ?
+                    AND YEAR(paymentLog.paymentTime) = ?
+                ) AS combined
+        `;
+        const [rows] = await dbs.promise().query(query, [currentMonth, currentYear, currentMonth, currentYear]);
+        return rows;
+    };
+
+    static getCountYearOrderDataFromDB = async (currentYear) => {
+        const query = `
+            SELECT 
+                COUNT(*) AS totalOrders
+            FROM
+                makeOrders
+            JOIN
+                paymentLog ON makeOrders.logID = paymentLog.id
+            WHERE
+                YEAR(paymentLog.paymentTime) = ?;
+        `;
+        const [rows] = await dbs.promise().query(query, [currentYear]);
+        return rows;
+    };
+
+    static getCountYearTransactionrDataFromDB = async (currentYear) => {
+        const query = `
+            SELECT 
+                COUNT(*) AS totalTransactions
+            FROM
+                depositLog
+            JOIN
+                paymentLog ON depositLog.id = paymentLog.id
+            WHERE
+                YEAR(paymentLog.paymentTime) = ?;
+        `;
+        const [rows] = await dbs.promise().query(query, [currentYear]);
+        return rows;
+    };
+
+    static getTotalCancelOrderByYearFromDB = async (currentYear) => {
+        const query = `
+            SELECT 
+                SUM(totalCanceledOrder) AS totalCanceledOrder
+            FROM
+                (SELECT 
+                    COUNT(*) AS totalCanceledOrder
+                FROM
+                    cancelOrders 
+                JOIN 
+                    paymentLog ON cancelOrders.logID = paymentLog.id
+                WHERE 
+                    YEAR(paymentLog.paymentTime) = ?
+                UNION ALL 
+                SELECT 
+                    COUNT(*) AS totalCanceledOrder
+                FROM
+                    declineOrders 
+                JOIN 
+                    paymentLog ON declineOrders.logID = paymentLog.id
+                WHERE 
+                    YEAR(paymentLog.paymentTime) = ?
+                ) AS combined
+        `;
+        const [rows] = await dbs.promise().query(query, [currentYear, currentYear]);
         return rows;
     }
 
-    static getTotalUserCanceledOrderFromDB = async () => {
-        const query = `
-            SELECT 
-                COUNT(*) AS totalCanceledOrder
-            FROM
-                cancelOrders
-        `;
-        const [rows] = await dbs.promise().query(query);
-        return rows;
-    };
-
-    static getTotalPSCanceledOrderFromDB = async () => {
-        const query = `
-            SELECT 
-                COUNT(*) AS totalCanceledOrder
-            FROM
-                declineOrders
-        `;
-        const [rows] = await dbs.promise().query(query);
-        return rows;
-    };
-
-    static getNumberOfOrdersByMonthYearFromDB = async () => {
+    static getRecentlyYearlyOrderFromDB = async (currentYear) => {
         const query = `
             SELECT 
                 DATE_FORMAT(paymentLog.paymentTime, '%Y-%m') AS MonthYear, 
@@ -74,16 +168,18 @@ export class statisticRepository {
                 makeOrders 
             JOIN 
                 paymentLog ON makeOrders.logID = paymentLog.id
+            WHERE
+                YEAR(paymentLog.paymentTime) = ?
             GROUP BY 
                 DATE_FORMAT(paymentLog.paymentTime, '%Y-%m')
             ORDER BY 
                 MonthYear;
         `;
-        const [rows] = await dbs.promise().query(query);
+        const [rows] = await dbs.promise().query(query, [currentYear]);
         return rows;
     };
 
-    static getNumberOfTransactionByMonthYearFromDB = async () => {
+    static getRecentlyYearlyTransactionFromDB = async (currentYear) => {
         const query = `
             SELECT 
                 DATE_FORMAT(paymentLog.paymentTime, '%Y-%m') AS MonthYear,
@@ -91,11 +187,13 @@ export class statisticRepository {
             FROM
                 depositLog
             JOIN
-	            paymentLog ON depositLog.id = paymentLog.id
+                paymentLog ON depositLog.id = paymentLog.id
+            WHERE
+                YEAR(paymentLog.paymentTime) = ?
             GROUP BY DATE_FORMAT(paymentLog.paymentTime, '%Y-%m')
             ORDER BY MonthYear;
         `;
-        const [rows] = await dbs.promise().query(query);
+        const [rows] = await dbs.promise().query(query, [currentYear]);
         return rows;
     };
 }

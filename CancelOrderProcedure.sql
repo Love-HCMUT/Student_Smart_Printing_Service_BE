@@ -6,34 +6,56 @@ CREATE PROCEDURE CancelOrder (
     IN oID INT
 )
 BEGIN
-    INSERT INTO returnLog (id)
-    SELECT DISTINCT m.logID
-    FROM makeOrders AS m
-    WHERE m.orderID = oID
-    AND NOT EXISTS (
-        SELECT 1
-        FROM returnLog AS r
-        WHERE r.id = m.logID
-    );
+    DECLARE orderStatus VARCHAR(50);
+    DECLARE customerID INT;
+    DECLARE orderID INT;
+    DECLARE logID INT;
+    DECLARE note VARCHAR(255);
+    
+    IF oID IS NULL OR oID <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Invalid order ID';
+    END IF;
 
-    INSERT INTO cancelOrders (customerID, orderID, logID, note)
-    SELECT 
-        m.customerID, m.orderID, m.logID, m.note
-    FROM
-        makeOrders AS m
-    WHERE
-        m.orderID = oID
-        AND NOT EXISTS (
-            SELECT 1
-            FROM cancelOrders AS c
-            WHERE c.customerID = m.customerID
-            AND c.orderID = m.orderID
-        )
-        AND EXISTS (
-            SELECT 1
-            FROM returnLog AS r
-            WHERE r.id = m.logID
-        );
+SELECT 
+    u.orderStatus
+INTO orderStatus FROM
+    userOrders AS u
+WHERE
+    u.id = oID;
+
+    IF orderStatus IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Order not found';
+    END IF;
+
+    IF orderStatus = 'Cancelled' OR orderStatus = 'Declined' OR orderStatus = 'Completed' THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Order already cancelled or declined or completed';
+    END IF;
+    
+
+
+SELECT 
+    m.customerID, m.orderID, m.logID, m.note
+INTO customerID , orderID , logID , note FROM
+    makeOrders AS m
+WHERE
+    m.orderID = oID;
+
+	IF customerID IS NULL THEN
+		SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'No order founded in makeOrder';
+    END IF;
+    
+	IF EXISTS (SELECT 1 FROM returnLog WHERE id = logID) THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Order already cancelled!';
+	END IF;
+    
+    INSERT INTO returnLog (id) VALUES (logID);
+    INSERT INTO cancelOrders (customerID, orderID, logID, note) 
+    VALUES (customerID, orderID, logID, 'Cancelled by customer');
 END $$
 
 DELIMITER ;

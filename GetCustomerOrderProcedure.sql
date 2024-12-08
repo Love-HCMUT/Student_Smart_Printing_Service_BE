@@ -1,3 +1,4 @@
+DROP PROCEDURE IF EXISTS GetCustomerOrders;
 DELIMITER $$
 CREATE PROCEDURE GetCustomerOrders (
     IN customerID INT
