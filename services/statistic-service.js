@@ -31,7 +31,7 @@ export class statisticService {
                 keys[2], JSON.stringify(twoMonthsAgoData)
             );
 
-            keys.forEach(key => redis.expire(key, 60 * 60));
+            keys.forEach(key => redis.expire(key, 60 * 10));
 
             return [currentMonthData, lastMonthData, twoMonthsAgoData];
         } catch (error) {
@@ -64,7 +64,7 @@ export class statisticService {
             };
 
             await redis.set(key, JSON.stringify(currentMonthData));
-            redis.expire(key, 60 * 60);
+            redis.expire(key, 60 * 10);
 
             return currentMonthData;
         } catch (error) {
@@ -97,7 +97,7 @@ export class statisticService {
             };
 
             await redis.set(key, JSON.stringify(currentYearData));
-            redis.expire(key, 60 * 60);
+            redis.expire(key, 60 * 10);
 
             return currentYearData;
         } catch (error) {
@@ -117,7 +117,7 @@ export class statisticService {
             const data = await statisticRepository.getRecentlyYearlyOrderFromDB(currentYear);
 
             await redis.set(key, JSON.stringify(data));
-            redis.expire(key, 60 * 60 * 24);
+            redis.expire(key, 60 * 10);
 
             return data;
         } catch (error) {
