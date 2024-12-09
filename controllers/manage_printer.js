@@ -24,7 +24,7 @@ export class PrinterController {
       } = req.body;
 
        // Kiểm tra printerStatus chỉ có thể là 'Available' hoặc 'Unavailable'
-       if (printerStatus !== "Available" && printerStatus !== "Unavailable") {
+       if (printerStatus !== "Available" && printerStatus !== "Unavailabl") {
         return res
           .status(400)
           .json({
@@ -53,13 +53,14 @@ export class PrinterController {
           .status(400)
           .json({ message: "side must be either '1' or '2'" });
       }
-
+      
       let locationID = await PrinterService.findOrAddLocation(
         campus,
         building,
         room
       );
-      if (locationID == "0") {
+      
+      if (locationID == 0) {
         locationID = await PrinterService.addLocation(campus, building, room);
       }
 
@@ -77,11 +78,12 @@ export class PrinterController {
         printingMethod,
         locationID
       );
-      const manage = await PrinterService.addManage(spsoID, printer.printerID);
+      const manage = await PrinterService.addManage(spsoID, printer);
+
       const spsoAction = "ADD";
       const manipulation = await PrinterService.addManipulation(
         spsoID,
-        printer.printerID,
+        printer,
         spsoAction
       );
       res
@@ -118,6 +120,7 @@ export class PrinterController {
       await PrinterService.updatePrinterStatus(printerStatus, printerIds);
       printerIds.forEach(async (id) => {
         let x = await PrinterService.findOrAddManage(spsoID, id);
+        console.log("x:   ",x)
         if (x == 0) {
           await PrinterService.addManage(spsoID, id);
         }
@@ -154,9 +157,10 @@ export class PrinterController {
         building,
         room,
       } = req.body;
+      
 
       // Kiểm tra printerStatus chỉ có thể là 'Available' hoặc 'Unavailable'
-      if (printerStatus !== "Available" && printerStatus !== "Unavailable") {
+      if (printerStatus !== "Available" && printerStatus !== "Unavailabl") {
         return res
           .status(400)
           .json({
@@ -191,9 +195,14 @@ export class PrinterController {
         building,
         room
       );
-      if (locationID == 0) {
+
+
+      
+      if (locationID==0) {
         locationID = await PrinterService.addLocation(campus, building, room);
+
       }
+      
 
       await PrinterService.updatePrinter(
         id,

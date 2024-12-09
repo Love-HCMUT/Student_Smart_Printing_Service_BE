@@ -17,7 +17,7 @@ export class AccountController {
         room,
         id,
       } = req.body;
-
+      
       // Kiểm tra các trường bắt buộc
       if (!username || !password || !fullName || !roles) {
         return res
@@ -25,7 +25,7 @@ export class AccountController {
           .json(createResponse(false, "Missing required fields"));
       }
 
-
+      
       const fullNamePattern = /^[A-Za-zÀ-ỹ\s]{2,}$/;
       if (!fullNamePattern.test(fullName)) {
         return res
@@ -55,16 +55,17 @@ export class AccountController {
       const existingAccount = await AccountService.findAccountByUsername(
         username
       );
+
       if (existingAccount) {
         return res
           .status(400)
           .json(createResponse(false, "Username is already taken"));
       }
-
+      
       // Hash mật khẩu
       const hashedPassword = await bcrypt.hash(password, 10);
       // const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
-
+      
       let accountId;
       // Thêm tài khoản vào database
       if (roles === "Lecture" || roles === "Student") {
@@ -75,6 +76,7 @@ export class AccountController {
           fullName,
           type
         );
+        console.log("account: ", accountId)
       } else {
         accountId = await AccountService.addAccount(
           username,
@@ -83,6 +85,8 @@ export class AccountController {
           roles
         );
       }
+
+
 
       // Xử lý thêm thông tin theo vai trò (roles)
       if (roles === "Lecture" || roles === "Student") {
@@ -158,6 +162,7 @@ export class AccountController {
 
       // Tìm tài khoản
       const account = await AccountService.findAccountByUsername(username);
+      // console.log(account);
       if (!account) {
         return res
           .status(401)
@@ -169,7 +174,7 @@ export class AccountController {
         password,
         account.accountPassword
       );
-
+  
       // Kiểm tra kết quả so sánh
       if (!isPasswordValid) {
         return res
