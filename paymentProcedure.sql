@@ -1,16 +1,15 @@
 DELIMITER // 
 
 DROP PROCEDURE IF EXISTS SavePaymentDepositLog //
-DELIMITER //
 
 CREATE PROCEDURE SavePaymentDepositLog (
     IN payTime DATETIME, 
     IN paymentAmount INT, 
     IN note VARCHAR(255), 
-    IN customerID INT,
-    OUT PaymentLogId INT
+    IN customerID INT
 )
 BEGIN
+    DECLARE PaymentLogId INT;
     START TRANSACTION;
 
     -- Chèn vào paymentLog và lấy ID
@@ -26,9 +25,10 @@ BEGIN
         -- Chèn vào depositLog nếu không có lỗi
         INSERT INTO depositLog (id, method, note, customerID) 
         VALUES (PaymentLogId, 'momo-wallet', note, customerID);
-
         COMMIT;
     END IF;
+
+    SELECT PaymentLogId AS PaymentLogId;
 END //
 
 

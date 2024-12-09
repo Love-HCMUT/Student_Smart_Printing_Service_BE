@@ -69,14 +69,11 @@ import dbs from "../config/mysql-dbs.js";
 
 async function createDepositLog(time, money, note, customerID, combo) {
   try {
-    const sql = 'CALL SavePaymentDepositLog(?, ?, ?, ?, @PaymentLogId)';
-    await dbs.promise().execute(sql, [time, money, note, customerID]);
-    console.log("finish save deposit logs")
-
-    const selectSql = 'SELECT @PaymentLogId AS PaymentLogId';
-    const [result] = await dbs.promise().query(selectSql);
+    const sql = 'CALL SavePaymentDepositLog(?, ?, ?, ?)';
+    const [result] = await dbs.promise().execute(sql, [time, money, note, customerID]);
     console.log(result)
-    const paymentLogId = result[0]?.PaymentLogId;
+    const paymentLogId = result[0][0]?.PaymentLogId;
+    // console.log("finish save deposit logs", paymentLogId)
 
     if (!paymentLogId) {
       console.log('Error: PaymentLogId không tồn tại');
@@ -87,7 +84,7 @@ async function createDepositLog(time, money, note, customerID, combo) {
       combo.forEach(async (e) => {
         const sql = `CALL saveDepositCombo(?, ?, ?)`
         await dbs.promise().query(sql, [paymentLogId, e.id, e.quantity]);
-        console.log("Save success combo", e.id)
+        // console.log("Save success combo", e.id)
       });
       return true
     } else {
