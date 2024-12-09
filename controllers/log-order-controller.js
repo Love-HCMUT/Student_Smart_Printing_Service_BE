@@ -20,9 +20,8 @@ export const cancelOrder = async (req, res) => {
 };
 
 export const getOrderAll = async (req, res) => {
-    const { customerId } = req.params;
     try {
-        res.status(200).send(await historyService.getOrderAllService(customerId));
+        res.status(200).send(await historyService.getOrderAllService());
     } catch (error) {
         res.status(500).send({ error: 'Internal Server Error' });
     }
