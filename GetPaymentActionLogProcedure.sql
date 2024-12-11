@@ -1,3 +1,4 @@
+DROP PROCEDURE IF EXISTS GetPaymentActionLog;
 DELIMITER $$
 CREATE PROCEDURE GetPaymentActionLog(IN userId INT) 
 BEGIN

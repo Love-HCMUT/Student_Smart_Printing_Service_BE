@@ -1,15 +1,98 @@
 import redis from '../config/redis-dbs.js';
 import { statisticRepository } from '../models/statistic-repository.js';
 
+const getCountMonthOrder = async (currentMonth, currentYear) => {
+    try {
+        let total = 0;
+        const key = `month-orders-${currentMonth}-${currentYear}`;
+        let data = await redis.get(key);
+        data = JSON.parse(data)
+        if (data === null) {
+            data = await statisticRepository.getRecentlyMonthlyOrderFromDB(currentMonth, currentYear);
+            await redis.set(key, JSON.stringify(data));
+            redis.expire(key, 60 * 10);
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            total += data[i].OrderCount
+        }
+        return [{
+            totalOrders: total
+        }]
+    } catch (error) {
+        console.log(`Error in function getCountMonthOrder: ${error}`);
+    }
+};
+
+const getCountMonthTransaction = async (currentMonth, currentYear) => {
+    try {
+        let total = 0;
+        const key = `month-transactions-${currentMonth}-${currentYear}`;
+        let data = await redis.get(key);
+        data = JSON.parse(data)
+        if (data === null) {
+            data = await statisticRepository.getRecentlyMonthlyTransactionFromDB(currentMonth, currentYear);
+            await redis.set(key, JSON.stringify(data));
+            redis.expire(key, 60 * 10);
+        }
+        for (let i = 0; i < data.length; i++) {
+            total += data[i].TransactionCount
+        }
+        return [{
+            totalTransactions: total
+        }]
+    } catch (error) {
+        console.log(`Error in function getCountMonthTransaction: ${error}`);
+    }
+};
+
+const getCountYearOrder = async (currentYear) => {
+    try {
+        let total = 0;
+        const key = `year-orders-${currentYear}`;
+        let data = await redis.get(key);
+        data = JSON.parse(data)
+        if (data === null) {
+            data = await statisticRepository.getRecentlyYearlyOrderFromDB(currentYear)
+            await redis.set(key, JSON.stringify(data));
+            redis.expire(key, 60 * 10);
+        }
+        for (let i = 0; i < data.length; i++) {
+            total += data[i].OrderCount
+        }
+        return [{
+            totalOrders: total
+        }]
+    } catch (error) {
+        console.log(`Error in function getCountYearOrder: ${error}`);
+    }
+};
+
+const getCountYearTransaction = async (currentYear) => {
+    try {
+        let total = 0;
+        const key = `year-transactions-${currentYear}`;
+        let data = await redis.get(key);
+        data = JSON.parse(data)
+        if (data === null) {
+            data = await statisticRepository.getRecentlyYearlyTransactionFromDB(currentYear)
+            await redis.set(key, JSON.stringify(data));
+            redis.expire(key, 60 * 10);
+        }
+        for (let i = 0; i < data.length; i++) {
+            total += data[i].TransactionCount
+        }
+        return [{
+            totalTransactions: total
+        }]
+    } catch (error) {
+        console.log(`Error in function getCountYearTransaction: ${error}`);
+    }
+};
+
 export class statisticService {
     static getRecentlyMonthlyOrderService = async () => {
         try {
-            const keys = ['currentMonth', 'lastMonth', 'twoMonthsAgo'];
-
-            const cacheVal = await redis.mget(keys)
-
-            if (cacheVal[0] !== null && cacheVal[1] !== null && cacheVal[2] !== null)
-                return [JSON.parse(cacheVal[0]), JSON.parse(cacheVal[1]), JSON.parse(cacheVal[2])]
 
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth() + 1;
@@ -19,17 +102,29 @@ export class statisticService {
             const twoMonthsAgo = currentMonth <= 2 ? 12 + (currentMonth - 2) : currentMonth - 2;
             const twoMonthsAgoYear = currentMonth <= 2 ? currentYear - 1 : currentYear;
 
-            const currentMonthData = await statisticRepository.getRecentlyMonthlyOrderFromDB(currentMonth, currentYear);
-            const lastMonthData = await statisticRepository.getRecentlyMonthlyOrderFromDB(lastMonth, lastMonthYear);
-            const twoMonthsAgoData = await statisticRepository.getRecentlyMonthlyOrderFromDB(twoMonthsAgo, twoMonthsAgoYear);
+            const keys = [
+                `month-orders-${currentMonth}-${currentYear}`,
+                `month-orders-${lastMonth}-${lastMonthYear}`,
+                `month-orders-${twoMonthsAgo}-${twoMonthsAgoYear}`];
+            const cacheVal = await redis.mget(keys);
 
-            redis.mset(keys[0], JSON.stringify(currentMonthData),
+            if (cacheVal.every(val => val !== null)) {
+                return cacheVal.map(val => JSON.parse(val));
+            }
+
+            const [currentMonthData, lastMonthData, twoMonthsAgoData] = await Promise.all([
+                statisticRepository.getRecentlyMonthlyOrderFromDB(currentMonth, currentYear),
+                statisticRepository.getRecentlyMonthlyOrderFromDB(lastMonth, lastMonthYear),
+                statisticRepository.getRecentlyMonthlyOrderFromDB(twoMonthsAgo, twoMonthsAgoYear)
+            ]);
+
+            await redis.mset(
+                keys[0], JSON.stringify(currentMonthData),
                 keys[1], JSON.stringify(lastMonthData),
-                keys[2], JSON.stringify(twoMonthsAgoData))
+                keys[2], JSON.stringify(twoMonthsAgoData)
+            );
 
-            redis.expire(keys[0], 60 * 60 * 24)
-            redis.expire(keys[1], 60 * 60 * 24)
-            redis.expire(keys[2], 60 * 60 * 24)
+            keys.forEach(key => redis.expire(key, 60 * 10));
 
             return [currentMonthData, lastMonthData, twoMonthsAgoData];
         } catch (error) {
@@ -37,89 +132,85 @@ export class statisticService {
         }
     };
 
-    static getCurrentMonthlyOrderService = async (currentMonth, currentYear) => {
+    static getMonthlyOrderService = async (currentMonth, currentYear) => {
         try {
-            const key = `current-monthly-order-${currentMonth}-${currentYear}`;
-            const cache = await redis.get(key)
+            const key = `month-${currentMonth}-${currentYear}-statistics`;
+            const cache = await redis.get(key);
             if (cache) {
-                return {
-                    currentMonth: JSON.parse(cache)
-                }
+                return JSON.parse(cache);
             }
-            const currentMonthData = await statisticRepository.getRecentlyMonthlyOrderFromDB(currentMonth, currentYear);
 
-            await redis.set(key, JSON.stringify(currentMonthData))
-            redis.expire(key, 60 * 60)
-
-            return {
-                currentMonth: currentMonthData
+            const [monthOrderData, monthTransactionData, getCountMonthOrderData, getCountTransactionData, getCountCancelData] = await Promise.all([
+                statisticRepository.getRecentlyMonthlyOrderFromDB(currentMonth, currentYear),
+                statisticRepository.getRecentlyMonthlyTransactionFromDB(currentMonth, currentYear),
+                getCountMonthOrder(currentMonth, currentYear),
+                getCountMonthTransaction(currentMonth, currentYear),
+                statisticRepository.getTotalCancelOrderFromDB(currentMonth, currentYear)
+            ]);
+            const currentMonthData = {
+                order: monthOrderData,
+                transaction: monthTransactionData,
+                countOrder: getCountMonthOrderData,
+                countTransaction: getCountTransactionData,
+                countCancel: getCountCancelData
             };
 
+            await redis.set(key, JSON.stringify(currentMonthData));
+            redis.expire(key, 60 * 10);
+
+            return currentMonthData;
         } catch (error) {
             throw new Error('Internal Server Error');
         }
     };
 
-    static getTotalCountService = async () => {
+    static getCurrentYearlyStatictisService = async (currentYear) => {
         try {
-            const key = `total-count`;
-            const cache = await redis.get(key)
+            const key = `year-${currentYear}-statistics`;
+            const cache = await redis.get(key);
             if (cache) {
-                return JSON.parse(cache)
+                return JSON.parse(cache);
             }
-            const totalOrder = await statisticRepository.getTotalOrderFromDB();
-            const totalTransaction = await statisticRepository.getTotalTransactionFromDB();
 
-            const totalUserCanceledOrder = await statisticRepository.getTotalUserCanceledOrderFromDB();
-            const totalPSCanceledOrder = await statisticRepository.getTotalPSCanceledOrderFromDB();
+            const [yearOrderData, yearTransactionData, getCountYearOrderData, getCountYearTransactionData, getCountYearCancelData] = await Promise.all([
+                statisticRepository.getRecentlyYearlyOrderFromDB(currentYear),
+                statisticRepository.getRecentlyYearlyTransactionFromDB(currentYear),
+                getCountYearOrder(currentYear),
+                getCountYearTransaction(currentYear),
+                statisticRepository.getTotalCancelOrderByYearFromDB(currentYear)
+            ]);
 
-            const totalCanceledOrder = totalUserCanceledOrder[0].totalCanceledOrder + totalPSCanceledOrder[0].totalCanceledOrder;
-
-            const total = {
-                totalOrder: totalOrder[0].totalOrder,
-                totalTransaction: totalTransaction[0].totalTransaction,
-                totalCanceledOrder: totalCanceledOrder
+            const currentYearData = {
+                order: yearOrderData,
+                transaction: yearTransactionData,
+                countOrder: getCountYearOrderData,
+                countTransaction: getCountYearTransactionData,
+                countCancel: getCountYearCancelData
             };
 
-            await redis.set(key, JSON.stringify(total))
-            redis.expire(key, 60 * 60 * 24)
+            await redis.set(key, JSON.stringify(currentYearData));
+            redis.expire(key, 60 * 10);
 
-            return total;
-
+            return currentYearData;
         } catch (error) {
             throw new Error(error);
         }
-    };
+    }
 
     static getNumberOfOrdersByMonthYearService = async () => {
         try {
-            const key = `number-of-orders-by-month-year`;
+            const currentYear = new Date().getFullYear()
+            const key = `number-of-orders-by-month-year-${currentYear}`;
             const cache = await redis.get(key);
             if (cache) {
-                return JSON.parse(cache)
+                return JSON.parse(cache);
             }
 
-            const data = await statisticRepository.getNumberOfOrdersByMonthYearFromDB();
+            const data = await statisticRepository.getRecentlyYearlyOrderFromDB(currentYear);
 
-            await redis.set(key, JSON.stringify(data))
-            redis.expire(key, 60 * 60 * 24)
+            await redis.set(key, JSON.stringify(data));
+            redis.expire(key, 60 * 10);
 
-            return data;
-        } catch (error) {
-            throw new Error(error);
-        }
-    };
-
-    static getNumberOfTransactionByMonthYearService = async () => {
-        try {
-            const key = `number-of-transaction-by-month-year`;
-            const cache = await redis.get(key);
-            if (cache) {
-                return JSON.parse(cache)
-            }
-            const data = await statisticRepository.getNumberOfTransactionByMonthYearFromDB();
-            redis.set(key, JSON.stringify(data))
-            redis.expire(key, 60 * 60 * 24)
             return data;
         } catch (error) {
             throw new Error(error);

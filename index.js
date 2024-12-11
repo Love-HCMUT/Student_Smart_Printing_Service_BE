@@ -47,16 +47,16 @@ app.use(sessionMiddleware);
 // Middleware để xử lý dữ liệu URL-encoded
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/test', async (req, res) => {
-    try {
-        // await test.insertDepositLog('2024-11-22 10:30:00', 50000)
-        await test.loadCombo()
-        res.status(200).json({ "mess": "true" })
-    }
-    catch (err) {
-        res.status(400)
-    }
-})
+// app.post('/test', async (req, res) => {
+//     try {
+//         // await test.insertDepositLog('2024-11-22 10:30:00', 50000)
+//         await test.loadCombo()
+//         res.status(200).json({ "mess": "true" })
+//     }
+//     catch (err) {
+//         res.status(400)
+//     }
+// })
 
 //routing 
 app.use(centralizeRouter)

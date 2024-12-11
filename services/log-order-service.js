@@ -12,24 +12,22 @@ export class historyService {
     };
 
     static cancelOrderService = async (orderId, note) => {
-        try {
-            return await historyRepository.cancelOrderFromDB(orderId, note);
-        } catch (error) {
-            console.error(error)
+
+        if (orderId === undefined || orderId === null || orderId === "") {
+            throw new Error("orderId is required")
+        } else if (isNaN(orderId)) {
+            throw new Error("orderId must be a number")
+        } else if (orderId < 0) {
+            throw new Error("orderId must be a positive number")
         }
+        return await historyRepository.cancelOrderFromDB(orderId, note);
+
     };
 
-    static getOrderAllService = async (customerId) => {
+    static getOrderAllService = async () => {
         try {
-            // const key = `order-all-${customerId}`
-            // const cache = await redis.get(key)
-            // if (cache) {
-            //     return JSON.parse(cache)
-            // } else {
-            const result = await historyRepository.getOrderAllFromDB(customerId)
-            // await redis.set(key, JSON.stringify(result))
+            const result = await historyRepository.getOrderAllFromDB()
             return result
-            // }
         } catch (error) {
             console.error(error)
         }
@@ -44,7 +42,7 @@ export class historyService {
             } else {
                 const result = await historyRepository.getOrderPaginationFromDB(page, limit)
                 await redis.set(key, JSON.stringify(result))
-                redis.expire(key, 60 * 30)
+                redis.expire(key, 60 * 10)
                 return result
             }
         } catch (error) {
@@ -61,7 +59,7 @@ export class historyService {
             } else {
                 const result = await historyRepository.getOrderCountFromDB()
                 await redis.set(key, JSON.stringify(result))
-                redis.expire(key, 60 * 30)
+                redis.expire(key, 60 * 10)
                 return result
             }
         } catch (error) {

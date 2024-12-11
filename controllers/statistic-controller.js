@@ -2,6 +2,7 @@ import { statisticService } from '../services/statistic-service.js';
 
 
 export const getRecentlyMonthlyOrder = async (req, res) => {
+
     try {
         const listCurrentMonth = await statisticService.getRecentlyMonthlyOrderService();
         const monthYear = await statisticService.getNumberOfOrdersByMonthYearService();
@@ -9,43 +10,26 @@ export const getRecentlyMonthlyOrder = async (req, res) => {
             listCurrentMonth: listCurrentMonth,
             monthYear: monthYear
         });
-
     } catch (error) {
         res.status(500).send({ error: 'Internal Server Error' });
     }
 };
 
-
-export const getCurrentMonthlyOrder = async (req, res) => {
+export const getCurrentMonthlyStatictis = async (req, res) => {
     const { month, year } = req.params;
 
     try {
-        res.status(200).send(await statisticService.getCurrentMonthlyOrderService(month, year));
+        res.status(200).send(await statisticService.getMonthlyOrderService(month, year));
     } catch (error) {
         res.status(500).send({ error: 'Internal Server Error' });
     }
 };
 
-export const getTotalCount = async (req, res) => {
+export const getCurrentYearlyStatictis = async (req, res) => {
+    const { year } = req.params;
     try {
-        res.status(200).send(await statisticService.getTotalCountService());
+        res.status(200).send(await statisticService.getCurrentYearlyStatictisService(year));
     } catch (error) {
-        res.status(500).send({ error });
-    }
-}
-
-export const getNumberOfOrdersByMonthYear = async (req, res) => {
-    try {
-        res.status(200).send(await statisticService.getNumberOfOrdersByMonthYearService());
-    } catch (error) {
-        res.status(500).send({ error });
-    }
-}
-
-export const getNumberOfTransactionByMonthYear = async (req, res) => {
-    try {
-        res.status(200).send(await statisticService.getNumberOfTransactionByMonthYearService());
-    } catch (error) {
-        res.status(500).send({ error });
+        res.status(500).send({ error: 'Internal Server Error' });
     }
 }
