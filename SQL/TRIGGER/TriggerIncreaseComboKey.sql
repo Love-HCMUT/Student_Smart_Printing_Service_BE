@@ -1,0 +1,10 @@
+DELIMITER $$
+CREATE TRIGGER increase_pk_combo
+BEFORE INSERT ON combo
+FOR EACH ROW
+BEGIN
+	DECLARE new_id VARCHAR(255);
+    SET new_id = CONCAT('COMBO-', LPAD(IFNULL((SELECT MAX(CAST(SUBSTRING(id, 8) AS UNSIGNED)) FROM combo), 0) + 1, 6, '0'));
+    SET NEW.id = new_id;
+END $$
+DELIMITER 

@@ -22,7 +22,8 @@ FROM
     combo AS c ON c.id = dc.comboID
 WHERE
     d.customerID = cID
-GROUP BY p.paymentTime, d.method, d.note;
+GROUP BY p.paymentTime, d.method, d.note
+ORDER BY p.paymentTime DESC;
 END $$
 
 DELIMITER 

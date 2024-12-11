@@ -1,5 +1,5 @@
 import dbs from "../config/mysql-dbs.js";
-
+import { getCountFromRepository } from "./get-count-from-repository.js";
 export class historyRepository {
     static getOrderHistoryFromDB = async (customerId) => {
         const query = 'CALL GetCustomerOrders(?)';
@@ -31,8 +31,6 @@ export class historyRepository {
     }
 
     static getOrderCountFromDB = async () => {
-        const query = `SELECT COUNT(*) AS totalOrder FROM makeOrders`;
-        const [rows] = await dbs.promise().query(query);
-        return rows[0];
+        return getCountFromRepository({ allOrderCount: true });
     }
 }
