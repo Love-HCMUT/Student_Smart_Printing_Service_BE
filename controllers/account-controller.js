@@ -17,7 +17,7 @@ export class AccountController {
         room,
         id,
       } = req.body;
-      
+
       // Kiểm tra các trường bắt buộc
       if (!username || !password || !fullName || !roles) {
         return res
@@ -25,7 +25,7 @@ export class AccountController {
           .json(createResponse(false, "Missing required fields"));
       }
 
-      
+
       const fullNamePattern = /^[A-Za-zÀ-ỹ\s]{2,}$/;
       if (!fullNamePattern.test(fullName)) {
         return res
@@ -48,9 +48,6 @@ export class AccountController {
       }
       const phonePattern = /[0-9]{10,11}/;
 
-
-
-
       // Kiểm tra tài khoản đã tồn tại
       const existingAccount = await AccountService.findAccountByUsername(
         username
@@ -61,11 +58,11 @@ export class AccountController {
           .status(400)
           .json(createResponse(false, "Username is already taken"));
       }
-      
+
       // Hash mật khẩu
       const hashedPassword = await bcrypt.hash(password, 10);
       // const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
-      
+
       let accountId;
       // Thêm tài khoản vào database
       if (roles === "Lecture" || roles === "Student") {
@@ -85,7 +82,6 @@ export class AccountController {
           roles
         );
       }
-
 
 
       // Xử lý thêm thông tin theo vai trò (roles)
@@ -118,7 +114,7 @@ export class AccountController {
         if (locationID == 0) {
           locationID = await AccountService.addLocation(campus, building, room);
         }
-        await AccountService.addStaff(accountId ,id ,locationID);
+        await AccountService.addStaff(accountId, id, locationID);
         if (!phoneNumber || !phonePattern.test(phoneNumber)) {
           return res.status(400).json({
             success: false,
@@ -174,7 +170,7 @@ export class AccountController {
         password,
         account.accountPassword
       );
-  
+
       // Kiểm tra kết quả so sánh
       if (!isPasswordValid) {
         return res
@@ -189,15 +185,22 @@ export class AccountController {
         roles: account.roles,
       };
 
+
       const data = {
         id: account.id,
         username: account.fullName,
         roles: account.roles,
       };
 
-      return res
-        .status(200)
-        .json(createResponse(true, "Login successful", data));
+      req.session.save((err) => {
+        if (err) {
+          console.error('Không thể lưu session:', err);
+          return res.status(500).send('Có lỗi xảy ra');
+        }
+        console.log("add session successfully ", req.session)
+        return res.status(200).json(createResponse(true, "Login successful", data));
+      });
+
     } catch (error) {
       console.error("Login error:", error);
       return res
@@ -236,9 +239,14 @@ export class AccountController {
         roles: account.roles,
       };
 
-      return res
-        .status(200)
-        .json(createResponse(true, "Login successful", data));
+      req.session.save((err) => {
+        if (err) {
+          console.error('Không thể lưu session:', err);
+          return res.status(500).send('Có lỗi xảy ra');
+        }
+        return res.status(200).json(createResponse(true, "Login successful", data));
+      });
+
     } catch (error) {
       console.error("Login error:", error);
       return res
@@ -256,6 +264,13 @@ export class AccountController {
             .status(500)
             .json(createResponse(false, "Failed to logout"));
         }
+
+        res.clearCookie('connect.sid', {
+          httpOnly: true,
+          secure: false, // Bật `true` nếu dùng HTTPS
+          sameSite: 'strict',
+        });
+        console.log("delete cookie")
 
         return res.status(200).json(createResponse(true, "Logout successful"));
       });

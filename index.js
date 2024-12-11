@@ -13,8 +13,11 @@ import dbs from './config/mysql-dbs.js'
 import { sessionMiddleware } from './config/sessionConfig.js';
 import accountRouter from "./routes/account-router.js";
 import PrinterRouter from "./routes/manage_printer.js"
+import session from 'express-session'
 
 const app = express()
+app.use(sessionMiddleware);
+
 
 // app.use(cors({
 //     origin: '*', // Cho phép tất cả domain
@@ -37,16 +40,22 @@ app.use(cors({
     credentials: true,
 }));
 
+// app.use(session({
+//     resave: true,
+//     saveUninitialized: true,
+//     secret: 'somesecret',
+//     cookie: { maxAge: 60000 }
+// }));
+
 // Sử dụng Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
 
 // parse json
 app.use(express.json())
-app.use(sessionMiddleware);
 // Middleware để xử lý dữ liệu URL-encoded
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 // app.post('/test', async (req, res) => {
 //     try {
 //         // await test.insertDepositLog('2024-11-22 10:30:00', 50000)
@@ -58,7 +67,31 @@ app.use(express.urlencoded({ extended: true }));
 //     }
 // })
 
+// app.get('/set_session', (req, res) => {
+//     //set a object to session
+//     req.session.User = {
+//         website: 'anonystick.com',
+//         type: 'blog javascript',
+//         like: '4550'
+//     }
+
+//     console.log(req.session)
+
+//     return res.status(200).json({ status: 'success' })
+// })
+
+//set session
+// app.get('/get_session', (req, res) => {
+//     //check session
+//     console.log(req.session)
+//     if (req.session.user) {
+//         return res.status(200).json({ status: 'success', session: req.session.user })
+//     }
+//     return res.status(200).json({ status: 'error', session: 'No session' })
+// })
+
 //routing 
+// app.use("/:test", (req, res) => console.log("your session ", req.session))
 app.use(centralizeRouter)
 app.use("/api/account", accountRouter);
 app.use("/api/printer", PrinterRouter);

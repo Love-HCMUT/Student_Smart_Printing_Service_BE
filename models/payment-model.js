@@ -82,8 +82,12 @@ async function createDepositLog(time, money, note, customerID, combo) {
 
     if (Array.isArray(combo)) {
       combo.forEach(async (e) => {
+
         const sql = `CALL saveDepositCombo(?, ?, ?)`
-        await dbs.promise().query(sql, [paymentLogId, e.id, e.quantity]);
+        console.log(e.id)
+        console.log(typeof (e.id))
+
+        await dbs.promise().execute(sql, [paymentLogId, e.id, e.quantity]);
         console.log("Save success combo", e.id)
       });
       return true

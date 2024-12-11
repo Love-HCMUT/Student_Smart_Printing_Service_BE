@@ -12,7 +12,7 @@ export const isAuthenticated = (req, res, next) => {
 export const hasRole = (requiredRole) => {
     return (req, res, next) => {
         if (req.session && req.session.user && req.session.user.roles === requiredRole) {
-            return next();
+            return next(); // Người dùng có vai trò phù hợp
         }
         res.status(403).json(createResponse(false, 'Forbidden. Insufficient permissions'));
     };
