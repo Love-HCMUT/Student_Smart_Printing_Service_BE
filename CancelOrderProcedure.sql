@@ -34,8 +34,6 @@ WHERE
             SET MESSAGE_TEXT = 'Order already cancelled or declined or completed';
     END IF;
     
-
-
 SELECT 
     m.customerID, m.orderID, m.logID, m.note
 INTO customerID , orderID , logID , note FROM
@@ -54,7 +52,12 @@ WHERE
 	END IF;
     
     INSERT INTO returnLog (id) VALUES (logID);
-    INSERT INTO cancelOrders (customerID, orderID, logID, note) 
+    
+    UPDATE printingLog
+    SET printingLog.endTime = now()
+    WHERE printingLog.orderID = oID;
+    
+    INSERT INTO cancelOrders (customerID, orderID, logID, note)
     VALUES (customerID, orderID, logID, 'Cancelled by customer');
 END $$
 
