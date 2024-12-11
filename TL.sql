@@ -23,3 +23,18 @@ ADD CONSTRAINT chk_phone_spso
 ALTER TABLE printer
 ADD CONSTRAINT chk_status 
     CHECK (printerStatus IN ('Available', 'Unavailabl'));
+
+-- trigger : nếu xóa 1 hay nhiều hàng trong table order thì lưu vào 1 bảng khác tên là DeleteAttempt
+use ssps;
+DROP TRIGGER IF EXISTS prevent_delete_order;
+DELIMITER $$
+
+CREATE TRIGGER prevent_delete_order
+BEFORE DELETE ON userOrders
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Deletion is not allowed. Attempt has been logged.';
+END$$
+
+DELIMITER ;
