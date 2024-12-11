@@ -1,10 +1,11 @@
 import dbs from "../config/mysql-dbs.js";
-
+import { getCountFromRepository } from "./get-count-from-repository.js";
 export class paymentRepository {
   static getCustomerBalance = async (customerId) => {
-    const query = "SELECT balance FROM customer WHERE id = ?";
-    const [rows] = await dbs.promise().query(query, [customerId]);
-    return rows.length ? rows[0].balance : null;
+    return getCountFromRepository({
+      balanceFromCustomer: true,
+      customerId
+    })
   };
 
   static getRecentTransitionFromDB = async (customerId) => {
@@ -19,12 +20,6 @@ export class paymentRepository {
     return rows[0];
   };
 
-  // static getTransactionAllFromDB = async () => {
-  //   const query = `CALL getAllTransaction(?)`;
-  //   const [rows] = await dbs.promise().query(query);
-  //   return rows[0];
-  // };
-
   static getTransactionPaginationFromDB = async (page, limit) => {
     const query = `CALL getTransactionPagination(?, ?)`;
 
@@ -35,8 +30,8 @@ export class paymentRepository {
   };
 
   static getTransactionCountFromDB = async () => {
-    const query = ` SELECT COUNT(*) AS totalTransaction FROM depositLog`;
-    const [rows] = await dbs.promise().query(query);
-    return rows[0];
+    return getCountFromRepository({
+      allTransactionCount: true
+    });
   };
 }
