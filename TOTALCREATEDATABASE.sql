@@ -227,7 +227,7 @@ CREATE TABLE depositCombo (
   comboID varchar(255) NOT NULL,
   quantity INT DEFAULT NULL,
   PRIMARY KEY (logID,comboID),
-  KEY depositCombo_ibfk_2 (comboID),
+  CONSTRAINT depositCombo_ibfk_2 FOREIGN KEY (comboID) REFERENCES combo (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT depositCombo_ibfk_1 FOREIGN KEY (logID) REFERENCES depositLog (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT chk_quantity CHECK ((quantity > 0))
 );

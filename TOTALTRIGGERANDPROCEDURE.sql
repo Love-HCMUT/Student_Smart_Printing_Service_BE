@@ -1,0 +1,675 @@
+DROP PROCEDURE IF EXISTS add_account;
+DROP PROCEDURE IF EXISTS find_or_add_location;
+DROP PROCEDURE IF EXISTS add_customer;
+DROP PROCEDURE IF EXISTS add_spso;
+DROP PROCEDURE IF EXISTS add_spso_phone_number;
+DROP PROCEDURE IF EXISTS add_staff_phone_number;
+DROP PROCEDURE IF EXISTS add_staff;
+DROP PROCEDURE IF EXISTS addLocation;
+DROP PROCEDURE IF EXISTS find_account_by_username;
+DROP PROCEDURE IF EXISTS CancelOrder;
+DROP PROCEDURE IF EXISTS GetCustomerOrders;
+DROP PROCEDURE IF EXISTS getCustomerTransaction;
+DROP PROCEDURE IF EXISTS getOrderLog;
+DROP PROCEDURE IF EXISTS getOrderPagination;
+DROP PROCEDURE IF EXISTS GetPaymentActionLog;
+DROP PROCEDURE IF EXISTS getRecentlyMonthlyOrder;
+DROP PROCEDURE IF EXISTS getRecentlyMonthlyTransaction;
+DROP PROCEDURE IF EXISTS getRecentlyYearlyOrder;
+DROP PROCEDURE IF EXISTS getRecentlyYearlyTransaction;
+DROP PROCEDURE IF EXISTS getTotalCancelOrderByMonth;
+DROP PROCEDURE IF EXISTS getTotalCancelOrderByYear; 
+DROP PROCEDURE IF EXISTS getTransactionPagination;
+DROP PROCEDURE IF EXISTS GetPrintersBySPSO;
+DROP PROCEDURE IF EXISTS AddManipulation;
+DROP PROCEDURE IF EXISTS AddPrinter;
+DROP PROCEDURE IF EXISTS AddManage;
+DROP PROCEDURE IF EXISTS find_or_add_manage;
+DROP PROCEDURE IF EXISTS UpdatePrinterStatus;
+DROP PROCEDURE IF EXISTS UpdatePrinter;
+DROP PROCEDURE IF EXISTS GetPrintersByIds;
+DROP PROCEDURE IF EXISTS SavePaymentDepositLog;
+DROP PROCEDURE IF EXISTS saveDepositCombo;
+DROP PROCEDURE IF EXISTS LoadCombo;
+DROP TRIGGER IF EXISTS  increase_pk_combo;
+DELIMITER $$
+
+
+CREATE PROCEDURE add_account(
+    IN p_username VARCHAR(50) ,
+    IN p_accountPassword VARCHAR(100) ,
+    IN p_fullName VARCHAR(100),
+    IN p_roles VARCHAR(20) 
+)
+BEGIN
+    INSERT INTO account (username, accountPassword, fullName, roles) 
+    VALUES (p_username, p_accountPassword, p_fullName, p_roles);
+    SELECT LAST_INSERT_ID() AS account_id;
+END$$
+
+
+CREATE PROCEDURE find_or_add_location(
+    IN p_campus VARCHAR(20) ,
+    IN p_building VARCHAR(20) ,
+    IN p_room VARCHAR(20) 
+)
+BEGIN
+    SELECT id FROM location WHERE campus = p_campus AND building = p_building AND room = p_room;
+END$$
+
+
+CREATE PROCEDURE add_customer(IN p_id INT)
+BEGIN
+    INSERT INTO customer (id) VALUES (p_id);
+END$$
+
+
+CREATE PROCEDURE add_spso(IN p_id INT)
+BEGIN
+    INSERT INTO spso (id) VALUES (p_id);
+END$$
+
+
+CREATE PROCEDURE add_spso_phone_number(IN p_id INT, IN p_phoneNumber VARCHAR(20) )
+BEGIN
+    INSERT INTO spsoPhoneNumbers (id, phoneNumber) VALUES (p_id, p_phoneNumber);
+END$$
+
+
+CREATE PROCEDURE add_staff_phone_number(IN p_id INT, IN p_phoneNumber VARCHAR(20) )
+BEGIN
+    INSERT INTO staffPhoneNumbers (id, phoneNumber) VALUES (p_id, p_phoneNumber);
+END$$
+
+
+CREATE PROCEDURE add_staff(IN p_id INT, IN p_spsoID INT, IN p_locationID INT)
+BEGIN
+    INSERT INTO staff (id, spsoID, locationID) VALUES (p_id, p_spsoID, p_locationID);
+END$$
+
+CREATE PROCEDURE addLocation(
+    IN campus VARCHAR(20)  ,
+    IN building VARCHAR(20) ,
+    IN room VARCHAR(20) )
+BEGIN
+    INSERT INTO location (campus, building, room)
+    VALUES (campus, building, room);
+    SELECT LAST_INSERT_ID() AS location_id;
+END$$
+
+
+CREATE PROCEDURE find_account_by_username(IN p_username VARCHAR(50))
+BEGIN
+    SELECT * FROM account WHERE username = p_username;
+END$$
+
+
+CREATE PROCEDURE CancelOrder (
+    IN oID INT
+)
+BEGIN
+    DECLARE orderStatus VARCHAR(50);
+    DECLARE customerID INT;
+    DECLARE orderID INT;
+    DECLARE logID INT;
+    DECLARE note VARCHAR(255);
+    
+    IF oID IS NULL OR oID <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Invalid order ID';
+    END IF;
+
+SELECT 
+    u.orderStatus
+INTO orderStatus FROM
+    userOrders AS u
+WHERE
+    u.id = oID;
+
+    IF orderStatus IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Order not found';
+    END IF;
+
+    IF orderStatus = 'Cancelled' OR orderStatus = 'Declined' OR orderStatus = 'Completed' THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Order already cancelled or declined or completed';
+    END IF;
+    
+SELECT 
+    m.customerID, m.orderID, m.logID, m.note
+INTO customerID , orderID , logID , note FROM
+    makeOrders AS m
+WHERE
+    m.orderID = oID;
+
+	IF customerID IS NULL THEN
+		SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'No order founded in makeOrder';
+    END IF;
+    
+	IF EXISTS (SELECT 1 FROM returnLog WHERE id = logID) THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Order already cancelled!';
+	END IF;
+    
+    INSERT INTO returnLog (id) VALUES (logID);
+    
+    UPDATE printingLog
+    SET printingLog.endTime = now()
+    WHERE printingLog.orderID = oID;
+    
+    INSERT INTO cancelOrders (customerID, orderID, logID, note)
+    VALUES (customerID, orderID, logID, 'Cancelled by customer');
+END $$
+
+CREATE PROCEDURE GetCustomerOrders (
+    IN customerID INT
+)
+BEGIN
+    SELECT 
+        u.id AS orderID,
+        u.orderDate AS orderDate,
+        CASE
+            WHEN c.orderID IS NOT NULL THEN 'Cancelled'
+            WHEN d.orderID IS NOT NULL THEN 'Declined'
+            ELSE u.orderStatus
+        END AS orderStatus,
+        u.completeTime AS completeAt,
+        COALESCE(c.note, m.note) AS note
+    FROM userOrders AS u
+    LEFT JOIN makeOrders AS m
+        ON u.id = m.orderID AND m.customerID = customerID
+    LEFT JOIN declineOrders AS d
+        ON u.id = d.orderID
+    LEFT JOIN cancelOrders AS c
+        ON u.id = c.orderID AND c.customerID = customerID
+    WHERE (m.customerID = customerID OR c.customerID = customerID);
+END$$
+
+CREATE PROCEDURE getCustomerTransaction(
+	cID INT
+)
+BEGIN
+SELECT 
+    p.paymentTime AS date_of_transaction,
+    SUM(c.numCoins) AS number_of_coins,
+    d.method AS method,
+    GROUP_CONCAT(dc.comboID) AS combo_list,
+    p.money AS charge,
+    d.note AS note
+FROM
+    depositLog AS d
+        JOIN
+    paymentLog AS p ON d.id = p.id
+        JOIN
+    depositCombo AS dc ON d.id = dc.logID
+        JOIN
+    combo AS c ON c.id = dc.comboID
+WHERE
+    d.customerID = cID
+GROUP BY p.paymentTime, d.method, d.note
+ORDER BY p.paymentTime DESC;
+END $$
+
+CREATE PROCEDURE getOrderLog()
+BEGIN
+SELECT 
+    customerID AS userID,
+    printerID AS printerID,
+    staffID AS printingStaffID,
+    fileName AS fileName,
+    startTime AS startTime,
+    endTime AS endTime,
+    numPages AS numberOfPage
+FROM
+    makeOrders AS m
+        JOIN
+    paymentLog AS p ON m.logID = p.id
+        JOIN
+    userOrders AS u ON m.orderID = u.id
+        JOIN
+    printingLog AS pl ON u.id = pl.orderID
+        JOIN
+    fileMetadata AS f ON pl.fileID = f.id;
+END $$
+
+CREATE PROCEDURE getOrderPagination(
+	pageSize INT,
+    offset INT
+)
+BEGIN
+SELECT 
+    m.customerID AS userID,
+    printerID AS printerID,
+    u.staffID AS printingStaffID,
+    fileName AS fileName,
+    startTime AS startTime,
+    endTime AS endTime,
+    numPages AS numberOfPage,
+    CASE
+        WHEN c.orderID IS NOT NULL THEN 'Cancelled'
+        WHEN d.orderID IS NOT NULL THEN 'Declined'
+        ELSE u.orderStatus
+    END AS status
+FROM
+    makeOrders AS m
+        LEFT JOIN
+    paymentLog AS p ON m.logID = p.id
+        LEFT JOIN
+    userOrders AS u ON m.orderID = u.id
+        LEFT JOIN
+    printingLog AS pl ON u.id = pl.orderID
+        LEFT JOIN
+    fileMetadata AS f ON pl.fileID = f.id
+        LEFT JOIN
+    cancelOrders AS c ON m.orderID = c.orderID
+        LEFT JOIN
+    declineOrders AS d ON m.orderID = d.orderID
+GROUP BY startTime , endTime , fileName , numberOfPage , printerID , printingStaffID , userID , status
+LIMIT pageSize OFFSET offset;
+END $$
+
+CREATE PROCEDURE GetPaymentActionLog(IN userId INT) 
+BEGIN
+	SELECT * 
+    FROM (
+		SELECT
+			p.money AS money,
+			p.paymentTime  AS time,
+			'AddCoin' AS paymentStatus
+		FROM
+			depositLog as d
+		JOIN
+			paymentLog AS p 
+		ON 
+			d.id = p.id
+		WHERE
+			d.customerID = userId
+	
+		UNION ALL
+    
+		SELECT 
+			p.money AS money,
+			p.paymentTime  AS time,
+			'MinusCoin' AS paymentStatus
+		FROM
+			makeOrders AS m
+		JOIN
+			paymentLog AS p 
+		ON 
+			m.orderID = p.id
+		WHERE
+			m.customerID = userId
+            AND m.orderID 
+            NOT IN (
+				SELECT orderID
+                FROM declineOrders
+            )
+		
+	) AS CombinedLogs
+    ORDER BY time DESC
+    LIMIT 3;	
+END$$
+
+CREATE PROCEDURE getRecentlyMonthlyOrder(
+	m INT,
+    y INT
+)
+BEGIN
+SELECT 
+	DATE(paymentLog.paymentTime) AS Date,
+	COUNT(*) AS OrderCount
+FROM
+	makeOrders
+JOIN
+	paymentLog ON makeOrders.logID = paymentLog.id
+WHERE
+	MONTH(paymentLog.paymentTime) = m
+	AND YEAR(paymentLog.paymentTime) = y
+GROUP BY DATE(paymentLog.paymentTime)
+ORDER BY Date;
+END $$
+
+CREATE PROCEDURE getRecentlyMonthlyTransaction(
+	m INT,
+    y INT
+)
+BEGIN
+SELECT
+                DATE(paymentLog.paymentTime) AS Date, 
+                COUNT(*) AS TransactionCount
+            FROM 
+                depositLog 
+            JOIN 
+                paymentLog ON depositLog.id = paymentLog.id
+            WHERE
+                MONTH(paymentLog.paymentTime) = m
+                AND YEAR(paymentLog.paymentTime) = y
+            GROUP BY DATE(paymentLog.paymentTime)
+            ORDER BY Date;
+END $$
+
+CREATE PROCEDURE getRecentlyYearlyOrder(
+	y INT
+)
+BEGIN
+	SELECT 
+                DATE_FORMAT(paymentLog.paymentTime, '%Y-%m') AS MonthYear, 
+                COUNT(*) AS OrderCount
+            FROM 
+                makeOrders 
+            JOIN 
+                paymentLog ON makeOrders.logID = paymentLog.id
+            WHERE
+                YEAR(paymentLog.paymentTime) = y 
+            GROUP BY 
+                DATE_FORMAT(paymentLog.paymentTime, '%Y-%m')
+            ORDER BY 
+                MonthYear;
+END $$
+CREATE PROCEDURE getRecentlyYearlyTransaction(
+	y INT
+)
+BEGIN
+	SELECT 
+                DATE_FORMAT(paymentLog.paymentTime, '%Y-%m') AS MonthYear,
+                COUNT(*) AS TransactionCount
+            FROM
+                depositLog
+            JOIN
+                paymentLog ON depositLog.id = paymentLog.id
+            WHERE
+                YEAR(paymentLog.paymentTime) = y
+            GROUP BY DATE_FORMAT(paymentLog.paymentTime, '%Y-%m')
+            ORDER BY MonthYear;
+END $$
+CREATE PROCEDURE getTotalCancelOrderByMonth(
+	m INT,
+    y INT
+)
+BEGIN
+SELECT 
+                SUM(totalCanceledOrder) AS totalCanceledOrder
+            FROM
+                (SELECT 
+                    COUNT(*) AS totalCanceledOrder
+                FROM
+                    cancelOrders 
+                JOIN 
+                    paymentLog ON cancelOrders.logID = paymentLog.id
+                WHERE 
+                    MONTH(paymentLog.paymentTime) = m
+                    AND YEAR(paymentLog.paymentTime) = y
+                UNION ALL 
+                SELECT 
+                    COUNT(*) AS totalCanceledOrder
+                FROM
+                    declineOrders 
+                JOIN 
+                    paymentLog ON declineOrders.logID = paymentLog.id
+                WHERE 
+                    MONTH(paymentLog.paymentTime) = m
+                    AND YEAR(paymentLog.paymentTime) = y
+                ) AS combined;
+END $$
+CREATE PROCEDURE getTotalCancelOrderByYear(
+	y INT
+)
+BEGIN
+SELECT 
+                SUM(totalCanceledOrder) AS totalCanceledOrder
+            FROM
+                (SELECT 
+                    COUNT(*) AS totalCanceledOrder
+                FROM
+                    cancelOrders 
+                JOIN 
+                    paymentLog ON cancelOrders.logID = paymentLog.id
+                WHERE 
+                    YEAR(paymentLog.paymentTime) = y
+                UNION ALL 
+                SELECT 
+                    COUNT(*) AS totalCanceledOrder
+                FROM
+                    declineOrders 
+                JOIN 
+                    paymentLog ON declineOrders.logID = paymentLog.id
+                WHERE 
+                    YEAR(paymentLog.paymentTime) = y
+                ) AS combined;
+END $$
+CREATE PROCEDURE getTransactionPagination(
+	lmt INT,
+    ost INT
+)
+BEGIN
+SELECT 
+                            customerID AS ID,
+                            paymentTime AS dateOfTransaction,
+                            SUM(depositCombo.quantity * combo.numCoins) AS coins,
+                            SUM(depositCombo.quantity * combo.price) 	AS charge, 
+                            method AS paymentMethod,
+                            note
+                        FROM
+                            depositLog
+                        JOIN
+                            paymentLog ON depositLog.id = paymentLog.id
+                        JOIN
+                            depositCombo ON depositLog.id = depositCombo.logID
+                        JOIN
+                            combo ON depositCombo.comboID = combo.id
+                        GROUP BY paymentLog.id
+                        ORDER BY paymentTime DESC
+                        LIMIT lmt OFFSET ost;
+END $$
+CREATE PROCEDURE GetPrintersBySPSO()
+BEGIN
+    SELECT 
+        printer.id AS printer_id,
+        printer.brand,
+        printer.model,
+        printer.printerDescription AS description,
+        CONCAT(location.campus, " - ", location.building, " - ", location.room) AS location,
+        printer.printerStatus AS status
+    FROM printer
+    JOIN location ON printer.locationID = location.id;
+END$$
+
+
+
+CREATE PROCEDURE AddManipulation(
+    IN spsoID INT,
+    IN printerID INT,
+    IN spsoAction VARCHAR(20),
+    IN actionTime DATETIME
+)
+BEGIN
+    INSERT INTO manipulation (spsoID, printerID, spsoAction, actionTime)
+    VALUES (spsoID, printerID, spsoAction, actionTime);
+    SELECT LAST_INSERT_ID() AS manipulation_id;
+END$$
+
+
+CREATE PROCEDURE AddManage(
+    IN spsoID INT,
+    IN printerID INT
+)
+BEGIN
+    INSERT INTO manage (spsoID, printerID)
+    VALUES (spsoID, printerID);
+    SELECT LAST_INSERT_ID() AS manage_id;
+END$$
+
+
+CREATE PROCEDURE find_or_add_manage(
+    IN p_spsoID INT,
+    IN p_printerID INT
+)
+BEGIN
+    SELECT spsoID FROM manage WHERE  spsoID = p_spsoID AND printerID = p_printerID;
+END$$
+
+
+CREATE PROCEDURE AddPrinter(
+    IN printerStatus VARCHAR(10),
+    IN printerDescription VARCHAR(255),
+    IN resolution VARCHAR(30),
+    IN colorPrinting BOOL,
+    IN side VARCHAR(20),
+    IN price INT,
+    IN model VARCHAR(50),
+    IN speed INT,
+    IN brand VARCHAR(50),
+    IN wireless BOOL,
+    IN printingMethod VARCHAR(20),
+    IN locationID INT
+)
+BEGIN
+    INSERT INTO printer 
+    (printerStatus, printerDescription, resolution, colorPrinting, side, price, model, speed, brand, wireless, printingMethod, locationID)
+    VALUES (printerStatus, printerDescription, resolution, colorPrinting, side, price, model, speed, brand, wireless, printingMethod, locationID);
+    SELECT LAST_INSERT_ID() AS printer_id;
+END$$
+
+CREATE PROCEDURE UpdatePrinterStatus(
+    IN printerStatus VARCHAR(20), 
+    IN printerIds TEXT             
+)
+BEGIN
+    SET @query = CONCAT('
+        UPDATE printer 
+        SET printerStatus = "', printerStatus, '" 
+        WHERE id IN (', printerIds, ')
+    ');
+
+    PREPARE stmt FROM @query;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+END$$
+
+CREATE PROCEDURE UpdatePrinter(
+    IN printerId INT,
+    IN printerStatus VARCHAR(10),
+    IN printerDescription VARCHAR(255),
+    IN resolution VARCHAR(30),
+    IN colorPrinting BOOL,
+    IN side VARCHAR(20),
+    IN price INT,
+    IN model VARCHAR(50),
+    IN speed INT,
+    IN brand VARCHAR(50),
+    IN wireless BOOL,
+    IN printingMethod VARCHAR(20),
+    IN locationID INT
+)
+BEGIN
+    UPDATE printer 
+    SET 
+        printerStatus = printerStatus, 
+        printerDescription = printerDescription, 
+        resolution = resolution, 
+        colorPrinting = colorPrinting, 
+        side = side, 
+        price = price, 
+        model = model, 
+        speed = speed, 
+        brand = brand, 
+        wireless = wireless, 
+        printingMethod = printingMethod, 
+        locationID = locationID
+    WHERE id = printerId;
+END$$
+
+
+CREATE PROCEDURE GetPrintersByIds(
+    IN printerIds TEXT
+)
+BEGIN
+    SET @query = CONCAT(
+        'SELECT 
+            printer.id AS printer_id,
+            printer.brand,
+            printer.model,
+            printer.printerStatus AS status,
+            location.campus,
+            location.building,
+            location.room,
+            printer.printerDescription AS description,
+            printer.resolution,
+            printer.colorPrinting AS color,
+            printer.side AS oneTwoSide,
+            printer.price,
+            printer.speed,
+            printer.wireless AS wirelessConnection,
+            printer.printingMethod
+        FROM printer
+        JOIN location ON printer.locationID = location.id
+        WHERE printer.id IN (', printerIds, ')'
+    );
+
+    PREPARE stmt FROM @query;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+END$$
+
+CREATE PROCEDURE SavePaymentDepositLog (
+    IN payTime DATETIME, 
+    IN paymentAmount INT, 
+    IN note VARCHAR(255), 
+    IN customerID INT
+)
+BEGIN
+    DECLARE PaymentLogId INT;
+    START TRANSACTION;
+
+    -- Chèn vào paymentLog và lấy ID
+    INSERT INTO paymentLog (paymentTime, money) 
+    VALUES (payTime, paymentAmount);
+    SET PaymentLogId = LAST_INSERT_ID();
+
+    -- Kiểm tra nếu PaymentLogId không hợp lệ
+    IF PaymentLogId IS NULL OR PaymentLogId < 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: PaymentLogId is undefined';
+    ELSE
+        -- Chèn vào depositLog nếu không có lỗi
+        INSERT INTO depositLog (id, method, note, customerID) 
+        VALUES (PaymentLogId, 'momo-wallet', note, customerID);
+        COMMIT;
+    END IF;
+
+    SELECT PaymentLogId AS PaymentLogId;
+END $$
+
+
+CREATE PROCEDURE saveDepositCombo(
+    IN depositId INT, 
+    IN comboId INT, 
+    IN quantity INT
+)
+BEGIN
+    IF EXISTS (SELECT 1 FROM combo WHERE id = comboId) THEN
+        INSERT INTO depositCombo (LogID, comboID, quantity)
+        VALUES (depositId, comboId, quantity);
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'comboID does not exist in combo table';
+    END IF;
+END $$
+
+CREATE PROCEDURE LoadCombo() 
+BEGIN
+    SELECT * FROM combo;
+END $$
+
+CREATE TRIGGER increase_pk_combo
+BEFORE INSERT ON combo
+FOR EACH ROW
+BEGIN
+    DECLARE new_id VARCHAR(255);
+    SET new_id = CONCAT('CB', LPAD(IFNULL((SELECT MAX(CAST(SUBSTRING(id, 3) AS UNSIGNED)) FROM combo), 0) + 1, 4, '0'));
+    SET NEW.id = new_id;
+END $$
+
+DELIMITER ;
