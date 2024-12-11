@@ -24,9 +24,9 @@ export class historyService {
 
     };
 
-    static getOrderAllService = async (customerId) => {
+    static getOrderAllService = async () => {
         try {
-            const result = await historyRepository.getOrderAllFromDB(customerId)
+            const result = await historyRepository.getOrderAllFromDB()
             return result
         } catch (error) {
             console.error(error)

@@ -93,8 +93,9 @@ export class paymentService {
 
     static getTransactionAllService = async () => {
         try {
-            const balanceAll = await paymentRepository.getTransactionAllFromDB();
-            return balanceAll;
+            // const balanceAll = await paymentRepository.getTransactionAllFromDB();
+            // return balanceAll;
+            return [];
         } catch (error) {
             throw new Error("Error fetching balance");
         }
@@ -103,10 +104,19 @@ export class paymentService {
 
     static getTransactionPaginationService = async (page, limit) => {
         try {
+            const key = `transaction-pagination-${page}-${limit}`;
+            const cache = await redis.get(key);
+            if (cache) {
+                return JSON.parse(cache);
+            }
             const balanceAll = await paymentRepository.getTransactionPaginationFromDB(
                 page,
                 limit
             );
+            if (balanceAll) {
+                await redis.set(key, JSON.stringify(balanceAll));
+                redis.expire(key, 60 * 10);
+            }
             return balanceAll;
         } catch (error) {
             throw new Error(error);

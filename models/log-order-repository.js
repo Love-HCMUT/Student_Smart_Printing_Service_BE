@@ -18,62 +18,16 @@ export class historyRepository {
         return 'Order has been cancelled';
     };
 
-    static getOrderAllFromDB = async (customerId) => {
-        const query = `SELECT 
-                            customerID AS userID,
-                            printerID AS printerID,
-                            staffID AS printingStaffID,
-                            fileName AS fileName,
-                            startTime AS startTime,
-                            endTime AS endTime,
-                            numPages AS numberOfPage
-                        FROM
-                            makeOrders AS m
-                        JOIN
-                            paymentLog AS p ON m.logID = p.id
-                        JOIN
-                            userOrders AS u ON m.orderID = u.id
-                        JOIN
-                            printingLog AS pl ON u.id = pl.orderID
-                        JOIN
-                            fileMetadata AS f ON pl.fileID = f.id`;
-        const [rows] = await dbs.promise().query(query, [customerId]);
+    static getOrderAllFromDB = async () => {
+        const query = `CALL getOrderLog()`;
+        const [rows] = await dbs.promise().query(query, []);
         return rows
     };
 
     static getOrderPaginationFromDB = async (page, limit) => {
-        const query = `
-                        SELECT 
-    m.customerID AS userID,
-    printerID AS printerID,
-    u.staffID AS printingStaffID,
-    fileName AS fileName,
-    startTime AS startTime,
-    endTime AS endTime,
-    numPages AS numberOfPage,
-    CASE
-        WHEN c.orderID IS NOT NULL THEN 'Cancelled'
-        WHEN d.orderID IS NOT NULL THEN 'Declined'
-        ELSE u.orderStatus
-    END AS status
-FROM
-    makeOrders AS m
-        LEFT JOIN
-    paymentLog AS p ON m.logID = p.id
-        LEFT JOIN
-    userOrders AS u ON m.orderID = u.id
-        LEFT JOIN
-    printingLog AS pl ON u.id = pl.orderID
-        LEFT JOIN
-    fileMetadata AS f ON pl.fileID = f.id
-        LEFT JOIN
-    cancelOrders AS c ON m.orderID = c.orderID
-        LEFT JOIN
-    declineOrders AS d ON m.orderID = d.orderID
-GROUP BY startTime , endTime , fileName , numberOfPage , printerID , printingStaffID , userID , status
-LIMIT ? OFFSET ?`;
+        const query = `CALL getOrderPagination(?, ?)`;
         const [rows] = await dbs.promise().query(query, [parseInt(limit), (parseInt(page) - 1) * parseInt(limit)]);
-        return rows
+        return rows[0]
     }
 
     static getOrderCountFromDB = async () => {
