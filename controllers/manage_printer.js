@@ -120,7 +120,6 @@ export class PrinterController {
       await PrinterService.updatePrinterStatus(printerStatus, printerIds);
       printerIds.forEach(async (id) => {
         let x = await PrinterService.findOrAddManage(spsoID, id);
-        console.log("x:   ",x)
         if (x == 0) {
           await PrinterService.addManage(spsoID, id);
         }
