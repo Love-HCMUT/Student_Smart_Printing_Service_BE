@@ -23,12 +23,44 @@ export class PrinterController {
         room,
       } = req.body;
 
+       // Kiểm tra printerStatus chỉ có thể là 'Available' hoặc 'Unavailable'
+       if (printerStatus !== "Available" && printerStatus !== "Unavailabl") {
+        return res
+          .status(400)
+          .json({
+            message:
+              "printerStatus must be either 'Available' or 'Unavailable'",
+          });
+      }
+
+      // Kiểm tra colorPrinting chỉ có thể là 1 hoặc 0
+      if (colorPrinting !== 1 && colorPrinting !== 0) {
+        return res
+          .status(400)
+          .json({ message: "colorPrinting must be either 1 or 0" });
+      }
+
+      // Kiểm tra wireless chỉ có thể là 'Yes' hoặc 'No'
+      if (wireless !== 1 && wireless !== 0) {
+        return res
+          .status(400)
+          .json({ message: "wireless must be either 1 or 0" });
+      }
+
+      // Kiểm tra side chỉ có thể là 'One-side' hoặc 'Two-side'
+      if (side !== "1" && side !== "2") {
+        return res
+          .status(400)
+          .json({ message: "side must be either '1' or '2'" });
+      }
+      
       let locationID = await PrinterService.findOrAddLocation(
         campus,
         building,
         room
       );
-      if (locationID == "0") {
+      
+      if (locationID == 0) {
         locationID = await PrinterService.addLocation(campus, building, room);
       }
 
@@ -46,9 +78,14 @@ export class PrinterController {
         printingMethod,
         locationID
       );
-      const manage = await PrinterService.addManage(spsoID, printer.printerID)
+      const manage = await PrinterService.addManage(spsoID, printer);
+
       const spsoAction = "ADD";
-      const manipulation = await PrinterService.addManipulation(spsoID, printer.printerID, spsoAction)
+      const manipulation = await PrinterService.addManipulation(
+        spsoID,
+        printer,
+        spsoAction
+      );
       res
         .status(201)
         .json(createResponse(true, "Printer added successfully", printer));
@@ -62,23 +99,33 @@ export class PrinterController {
   // Cập nhật trạng thái cho danh sách máy in
   static async updatePrinterStatus(req, res) {
     try {
-      const {spsoID} = req.query
+      const { spsoID } = req.query;
       const { printerStatus } = req.body;
       const { printerIds } = req.body; // Expecting an array of IDs
-      
 
       if (!Array.isArray(printerIds) || printerIds.length === 0) {
         return res
           .status(400)
           .json({ message: "printerIds must be a non-empty array" });
       }
+      if (printerStatus !== "Available" && printerStatus !== "Unavailable") {
+        return res
+          .status(400)
+          .json({
+            message:
+              "printerStatus must be either 'Available' or 'Unavailable'",
+          });
+      }
 
       await PrinterService.updatePrinterStatus(printerStatus, printerIds);
-      printerIds.forEach(async(id) =>  {
-        let x = await PrinterService.findOrAddManage(spsoID, id)
-        if (x == 0) { await PrinterService.addManage(spsoID, id) } 
-        await PrinterService.addManipulation(spsoID, id, printerStatus)
-      })
+      printerIds.forEach(async (id) => {
+        let x = await PrinterService.findOrAddManage(spsoID, id);
+        console.log("x:   ",x)
+        if (x == 0) {
+          await PrinterService.addManage(spsoID, id);
+        }
+        await PrinterService.addManipulation(spsoID, id, printerStatus);
+      });
       res
         .status(200)
         .json(createResponse(true, "Printer statuses updated successfully"));
@@ -93,7 +140,7 @@ export class PrinterController {
   static async updatePrinter(req, res) {
     try {
       const spsoID = req.params.spsoID;
-      const  id  = req.params.id; // Printer ID from the URL
+      const id = req.params.id; // Printer ID from the URL
       const {
         printerStatus,
         printerDescription,
@@ -110,15 +157,52 @@ export class PrinterController {
         building,
         room,
       } = req.body;
+      
+
+      // Kiểm tra printerStatus chỉ có thể là 'Available' hoặc 'Unavailable'
+      if (printerStatus !== "Available" && printerStatus !== "Unavailabl") {
+        return res
+          .status(400)
+          .json({
+            message:
+              "printerStatus must be either 'Available' or 'Unavailable'",
+          });
+      }
+
+      // Kiểm tra colorPrinting chỉ có thể là 1 hoặc 0
+      if (colorPrinting !== 1 && colorPrinting !== 0) {
+        return res
+          .status(400)
+          .json({ message: "colorPrinting must be either 1 or 0" });
+      }
+
+      // Kiểm tra wireless chỉ có thể là 'Yes' hoặc 'No'
+      if (wireless !== 1 && wireless !== 0) {
+        return res
+          .status(400)
+          .json({ message: "wireless must be either 1 or 0" });
+      }
+
+      // Kiểm tra side chỉ có thể là 'One-side' hoặc 'Two-side'
+      if (side !== "1" && side !== "2") {
+        return res
+          .status(400)
+          .json({ message: "side must be either '1' or '2'" });
+      }
 
       let locationID = await PrinterService.findOrAddLocation(
         campus,
         building,
         room
       );
-      if (locationID == 0) {
+
+
+      
+      if (locationID==0) {
         locationID = await PrinterService.addLocation(campus, building, room);
+
       }
+      
 
       await PrinterService.updatePrinter(
         id,
@@ -135,11 +219,13 @@ export class PrinterController {
         printingMethod,
         locationID
       );
-      let x = await PrinterService.findOrAddManage(spsoID, id)
-    
-        if (x == 0) { await PrinterService.addManage(spsoID, id) } 
-      const S = "UPDATE"
-        await PrinterService.addManipulation(spsoID, id, S)
+      let x = await PrinterService.findOrAddManage(spsoID, id);
+
+      if (x == 0) {
+        await PrinterService.addManage(spsoID, id);
+      }
+      const S = "UPDATE";
+      await PrinterService.addManipulation(spsoID, id, S);
       res
         .status(200)
         .json(createResponse(true, "Printer updated successfully"));
@@ -151,18 +237,17 @@ export class PrinterController {
   // Lấy thông tin tất cả máy in
   static async getAllPrinters(req, res) {
     try {
-        // const { spsoID } = req.query; // Lấy từ query string
-        const printers = await PrinterService.getPrintersBySPSO();
-        res
-            .status(200)
-            .json(createResponse(true, "Successful fetching printers", printers));
+      // const { spsoID } = req.query; // Lấy từ query string
+      const printers = await PrinterService.getPrintersBySPSO();
+      res
+        .status(200)
+        .json(createResponse(true, "Successful fetching printers", printers));
     } catch (error) {
-        res
-            .status(500)
-            .json(createResponse(false, "Error fetching printers", error.message));
+      res
+        .status(500)
+        .json(createResponse(false, "Error fetching printers", error.message));
     }
-}
-
+  }
 
   // Lấy thông tin một máy in cụ thể
   static async getPrintersByIds(req, res) {
