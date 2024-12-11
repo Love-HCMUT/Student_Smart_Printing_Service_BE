@@ -42,7 +42,7 @@ export class historyService {
             } else {
                 const result = await historyRepository.getOrderPaginationFromDB(page, limit)
                 await redis.set(key, JSON.stringify(result))
-                redis.expire(key, 60 * 30)
+                redis.expire(key, 60 * 10)
                 return result
             }
         } catch (error) {
@@ -59,7 +59,7 @@ export class historyService {
             } else {
                 const result = await historyRepository.getOrderCountFromDB()
                 await redis.set(key, JSON.stringify(result))
-                redis.expire(key, 60 * 30)
+                redis.expire(key, 60 * 10)
                 return result
             }
         } catch (error) {
