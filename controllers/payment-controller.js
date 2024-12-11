@@ -113,7 +113,7 @@ const handleDataFromMomoService = async (req, res) => {
     const id = info ? info[1] : undefined
     const now = new Date();
     const money = resultCode === 0 ? req.body.amount : undefined;
-    
+
     console.log(resultCode, combo, note, id, now, money)
     // // update database
     const t = await paymentModel.createDepositLog(now, money, note, id, combo);
