@@ -23,8 +23,8 @@ export class PrinterController {
         room,
       } = req.body;
 
-       // Kiểm tra printerStatus chỉ có thể là 'Available' hoặc 'Unavailable'
-       if (printerStatus !== "Available" && printerStatus !== "Unavailabl") {
+      // Kiểm tra printerStatus chỉ có thể là 'Available' hoặc 'Unavailable'
+      if (printerStatus !== "Available" && printerStatus !== "Unavailabl") {
         return res
           .status(400)
           .json({
@@ -53,13 +53,13 @@ export class PrinterController {
           .status(400)
           .json({ message: "side must be either '1' or '2'" });
       }
-      
+
       let locationID = await PrinterService.findOrAddLocation(
         campus,
         building,
         room
       );
-      
+
       if (locationID == 0) {
         locationID = await PrinterService.addLocation(campus, building, room);
       }
@@ -120,7 +120,7 @@ export class PrinterController {
       await PrinterService.updatePrinterStatus(printerStatus, printerIds);
       printerIds.forEach(async (id) => {
         let x = await PrinterService.findOrAddManage(spsoID, id);
-        console.log("x:   ",x)
+        console.log("x:   ", x)
         if (x == 0) {
           await PrinterService.addManage(spsoID, id);
         }
@@ -157,7 +157,7 @@ export class PrinterController {
         building,
         room,
       } = req.body;
-      
+
 
       // Kiểm tra printerStatus chỉ có thể là 'Available' hoặc 'Unavailable'
       if (printerStatus !== "Available" && printerStatus !== "Unavailabl") {
@@ -197,12 +197,12 @@ export class PrinterController {
       );
 
 
-      
-      if (locationID==0) {
+
+      if (locationID == 0) {
         locationID = await PrinterService.addLocation(campus, building, room);
 
       }
-      
+
 
       await PrinterService.updatePrinter(
         id,
@@ -239,6 +239,7 @@ export class PrinterController {
     try {
       // const { spsoID } = req.query; // Lấy từ query string
       const printers = await PrinterService.getPrintersBySPSO();
+      console.log(req.session)
       res
         .status(200)
         .json(createResponse(true, "Successful fetching printers", printers));

@@ -36,7 +36,7 @@ DROP PROCEDURE IF EXISTS saveDepositCombo //
 
 CREATE PROCEDURE saveDepositCombo(
     IN depositId INT, 
-    IN comboId INT, 
+    IN comboId VARCHAR(255), 
     IN quantity INT
 )
 BEGIN

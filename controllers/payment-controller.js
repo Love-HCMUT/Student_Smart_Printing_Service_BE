@@ -105,7 +105,7 @@ const createPaymentLink = async (req, res) => {
 const handleDataFromMomoService = async (req, res) => {
   try {
     console.log("Receive result data from momo service")
-    // console.log(req.body)
+    console.log(req.body)
     const resultCode = req.body?.resultCode;
     const combo = JSON.parse(req.body?.extraData)
     const info = resultCode === 0 ? req.body.orderInfo.split(':') : undefined;
@@ -113,8 +113,8 @@ const handleDataFromMomoService = async (req, res) => {
     const id = info ? info[1] : undefined
     const now = new Date();
     const money = resultCode === 0 ? req.body.amount : undefined;
-
-    // console.log(resultCode, combo, note, id, now, money)
+    
+    console.log(resultCode, combo, note, id, now, money)
     // // update database
     const t = await paymentModel.createDepositLog(now, money, note, id, combo);
     const check = await userModel.updateUserBalance(id, money);  // -> need to replace with sql procedure
