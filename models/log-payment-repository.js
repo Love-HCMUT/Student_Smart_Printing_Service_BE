@@ -1,6 +1,7 @@
 import dbs from "../config/mysql-dbs.js";
 import { getCountFromRepository } from "./get-count-from-repository.js";
 export class paymentRepository {
+  
   static getCustomerBalance = async (customerId) => {
     return getCountFromRepository({
       balanceFromCustomer: true,

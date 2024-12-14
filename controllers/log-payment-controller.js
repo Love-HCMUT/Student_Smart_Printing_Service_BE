@@ -2,13 +2,14 @@ import { paymentService } from '../services/log-payment-service.js';
 
 export const getBalance = async (req, res) => {
     const { customerId } = req.params;
+    console.log(customerId)
     try {
         const balance = await paymentService.getBalanceService(customerId);
         res.status(200).send(balance);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
-};
+};  
 
 export const getRecentTransition = async (req, res) => {
     const { customerId } = req.params;

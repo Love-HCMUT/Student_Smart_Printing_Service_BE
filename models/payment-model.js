@@ -82,7 +82,7 @@ async function createDepositLog(time, money, note, customerID, combo) {
 
     if (Array.isArray(combo)) {
       combo.forEach(async (e) => {
-
+        
         const sql = `CALL saveDepositCombo(?, ?, ?)`
         console.log(e.id)
         console.log(typeof (e.id))
