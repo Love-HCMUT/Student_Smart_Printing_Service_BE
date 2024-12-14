@@ -4,23 +4,43 @@ import { orderModel } from "../models/index.js";
 const SALT_ROUNDS = 10;
 
 const addOrder = async (printerID = 1) => {
-  return await orderModel.addOrder(printerID);
+  try {
+    return await orderModel.addOrder(printerID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getOrderByPrinterID = async (printerID = 1) => {
-  return await orderModel.getOrderByPrinterID(printerID);
+  try {
+    return await orderModel.getOrderByPrinterID(printerID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const updateOrderStatus = async (id = 2, orderStatus = "completed") => {
-  return await orderModel.updateOrderStatus(id, orderStatus);
+  try {
+    return await orderModel.updateOrderStatus(id, orderStatus);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const updateOrderCompleteTime = async (id = 2) => {
-  return await orderModel.updateOrderCompleteTime(id);
+  try {
+    return await orderModel.updateOrderCompleteTime(id);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const updateOrderStaffID = async (id = 2, staffID = 1) => {
-  return await orderModel.updateOrderStaffID(id, staffID);
+  try {
+    return await orderModel.updateOrderStaffID(id, staffID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addPackage = async (
@@ -38,7 +58,11 @@ const addPackage = async (
     orderID: 2,
   }
 ) => {
-  return await orderModel.addPackage(packageInfo);
+  try {
+    return await orderModel.addPackage(packageInfo);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addPackagePrintingPages = async (
@@ -50,15 +74,27 @@ const addPackagePrintingPages = async (
     orientation: "landscape",
   }
 ) => {
-  return await orderModel.addPackagePrintingPages(printingPages);
+  try {
+    return await orderModel.addPackagePrintingPages(printingPages);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getPackageByOrderID = async (orderID = 2) => {
-  return await orderModel.getPackageByOrderID(orderID);
+  try {
+    return await orderModel.getPackageByOrderID(orderID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getPackagePrintingPagesByPackageID = async (packageID = 1) => {
-  return await orderModel.getPackagePrintingPagesByPackageID(packageID);
+  try {
+    return await orderModel.getPackagePrintingPagesByPackageID(packageID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addFileMetadata = async (
@@ -70,41 +106,73 @@ const addFileMetadata = async (
     packageID: 5,
   }
 ) => {
-  return await orderModel.addFileMetadata(fileMetadata);
+  try {
+    return await orderModel.addFileMetadata(fileMetadata);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getFileMetadataByPackageID = async (packageID = 5) => {
-  return await orderModel.getFileMetadataByPackageID(packageID);
+  try {
+    return await orderModel.getFileMetadataByPackageID(packageID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addPaymentLog = async (money = 100000) => {
-  return await orderModel.addPaymentLog(money);
+  try {
+    return await orderModel.addPaymentLog(money);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addWithdrawLog = async (id = 2) => {
-  return await orderModel.addWithdrawLog(id);
+  try {
+    return await orderModel.addWithdrawLog(id);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addReturnLog = async (id = 3) => {
-  return await orderModel.addReturnLog(id);
+  try {
+    return await orderModel.addReturnLog(id);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addMakeOrders = async (
   makeOrders = { customerID: 5, orderID: 5, logID: 5, note: "test" }
 ) => {
-  return await orderModel.addMakeOrders(makeOrders);
+  try {
+    return await orderModel.addMakeOrders(makeOrders);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addCancelOrders = async (
   cancelOrders = { customerID: 5, orderID: 5, logID: 5 }
 ) => {
-  return await orderModel.addCancelOrders(cancelOrders);
+  try {
+    return await orderModel.addCancelOrders(cancelOrders);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addDeclineOrders = async (
   declineOrders = { staffID: 5, orderID: 5, logID: 5, note: "Decline order" }
 ) => {
-  return await orderModel.addDeclineOrders(declineOrders);
+  try {
+    return await orderModel.addDeclineOrders(declineOrders);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getAllActivePrinter = async (
@@ -125,12 +193,16 @@ const getAllActivePrinter = async (
     return res;
   } catch (err) {
     console.log("Error in orderService - getAllActivePrinter:", err);
-    return [];
+    throw new Error(`Error in orderService - getAllActivePrinter: ${err}`);
   }
 };
 
 const getCustomer = async (customerID = 2) => {
-  return await orderModel.getCustomer(customerID);
+  try {
+    return await orderModel.getCustomer(customerID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const generateMinioName = async (originalName) => {
@@ -152,29 +224,53 @@ const generateMinioName = async (originalName) => {
 };
 
 const getPrinterByStaffID = async (staffID = 1) => {
-  return await orderModel.getPrinterByStaffID(staffID);
+  try {
+    return await orderModel.getPrinterByStaffID(staffID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const decreaseCustomerBalance = async (customerID = 1, amount = 0) => {
-  return await orderModel.decreaseCustomerBalance(customerID, amount);
+  try {
+    return await orderModel.decreaseCustomerBalance(customerID, amount);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const increaseCustomerBalance = async (customerID = 1, amount = 0) => {
-  return await orderModel.increaseCustomerBalance(customerID, amount);
+  try {
+    return await orderModel.increaseCustomerBalance(customerID, amount);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getOrderCost = async (orderID = 1) => {
-  return await orderModel.getOrderCost(orderID);
+  try {
+    return await orderModel.getOrderCost(orderID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const addPrintingLog = async (
   printingLog = { orderID: 1, logNumber: 1, fileID: 10 }
 ) => {
-  return await orderModel.addPrintingLog(printingLog);
+  try {
+    return await orderModel.addPrintingLog(printingLog);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const updatePrintingLogEndTime = async (fileID) => {
-  return await orderModel.updatePrintingLogEndTime(fileID);
+  try {
+    return await orderModel.updatePrintingLogEndTime(fileID);
+  } catch (err) {
+    throw err;
+  }
 };
 
 export {
