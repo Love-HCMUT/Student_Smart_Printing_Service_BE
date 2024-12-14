@@ -14,7 +14,7 @@ const createPaymentLink = async (req, res) => {
   //parameters
   var accessKey = config.MOMO_ACCESS_KEY;
   var secretKey = config.MOMO_SECRET_KEY;
-  var orderInfo = req.body.note + ":" + req.body.id;
+  var orderInfo = req.body.note;
   var partnerCode = "MOMO";
   var redirectUrl = config.MOMO_REDIRECT_URL;
   var ipnUrl = `${config.MOMO_IPN_URL}/payment/result`;
@@ -22,7 +22,13 @@ const createPaymentLink = async (req, res) => {
   var amount = req.body?.money ? req.body?.money : 0;
   var orderId = partnerCode + new Date().getTime();
   var requestId = orderId;
-  var extraData = JSON.stringify(req.body?.combo);
+
+  const moredata = {
+    combo: req.body?.combo,
+    userid: req.body?.id
+  }
+
+  var extraData = JSON.stringify(moredata);
   var orderGroupId = "";
   var autoCapture = true;
   var lang = "vi";
@@ -107,17 +113,20 @@ const handleDataFromMomoService = async (req, res) => {
     console.log("Receive result data from momo service")
     console.log(req.body)
     const resultCode = req.body?.resultCode;
-    const combo = JSON.parse(req.body?.extraData)
-    const info = resultCode === 0 ? req.body.orderInfo.split(':') : undefined;
-    const note = info ? info[0] : "giao dich that bai"
-    const id = info ? info[1] : undefined
+    const { combo, userid } = JSON.parse(req.body?.extraData)
+    console.log("user id", userid)
+    const info = resultCode === 0 ? req.body.orderInfo : undefined;
+    const note = info ? info : "giao dich that bai"
     const now = new Date();
     const money = resultCode === 0 ? req.body.amount : undefined;
 
-    console.log(resultCode, combo, note, id, now, money)
+    const coins = combo.reduce((a, b) => a + b.numCoins, 0)
+
+    console.log(resultCode, combo, note, userid, now, money)
     // // update database
-    const t = await paymentModel.createDepositLog(now, money, note, id, combo);
-    const check = await userModel.updateUserBalance(id, money);  // -> need to replace with sql procedure
+    const t = await paymentModel.createDepositLog(now, money, note, userid, combo);
+
+    const check = await userModel.updateUserBalance(userid, coins);  // -> need to replace with sql procedure
     if (!t || !check) return res.status(500)
     return res.status(200).json(createResponse(true, "update payment data successfully"));
   } catch (error) {
