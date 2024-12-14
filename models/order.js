@@ -10,7 +10,7 @@ const addOrder = async (printerID) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addOrder:", err);
-    return [];
+    throw new Error(`Error in addOrder: ${err}`);
   }
 };
 
@@ -22,7 +22,7 @@ const getOrderByPrinterID = async (printerID) => {
     return res[0][0];
   } catch (err) {
     console.log("Error in getOrderByPrinterID:", err);
-    return [];
+    throw new Error(`Error in getOrderByPrinterID: ${err}`);
   }
 };
 
@@ -34,7 +34,7 @@ const updateOrderStatus = async (id, orderStatus) => {
     return res[0];
   } catch (err) {
     console.log("Error in updateOrderStatus:", err);
-    return [];
+    throw new Error(`Error in updateOrderStatus: ${err}`);
   }
 };
 
@@ -46,7 +46,7 @@ const updateOrderCompleteTime = async (id) => {
     return res[0];
   } catch (err) {
     console.log("Error in updateOrderCompleteTime:", err);
-    return [];
+    throw new Error(`Error in updateOrderCompleteTime: ${err}`);
   }
 };
 
@@ -58,7 +58,7 @@ const updateOrderStaffID = async (id, staffID) => {
     return res[0];
   } catch (err) {
     console.log("Error in updateOrderStaffID:", err);
-    return [];
+    throw new Error(`Error in updateOrderStaffID: ${err}`);
   }
 };
 
@@ -95,7 +95,7 @@ const addPackage = async (packageInfo) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addPackage:", err);
-    return [];
+    throw new Error(`Error in addPackage: ${err}`);
   }
 };
 
@@ -107,7 +107,7 @@ const getPackageByOrderID = async (orderID) => {
     return res[0][0];
   } catch (err) {
     console.log("Error in getPackagePrintingPagesByPackageID:", err);
-    return [];
+    throw new Error(`Error in getPackagePrintingPagesByPackageID: ${err}`);
   }
 };
 
@@ -126,7 +126,7 @@ const addPackagePrintingPages = async (printingPages) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addPackagePrintingPages:", err);
-    return [];
+    throw new Error(`Error in addPackagePrintingPages: ${err}`);
   }
 };
 
@@ -138,7 +138,7 @@ const getPackagePrintingPagesByPackageID = async (packageID) => {
     return res[0][0];
   } catch (err) {
     console.log("Error in getPackagePrintingPagesByPackageID:", err);
-    return [];
+    throw new Error(`Error in getPackagePrintingPagesByPackageID: ${err}`);
   }
 };
 
@@ -157,7 +157,7 @@ const addFileMetadata = async (fileMetadata) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addFileMetadata:", err);
-    return [];
+    throw new Error(`Error in addFileMetadata: ${err}`);
   }
 };
 
@@ -169,7 +169,7 @@ const getFileMetadataByPackageID = async (packageID) => {
     return res[0];
   } catch (err) {
     console.log("Error in getFileMetadataByPackageID:", err);
-    return [];
+    throw new Error(`Error in getFileMetadataByPackageID: ${err}`);
   }
 };
 
@@ -182,7 +182,7 @@ const addPaymentLog = async (money) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addPaymentLog:", err);
-    return [];
+    throw new Error(`Error in addPaymentLog: ${err}`);
   }
 };
 
@@ -192,7 +192,7 @@ const addWithdrawLog = async (id) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addWithdrawLog:", err);
-    return [];
+    throw new Error(`Error in addWithdrawLog: ${err}`);
   }
 };
 
@@ -202,7 +202,7 @@ const addReturnLog = async (id) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addReturnLog:", err);
-    return [];
+    throw new Error(`Error in addReturnLog: ${err}`);
   }
 };
 
@@ -220,7 +220,7 @@ const addMakeOrders = async (makeOrders) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addMakeOrders:", err);
-    return [];
+    throw new Error(`Error in addMakeOrders: ${err}`);
   }
 };
 
@@ -238,7 +238,7 @@ const addCancelOrders = async (cancelOrders) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addCancelOrders:", err);
-    return [];
+    throw new Error(`Error in addCancelOrders: ${err}`);
   }
 };
 
@@ -256,7 +256,7 @@ const addDeclineOrders = async (declineOrders) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addCanaddDeclineOrderscelOrders:", err);
-    return [];
+    throw new Error(`Error in addCanaddDeclineOrderscelOrders: ${err}`);
   }
 };
 
@@ -270,7 +270,7 @@ const getAllActivePrinter = async (condition) => {
     return res[0][0];
   } catch (err) {
     console.log("Error in getAllActivePrinter:", err);
-    return [];
+    throw new Error(`Error in getAllActivePrinter: ${err}`);
   }
 };
 
@@ -280,7 +280,7 @@ const getCustomer = async (customerID) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in getCustomer:", err);
-    return [];
+    throw new Error(`Error in getCustomer: ${err}`);
   }
 };
 
@@ -292,7 +292,7 @@ const getPrinterByStaffID = async (staffID) => {
     return res[0][0];
   } catch (err) {
     console.log("Error in getPrinterByStaffID:", err);
-    return [];
+    throw new Error(`Error in getPrinterByStaffID: ${err}`);
   }
 };
 
@@ -303,7 +303,8 @@ const decreaseCustomerBalance = async (customerID, amount) => {
       .query(`CALL decreaseCustomerBalance(?, ?)`, [customerID, amount]);
     return res[0];
   } catch (err) {
-    console.log("Error in updateCustomerBalance:", err);
+    console.log("Error in decreaseCustomerBalance:", err);
+    throw new Error(`Error in decreaseCustomerBalance: ${err}`);
   }
 };
 
@@ -314,7 +315,8 @@ const increaseCustomerBalance = async (customerID, amount) => {
       .query(`CALL increaseCustomerBalance(?, ?)`, [customerID, amount]);
     return res[0];
   } catch (err) {
-    console.log("Error in updateCustomerBalance:", err);
+    console.log("Error in increaseCustomerBalance:", err);
+    throw new Error(`Error in increaseCustomerBalance: ${err}`);
   }
 };
 
@@ -324,6 +326,7 @@ const getOrderCost = async (orderID) => {
     return res[0][0];
   } catch (err) {
     console.log("Error in getOrderCost:", err);
+    throw new Error(`Error in getOrderCost: ${err}`);
   }
 };
 
@@ -342,6 +345,7 @@ const addPrintingLog = async (printingLog) => {
     return res[0][0][0];
   } catch (err) {
     console.log("Error in addPrintingLog:", err);
+    throw new Error(`Error in addPrintingLog: ${err}`);
   }
 };
 
@@ -354,6 +358,7 @@ const updatePrintingLogEndTime = async (fileID) => {
     return res[0];
   } catch (err) {
     console.log("Error in updatePrintingLogEndTime:", err);
+    throw new Error(`Error in updatePrintingLogEndTime: ${err}`);
   }
 };
 

@@ -15,7 +15,7 @@ const createOrder = async (req, res) => {
     }
     // add order
     const insertedOrderInfo = await orderService.addOrder(printerID);
-    const orderID = insertedOrderInfo.insertId;
+    const orderID = insertedOrderInfo.insertedId;
 
     // add package
     const packageIDs = await Promise.all(
@@ -42,7 +42,7 @@ const createOrder = async (req, res) => {
           from_tos.forEach((range) => {
             const [fromPage, toPage] = range.split("-");
             orderService.addPackagePrintingPages({
-              packageID: insertedPackageInfo.insertId,
+              packageID: insertedPackageInfo.insertedId,
               color: color,
               fromPage: fromPage,
               toPage: toPage || fromPage,
@@ -50,13 +50,13 @@ const createOrder = async (req, res) => {
             });
           });
         }
-        return insertedPackageInfo.insertId;
+        return insertedPackageInfo.insertedId;
       })
     );
 
     // add withdraw log
     const paymentLogID = (await orderService.addPaymentLog(Number(totalCost)))
-      .insertId;
+      .insertedId;
     await orderService.addWithdrawLog(paymentLogID);
     await orderService.decreaseCustomerBalance(customerID, totalCost);
 
@@ -101,7 +101,7 @@ const declineOrder = async (req, res) => {
     const { customerID, money } = orderCostInfo;
 
     // add return log
-    const paymentLogID = (await orderService.addPaymentLog(money)).insertId;
+    const paymentLogID = (await orderService.addPaymentLog(money)).insertedId;
     await orderService.addReturnLog(paymentLogID);
     await orderService.increaseCustomerBalance(customerID, money);
 
