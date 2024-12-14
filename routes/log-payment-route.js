@@ -3,11 +3,21 @@ import { getBalance, getRecentTransition, getPaymentHistory, getTransactionAll, 
 import { isAuthenticated, hasRole } from "../middlewares/auth.js";
 const router = Router();
 
-router.get('/get-balance/:customerId', hasRole('User'), getBalance);
-router.get('/get-recent-transition/:customerId', hasRole('User'), getRecentTransition);
-router.get('/get-payment-history/:customerId', hasRole('User'), getPaymentHistory);
-router.get("/spso/get-transaction-pagination", hasRole('SPSO'), getTransactionPagination)
-router.get("/spso/get-transaction-count", hasRole('SPSO'), getTransactionCount)
+// router.get('/get-balance/:customerId', hasRole('User'), getBalance);
+// router.get('/get-recent-transition/:customerId', hasRole('User'), getRecentTransition);
+// router.get('/get-payment-history/:customerId', hasRole('User'), getPaymentHistory);
+// router.get("/spso/get-transaction-pagination", hasRole('SPSO'), getTransactionPagination)
+// router.get("/spso/get-transaction-count", hasRole('SPSO'), getTransactionCount)
+// router.post('/spso/get-transaction/all', hasRole('SPSO'), getTransactionAll);
 
-router.post('/spso/get-transaction/all', hasRole('SPSO'), getTransactionAll);
+
+
+router.get('/get-balance/:customerId', getBalance);
+router.get('/get-recent-transition/:customerId', getRecentTransition);
+router.get('/get-payment-history/:customerId', getPaymentHistory);
+router.get("/spso/get-transaction-pagination", getTransactionPagination)
+router.get("/spso/get-transaction-count", getTransactionCount)
+router.post('/spso/get-transaction/all', getTransactionAll);
+
+
 export default router;
