@@ -27,7 +27,7 @@ CREATE TABLE printer (
   PRIMARY KEY (id),
   KEY locationID (locationID),
   CONSTRAINT printer_ibfk_1 FOREIGN KEY (locationID) REFERENCES location (id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT chk_status CHECK ((printerStatus in ('Available','Unavailable')))
+  CONSTRAINT chk_status CHECK ((printerStatus in ('Available','Unavailabl')))
 );
 
 CREATE TABLE account (
