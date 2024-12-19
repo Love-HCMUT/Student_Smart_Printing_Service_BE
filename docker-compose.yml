@@ -1,4 +1,4 @@
-version: 'latest'
+# version: 'latest'
 services:
   ssps:
     image: quay.io/minio/minio
