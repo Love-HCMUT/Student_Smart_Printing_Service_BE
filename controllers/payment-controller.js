@@ -104,7 +104,7 @@ const createPaymentLink = async (req, res) => {
       money: result.data.amount,
     });
 
-    let momotest = axios.post('http://localhost:8888/test-momo', reqBody)
+    // let momotest = axios.post('http://localhost:8888/test-momo', reqBody)
     // console.log(momotest)
 
     return res.status(200).json(respone);
