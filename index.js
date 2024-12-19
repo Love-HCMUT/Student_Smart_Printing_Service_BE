@@ -55,7 +55,7 @@ app.use(express.json())
 // Middleware để xử lý dữ liệu URL-encoded
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+app.use('/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 // app.post('/test', async (req, res) => {
 //     try {
 //         // await test.insertDepositLog('2024-11-22 10:30:00', 50000)
@@ -92,9 +92,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
 //routing 
 // app.use("/:test", (req, res) => console.log("your session ", req.session))
-app.use(centralizeRouter)
-app.use("/api/account", accountRouter);
-app.use("/api/printer", PrinterRouter);
+app.use("/api", centralizeRouter)
+app.use("/api/api/account", accountRouter);
+app.use("/api/api/printer", PrinterRouter);
 
 
 const port = process.env.PORT
