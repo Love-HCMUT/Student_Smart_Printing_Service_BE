@@ -1,7 +1,7 @@
 import dbs from "../config/mysql-dbs.js";
 import { getCountFromRepository } from "./get-count-from-repository.js";
 export class paymentRepository {
-  
+
   static getCustomerBalance = async (customerId) => {
     return getCountFromRepository({
       balanceFromCustomer: true,
@@ -34,5 +34,12 @@ export class paymentRepository {
     return getCountFromRepository({
       allTransactionCount: true
     });
+  };
+
+  static getTransactionSearchFromDB = async (search, userID) => {
+    if (search === undefined) search = null;
+    const query = `CALL userSearchTransaction(?, ?)`;
+    const [rows] = await dbs.promise().query(query, [userID, search]);
+    return rows[0];
   };
 }

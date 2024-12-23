@@ -132,4 +132,13 @@ export class paymentService {
         }
 
     }
+
+    static getTransactionSearchService = async (search, userID) => {
+        try {
+            const balanceAll = await paymentRepository.getTransactionSearchFromDB(search, userID);
+            return balanceAll;
+        } catch (error) {
+            throw new Error("Error fetching balance");
+        }
+    }
 }
