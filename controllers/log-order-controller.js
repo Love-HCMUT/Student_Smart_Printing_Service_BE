@@ -43,3 +43,12 @@ export const getOrderCount = async (req, res) => {
         res.status(500).send({ error: 'Internal Server Error' });
     }
 }
+
+export const searchOrder = async (req, res) => {
+    const { customerId, search } = req.query;
+    try {
+        res.status(200).send(await historyService.searchOrderService(customerId, search));
+    } catch (error) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+}

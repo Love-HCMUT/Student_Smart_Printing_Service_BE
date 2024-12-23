@@ -66,4 +66,13 @@ export class historyService {
             console.error(error)
         }
     }
+
+    static searchOrderService = async (customerId, search) => {
+        try {
+            const result = await historyRepository.searchOrderFromDB(customerId, search)
+            return result
+        } catch (error) {
+            console.error(error)
+        }
+    }
 }

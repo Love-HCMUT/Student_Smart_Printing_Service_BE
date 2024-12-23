@@ -1188,4 +1188,61 @@ ELSE
 END IF;
 END $$
 
+CREATE PROCEDURE SearchUserOrder(
+    IN customerID INT,
+    IN param VARCHAR(255)
+)
+BEGIN
+    IF param IS NULL THEN
+        SELECT 
+            u.id AS orderID,
+            u.orderDate AS orderDate,
+            CASE
+                WHEN c.orderID IS NOT NULL THEN 'Cancelled'
+                WHEN d.orderID IS NOT NULL THEN 'Declined'
+                ELSE u.orderStatus
+            END AS orderStatus,
+            u.completeTime AS completeAt,
+            COALESCE(c.note, m.note) AS note
+        FROM
+            userOrders AS u
+                LEFT JOIN makeOrders AS m 
+                ON u.id = m.orderID AND m.customerID = customerID
+                LEFT JOIN declineOrders AS d 
+                ON u.id = d.orderID
+                LEFT JOIN cancelOrders AS c 
+                ON u.id = c.orderID AND c.customerID = customerID
+        WHERE
+            (m.customerID = customerID OR c.customerID = customerID)
+        ORDER BY orderDate DESC;
+    ELSE
+        SELECT 
+            u.id AS orderID,
+            u.orderDate AS orderDate,
+            CASE
+                WHEN c.orderID IS NOT NULL THEN 'Cancelled'
+                WHEN d.orderID IS NOT NULL THEN 'Declined'
+                ELSE u.orderStatus
+            END AS orderStatus,
+            u.completeTime AS completeAt,
+            COALESCE(c.note, m.note) AS note
+        FROM
+            userOrders AS u
+                LEFT JOIN makeOrders AS m 
+                ON u.id = m.orderID AND m.customerID = customerID
+                LEFT JOIN declineOrders AS d 
+                ON u.id = d.orderID
+                LEFT JOIN cancelOrders AS c 
+                ON u.id = c.orderID AND c.customerID = customerID
+        WHERE
+            (m.customerID = customerID OR c.customerID = customerID)
+            AND (
+                COALESCE(c.note, m.note) LIKE CONCAT('%', param, '%')
+                OR CAST(u.id AS CHAR) LIKE param
+                OR u.orderStatus LIKE param
+            )
+        ORDER BY orderDate DESC;
+    END IF;
+END $$
+
 DELIMITER ;

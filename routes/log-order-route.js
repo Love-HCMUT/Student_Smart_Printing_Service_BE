@@ -1,7 +1,7 @@
 import { Router } from "express"
 import {
     getOrderHistory, cancelOrder, getOrderAll,
-    getOrderPagination, getOrderCount
+    getOrderPagination, getOrderCount, searchOrder
 } from '../controllers/log-order-controller.js'
 
 const router = Router()
@@ -14,4 +14,6 @@ router.post("/cancel-order/:orderId", hasRole('User'), cancelOrder)
 router.get("/spso/get-all-orders", hasRole('SPSO'), getOrderAll)
 router.get("/spso/get-all-orders-pagination", hasRole('SPSO'), getOrderPagination)
 router.get("/spso/get-order-count", hasRole('SPSO'), getOrderCount)
+
+router.get("/search-order", hasRole('User'), searchOrder)
 export default router
