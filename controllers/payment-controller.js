@@ -65,7 +65,7 @@ const createPaymentLink = async (req, res) => {
     .digest("hex");
 
   //json object send to MoMo endpoint
-  const requestBody = JSON.stringify({
+  const reqBody = {
     partnerCode: partnerCode,
     partnerName: "Test",
     storeId: "MomoTestStore",
@@ -81,7 +81,9 @@ const createPaymentLink = async (req, res) => {
     extraData: extraData,
     orderGroupId: orderGroupId,
     signature: signature,
-  });
+  };
+
+  const requestBody = JSON.stringify(reqBody)
 
   //option for axios
   const option = {
@@ -101,6 +103,10 @@ const createPaymentLink = async (req, res) => {
       orderId: result.data.orderId,
       money: result.data.amount,
     });
+
+    // let momotest = axios.post('http://localhost:8888/test-momo', reqBody)
+    // console.log(momotest)
+
     return res.status(200).json(respone);
   } catch (err) {
     console.log(err);
@@ -160,6 +166,7 @@ const checkStatusPayment = async (req, res) => {
   const options = {
     method: "POST",
     url: `${config.MOMO_GATEWAY_URL}/query`,
+    // url: `http://localhost:8888/query`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -174,6 +181,7 @@ const checkStatusPayment = async (req, res) => {
   while ([1000, 9000, 7002, 7000].includes(statusCode) && count < 100) {
     try {
       result = await axios(options);
+      // console.log(result)
       statusCode = result.data.resultCode;
       count++;
       await delay(2000);
