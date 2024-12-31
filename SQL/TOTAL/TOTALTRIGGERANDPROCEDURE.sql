@@ -1,3 +1,26 @@
+DROP TRIGGER IF EXISTS  increase_pk_combo;
+DELIMITER $$
+CREATE TRIGGER increase_pk_combo
+BEFORE INSERT ON combo
+FOR EACH ROW
+BEGIN
+    DECLARE new_id VARCHAR(255);
+    SET new_id = CONCAT('CB', LPAD(IFNULL((SELECT MAX(CAST(SUBSTRING(id, 3) AS UNSIGNED)) FROM combo), 0) + 1, 4, '0'));
+    SET NEW.id = new_id;
+END $$
+
+CREATE PROCEDURE `addOrder`(
+    p_orderStatus VARCHAR(50),
+    p_orderData TIMESTAMP,
+    p_printerID INT
+)
+BEGIN
+    INSERT INTO userOrders (orderStatus, orderDate, printerID) VALUES (p_orderStatus, p_orderData, p_printerID);
+	SELECT LAST_INSERT_ID() AS insertedId;
+END$$
+DELIMITER ;
+
+
 DROP PROCEDURE IF EXISTS add_account;
 DROP PROCEDURE IF EXISTS find_or_add_location;
 DROP PROCEDURE IF EXISTS add_customer;
@@ -31,7 +54,6 @@ DROP PROCEDURE IF EXISTS GetPrintersByIds;
 DROP PROCEDURE IF EXISTS SavePaymentDepositLog;
 DROP PROCEDURE IF EXISTS saveDepositCombo;
 DROP PROCEDURE IF EXISTS LoadCombo;
-DROP TRIGGER IF EXISTS  increase_pk_combo;
 DROP PROCEDURE IF EXISTS updatePrintingLogEndTime;
 DROP PROCEDURE IF EXISTS addPrintingLog;
 DROP PROCEDURE IF EXISTS getOrderCost;
@@ -751,24 +773,7 @@ BEGIN
     SELECT * FROM combo;
 END $$
 
-CREATE TRIGGER increase_pk_combo
-BEFORE INSERT ON combo
-FOR EACH ROW
-BEGIN
-    DECLARE new_id VARCHAR(255);
-    SET new_id = CONCAT('CB', LPAD(IFNULL((SELECT MAX(CAST(SUBSTRING(id, 3) AS UNSIGNED)) FROM combo), 0) + 1, 4, '0'));
-    SET NEW.id = new_id;
-END $$
 
-CREATE PROCEDURE `addOrder`(
-    p_orderStatus VARCHAR(50),
-    p_orderData TIMESTAMP,
-    p_printerID INT
-)
-BEGIN
-    INSERT INTO userOrders (orderStatus, orderDate, printerID) VALUES (p_orderStatus, p_orderData, p_printerID);
-	SELECT LAST_INSERT_ID() AS insertedId;
-END$$
 
 
 
