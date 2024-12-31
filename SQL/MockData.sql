@@ -2,7 +2,11 @@ INSERT INTO location(campus, building, room) VALUES
 ('HCMUT', 'H1', '101'),
 ('HCMUT', 'H2', '203'),
 ('HCMUT', 'H7', '101'),
-('HCMUT', 'H5', '501');
+('HCMUT', 'H5', '501'),
+('HCMUT', 'H3', '102'),
+('HCMUT', 'H4', '204'),
+('HCMUT', 'H6', '302'),
+('HCMUT', 'H8', '402');
 
 -- Insert data into the printer table first
 INSERT INTO printer (printerStatus, printerDescription, resolution, colorPrinting, side, price, model, speed, brand, wireless, printingMethod, locationID) VALUES
@@ -11,7 +15,11 @@ INSERT INTO printer (printerStatus, printerDescription, resolution, colorPrintin
 ('Available', 'Office printer', '1200dpi', 1, '2', 200, 'Model Z', 25, 'Brand C', 1, 'Laser', 3),
 ('Unavailabl', 'Compact printer', '600dpi', 0, '1', 80, 'Model W', 15, 'Brand D', 0, 'Inkjet', 4),
 ('Available', 'High-volume printer', '1200dpi', 1, '2', 300, 'Model V', 35, 'Brand E', 1, 'Laser', 1),
-('Available', 'Photo printer', '2400dpi', 1, '1', 250, 'Model U', 10, 'Brand F', 1, 'Thermal', 2);
+('Available', 'Photo printer', '2400dpi', 1, '1', 250, 'Model U', 10, 'Brand F', 1, 'Thermal', 2),
+('Available', 'High-speed printer', '600dpi', 1, '2', 150, 'Model A', 30, 'Brand G', 1, 'Laser', 5),
+('Unavailable', 'Standard printer', '300dpi', 0, '1', 100, 'Model B', 20, 'Brand H', 0, 'Inkjet', 6),
+('Available', 'Office printer', '1200dpi', 1, '2', 200, 'Model C', 25, 'Brand I', 1, 'Laser', 7),
+('Unavailable', 'Compact printer', '600dpi', 0, '1', 80, 'Model D', 15, 'Brand J', 0, 'Inkjet', 8);
 
 INSERT INTO account (username, accountPassword, fullName, roles) VALUES
 ('HoGiaThang00', '$2b$10$lkzdlp/GEd.QdpiWcO.I/uL5TEVYhgfJpxWUH4QMlHhYFWwMm0E66', 'Ho Gia Thang', 'Printing Staff'),    -- Password123
@@ -23,17 +31,27 @@ INSERT INTO account (username, accountPassword, fullName, roles) VALUES
 ('NguoiHamMo33', '$2b$10$ccYOfgjrpfMSd59t4PI1muvBgER16lITCH1FEkpvCzsPpDTte0DPe', 'Nguyen Xuan C', 'User'), 			-- Top1SeverMienBac
 ('NguoiThoiLua44', '$2b$10$9TvAO6ee5rv0Iu45iR8ZDeLqRBLy47LB7k0pQ4gua55Bri0jR3Aie', 'Le Van Bao', 'User'),     			-- Top1SeverChauAu
 ('RonDemon1234', '$2b$10$lkzdlp/GEd.QdpiWcO.I/uL5TEVYhgfJpxWUH4QMlHhYFWwMm0E66', 'Phan Van Diot', 'Printing Staff'),     -- Password123
-('RoyCanon2946', '$2b$10$lkzdlp/GEd.QdpiWcO.I/uL5TEVYhgfJpxWUH4QMlHhYFWwMm0E66', 'Le Dinh T', 'Printing Staff');   -- FinalPass345
+('RoyCanon2946', '$2b$10$lkzdlp/GEd.QdpiWcO.I/uL5TEVYhgfJpxWUH4QMlHhYFWwMm0E66', 'Le Dinh T', 'Printing Staff'),   -- FinalPass345
+('NguyenVanA', '$2b$10$lkzdlp/GEd.QdpiWcO.I/uL5TEVYhgfJpxWUH4QMlHhYFWwMm0E66', 'Nguyen Van A', 'User'),    -- Password123
+('TranThiB', '$2b$10$Kv6eW3SmMgEnZE6Yp9/Iy.Nb4WCFd4Myxic0K47807fM130MmUB4G', 'Tran Thi B', 'SPSO'),          -- SecurePass456
+('LeVanC', '$2b$10$X.XAhqKBwWsmTySClJTIw.GlC8iMgzYQcGGksO2dQrDWL7m48joqq', 'Le Van C', 'Printing Staff'),    -- MyPassword789
+('PhamThiD', '$2b$10$PfHHGYXTk2x0nhQyrwprdeRq6bq083WyWyDvZ8dyrUcFc1oQh3.UK', 'Pham Thi D', 'User');          -- AnotherPass012
 
 INSERT INTO spso(id) VALUES
 (2),
-(5);
+(5),
+(11),
+(12);
 
 INSERT INTO spsoPhoneNumbers(id, phoneNumber) VALUES
 (2, '0901156009'),
 (2, '0387674221'),
 (5, '0987654321'),
-(5, '0332194924');
+(5, '0332194924'),
+(11, '0901234567'),
+(11, '0387654321'),
+(12, '0987654321'),
+(12, '0332123456');
 
 INSERT INTO manage (spsoID, printerID) VALUES
 (2, 1),
@@ -41,7 +59,11 @@ INSERT INTO manage (spsoID, printerID) VALUES
 (2, 4),
 (5, 3),
 (5, 5),
-(5, 6);
+(5, 6),
+(11, 7),
+(11, 8),
+(12, 9),
+(12, 10);
 
 INSERT INTO manipulation (spsoID, printerID, spsoAction, actionTime) VALUES
 (2, 1, 'Add printer', '2023-12-12 10:00:00'),
@@ -52,25 +74,39 @@ INSERT INTO manipulation (spsoID, printerID, spsoAction, actionTime) VALUES
 (5, 6, 'Add printer', '2023-12-12 15:00:00'),
 (2, 1, 'Repair printer', '2023-12-12 16:00:00'),
 (2, 2, 'Repair printer', '2023-12-12 17:00:00'),
-(5, 3, 'Repair printer', '2023-12-12 18:00:00');
+(5, 3, 'Repair printer', '2023-12-12 18:00:00'),
+(11, 7, 'Add printer', '2024-01-01 10:00:00'),
+(11, 8, 'Add printer', '2024-01-01 11:00:00'),
+(12, 9, 'Add printer', '2024-01-01 12:00:00'),
+(12, 10, 'Add printer', '2024-01-01 13:00:00');
 
 INSERT INTO customer (id, balance) VALUES
 (4, 10000),
 (6, 20000),
 (7, 30000),
-(8, 50000);
+(8, 50000),
+(13, 40000),
+(14, 50000);
 
 INSERT INTO staff (id, locationID, spsoID, mentorID) VALUES
 (1, 2, 2, NULL),
 (3, 1, 2, NULL),
 (9, 3, 5, NULL),
-(10, 4, 5, NULL);
+(10, 4, 5, NULL),
+(15, 5, 11, NULL),
+(16, 6, 11, NULL),
+(17, 7, 12, NULL),
+(18, 8, 12, NULL);
 
 INSERT INTO staffPhoneNumbers (id, phoneNumber) VALUES
 (1, '1234567890'),
 (3, '0987654321'),
 (9, '1122334455'),
-(10, '5566778899');
+(10, '5566778899'),
+(15, '1234567891'),
+(16, '0987654322'),
+(17, '1122334456'),
+(18, '5566778890');
 
 -- Insert data into the operatedBy table
 INSERT INTO operatedBy (printerID, staffID) VALUES
@@ -79,7 +115,11 @@ INSERT INTO operatedBy (printerID, staffID) VALUES
 (3, 9),
 (4, 10),
 (5, 1),
-(6, 3);
+(6, 3),
+(7, 15),
+(8, 16),
+(9, 17),
+(10, 18);
 
 -- Insert data into the repairedBy table
 INSERT INTO repairedBy (printerID, staffID, repairDate, cost, errorInfo) VALUES
@@ -88,7 +128,11 @@ INSERT INTO repairedBy (printerID, staffID, repairDate, cost, errorInfo) VALUES
 (3, 9, '2024-04-03 12:00:00', 200, 'Drum replacement'),
 (4, 10, '2024-05-04 13:00:00', 120, 'Software update'),
 (5, 1, '2024-06-09 14:00:00', 180, 'Power issue'),
-(6, 3, '2024-07-25 15:00:00', 160, 'Network connectivity');
+(6, 3, '2024-07-25 15:00:00', 160, 'Network connectivity'),
+(7, 15, '2024-02-01 10:00:00', 100, 'Paper jam'),
+(8, 16, '2024-02-02 11:00:00', 150, 'Ink leakage'),
+(9, 17, '2024-02-03 12:00:00', 200, 'Drum replacement'),
+(10, 18, '2024-02-04 13:00:00', 120, 'Software update');
 
 -- Insert data into the userOrders table
 INSERT INTO userOrders (orderStatus, orderDate, completeTime, printerID, staffID) VALUES
@@ -155,7 +199,11 @@ INSERT INTO userOrders (orderStatus, orderDate, completeTime, printerID, staffID
 ('Cancelled', '2025-01-26 09:00:00', NULL, 1, 1), 
 ('Completed', '2025-01-27 11:00:00', '2025-01-27 11:30:00', 2, 3),
 ('Cancelled', '2025-01-28 13:00:00', NULL, 3, 9),
-('Cancelled', '2025-01-29 14:00:00', NULL, 4, 10);
+('Cancelled', '2025-01-29 14:00:00', NULL, 4, 10),
+('Cancelled', '2024-02-01 09:00:00', NULL, 7, 15),
+('Completed', '2024-02-02 11:00:00', '2024-02-02 11:30:00', 8, 16),
+('Cancelled', '2024-02-03 13:00:00', NULL, 9, 17), 
+('Completed', '2024-02-04 14:00:00', '2024-02-04 14:30:00', 10, 18);
 
 -- Insert data into the package table
 INSERT INTO package (numOfCopies, side, colorAllPages, pagePerSheet, paperSize, scale, cover, glass, binding, orderID, colorCover) VALUES
@@ -222,7 +270,11 @@ INSERT INTO package (numOfCopies, side, colorAllPages, pagePerSheet, paperSize, 
 (1,  '1', 1, 2, 'A3', 0.75, 1, 0, 1, 61, 1),
 (2,  '2', 0, 4, 'A4', 1.25, 0, 1, 0, 62, 0),
 (1,  '1', 1, 1, 'A4', 1.0, 1, 0, 1, 63, 1),
-(2,  '2', 0, 2, 'A3', 0.5, 0, 1, 0, 64, 0);
+(2,  '2', 0, 2, 'A3', 0.5, 0, 1, 0, 64, 0),
+(10, '1', 1, 1, 'A4', 1.0, 1, 0, 1, 65, 1),
+(20, '2', 0, 2, 'A3', 0.5, 0, 1, 0, 66, 0),
+(15, '1', 1, 4, 'A4', 1.5, 1, 0, 1, 67, 1),
+(25, '2', 0, 1, 'A4', 1.0, 0, 1, 0, 68, 0);
 
 INSERT INTO packagePrintingPages (packageID, color, fromPage, toPage, orientation) VALUES
 (1, 1, 1, 10, 'Portrait'),
@@ -288,7 +340,11 @@ INSERT INTO packagePrintingPages (packageID, color, fromPage, toPage, orientatio
 (61, 1, 1, 15, 'Portrait'),
 (62, 0, 2, 8, 'Landscape'),
 (63, 1, 1, 16, 'Portrait'),
-(64, 0, 1, 8, 'Landscape');
+(64, 0, 1, 8, 'Landscape'),
+(65, 1, 1, 10, 'Portrait'),
+(66, 0, 1, 20, 'Landscape'),
+(67, 1, 1, 15, 'Portrait'),
+(68, 0, 1, 25, 'Landscape');
 
 -- Insert data into the fileMetadata table
 INSERT INTO fileMetadata (fileName, size, numPages, url, packageID) VALUES
@@ -355,7 +411,11 @@ INSERT INTO fileMetadata (fileName, size, numPages, url, packageID) VALUES
 ('file61.pdf', 0.1, 15, 'http://example.com/file61.pdf', 61),
 ('file62.pdf', 0.7, 11, 'http://example.com/file62.pdf', 62),
 ('file63.pdf', 0.6, 16, 'http://example.com/file63.pdf', 63),
-('file64.pdf', 0.5, 12, 'http://example.com/file64.pdf', 64);
+('file64.pdf', 0.5, 12, 'http://example.com/file64.pdf', 64),
+('file65.pdf', 1.2, 10, 'http://example.com/file65.pdf', 65),
+('file66.pdf', 2.5, 20, 'http://example.com/file66.pdf', 66),
+('file67.pdf', 1.8, 15, 'http://example.com/file67.pdf', 67),
+('file68.pdf', 3.0, 25, 'http://example.com/file68.pdf', 68);
 
 -- Insert data into the printingLog table
 INSERT INTO printingLog (orderID, logNumber, startTime, endTime, fileID) VALUES
@@ -422,7 +482,11 @@ INSERT INTO printingLog (orderID, logNumber, startTime, endTime, fileID) VALUES
 (61, 61, '2024-03-10 13:00:00', '2024-03-10 14:00:00', 61),
 (62, 62, '2024-03-11 14:00:00', '2024-03-11 15:00:00', 62),
 (63, 63, '2024-03-12 16:00:00', '2024-03-12 17:00:00', 63),
-(64, 64, '2024-03-13 18:00:00', '2024-03-13 19:00:00', 64);
+(64, 64, '2024-03-13 18:00:00', '2024-03-13 19:00:00', 64),
+(65, 65, '2024-02-01 09:00:00', '2024-02-01 10:00:00', 65),
+(66, 66, '2024-02-02 10:00:00', '2024-02-02 11:00:00', 66),
+(67, 67, '2024-02-03 11:00:00', '2024-02-03 12:00:00', 67),
+(68, 68, '2024-02-04 12:00:00', '2024-02-04 13:00:00', 68);
 
 INSERT INTO combo (price, numCoins) VALUES
 (10000, 10000),
@@ -430,7 +494,9 @@ INSERT INTO combo (price, numCoins) VALUES
 (30000, 30000),
 (40000, 40000),
 (50000, 50000),
-(60000, 60000);
+(60000, 60000),
+(70000, 70000),
+(80000, 80000);
 
 INSERT INTO paymentLog (paymentTime, money) VALUES
 ('2024-01-01 08:00:00', 500),
@@ -529,7 +595,9 @@ INSERT INTO paymentLog (paymentTime, money) VALUES
 ('2024-01-09 11:00:00', 20000),   -- CB0002
 ('2024-01-10 13:00:00', 20000),   -- CB0002
 ('2024-01-11 14:00:00', 2350),
-('2024-01-12 16:00:00', 20000);   -- CB0002
+('2024-01-12 16:00:00', 20000),   -- CB0002
+('2024-02-01 08:00:00', 700),
+('2024-02-02 09:00:00', 800);
 
 -- Deposit log has money in payemntLog >= 10000
 -- customerID = 4 or 6 or 7 or 8
@@ -566,7 +634,9 @@ INSERT INTO depositLog (id, method, note, customerID) VALUES
 (93, 'Momo', 'Use Momo', 4),
 (94, 'Momo', 'Use Momo', 6),
 (95, 'Momo', 'Use Momo', 8),
-(97, 'Momo', 'Use Momo', 4);
+(97, 'Momo', 'Use Momo', 4),
+(65, 'Cash', 'Use Cash', 13),
+(66, 'Momo', 'Use Momo', 14);
 
 INSERT INTO depositCombo (logID, comboID, quantity) VALUES
 (4, 'CB0001', 1),
@@ -601,7 +671,9 @@ INSERT INTO depositCombo (logID, comboID, quantity) VALUES
 (93, 'CB0002', 1),
 (94, 'CB0002', 1),
 (95, 'CB0002', 1),
-(97, 'CB0002', 1);
+(97, 'CB0002', 1),
+(65, 'CB0007', 1),
+(66, 'CB0008', 1);
 
 INSERT INTO returnLog (id) VALUES
 (1),
@@ -612,7 +684,9 @@ INSERT INTO returnLog (id) VALUES
 (68),
 (71),
 (92),
-(96), (2), (5), (6), (8), (11), (12), (14), (17), (18), (19), (23), (24), (25), (28), (29), (30), (33), (34), (35);
+(96), (2), (5), (6), (8), (11), (12), (14), (17), (18), (19), (23), (24), (25), (28), (29), (30), (33), (34), (35),
+(65),
+(66);
 
 INSERT INTO withdrawLog (id) VALUES
 (1),
@@ -678,7 +752,9 @@ INSERT INTO withdrawLog (id) VALUES
 (71),
 (91),
 (92),
-(96);
+(96),
+(65),
+(66);
 
 -- Mapping table for orderID and logID in withdrawLog customerID = 4 or 6 or 7 or 8
 INSERT INTO makeOrders (customerID, orderID, logID, note) VALUES
@@ -745,7 +821,9 @@ INSERT INTO makeOrders (customerID, orderID, logID, note) VALUES
 (7, 61, 71, 'Note for order 61'),
 (4, 62, 91, 'Note for order 62'),
 (6, 63, 92, 'Note for order 63'),
-(8, 64, 96, 'Note for order 64');
+(8, 64, 96, 'Note for order 64'),
+(13, 65, 65, 'Note for order 65'),
+(14, 66, 66, 'Note for order 66');
 
 INSERT INTO cancelOrders (customerID, orderID, logID, note) VALUES
 (6, 1, 1, 'Order cancelled due to printer issue'),
@@ -756,7 +834,9 @@ INSERT INTO cancelOrders (customerID, orderID, logID, note) VALUES
 (4, 58, 68, 'Order cancelled due to insufficient funds'),
 (7, 61, 71, 'Order cancelled due to printer issue'),
 (6, 63, 92, 'Order cancelled due to incorrect file format'),
-(4, 64, 96, 'Order cancelled due to insufficient funds');
+(4, 64, 96, 'Order cancelled due to insufficient funds'),
+(13, 65, 65, 'Order cancelled due to printer issue'),
+(14, 66, 66, 'Order cancelled due to incorrect file format');
 
 INSERT INTO declineOrders (staffID, orderID, logID, note) VALUES
 (1, 2, 2, 'Order declined due to printer issue'),
@@ -777,4 +857,6 @@ INSERT INTO declineOrders (staffID, orderID, logID, note) VALUES
 (1, 25, 30, 'Order declined due to printer issue'),
 (1, 27, 33, 'Order declined due to incorrect file format'),
 (3, 28, 34, 'Order declined due to insufficient funds'),
-(1, 29, 35, 'Order declined due to printer issue');
+(1, 29, 35, 'Order declined due to printer issue'),
+(15, 65, 65, 'Order declined due to printer issue'),
+(16, 66, 66, 'Order declined due to incorrect file format');

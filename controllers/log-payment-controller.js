@@ -9,7 +9,7 @@ export const getBalance = async (req, res) => {
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
-};  
+};
 
 export const getRecentTransition = async (req, res) => {
     const { customerId } = req.params;
@@ -53,6 +53,16 @@ export const getTransactionPagination = async (req, res) => {
 export const getTransactionCount = async (req, res) => {
     try {
         const balanceAll = await paymentService.getTransactionCountService();
+        res.status(200).send(balanceAll);
+    } catch (error) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+}
+
+export const getTransactionSearch = async (req, res) => {
+    try {
+        const { search, userID } = req.query;
+        const balanceAll = await paymentService.getTransactionSearchService(search, userID);
         res.status(200).send(balanceAll);
     } catch (error) {
         res.status(500).send({ error: 'Internal Server Error' });

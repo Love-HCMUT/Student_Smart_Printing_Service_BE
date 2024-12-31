@@ -33,4 +33,11 @@ export class historyRepository {
     static getOrderCountFromDB = async () => {
         return getCountFromRepository({ allOrderCount: true });
     }
+
+    static searchOrderFromDB = async (customerId, search) => {
+        if (search === "undefined" || search === "" || search === undefined) search = null
+        const query = `CALL SearchUserOrder(?, ?)`;
+        const [rows] = await dbs.promise().query(query, [customerId, search]);
+        return rows[0]
+    }
 }

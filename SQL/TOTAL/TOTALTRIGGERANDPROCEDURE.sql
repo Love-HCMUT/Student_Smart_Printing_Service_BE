@@ -1,3 +1,26 @@
+DROP TRIGGER IF EXISTS  increase_pk_combo;
+DELIMITER $$
+CREATE TRIGGER increase_pk_combo
+BEFORE INSERT ON combo
+FOR EACH ROW
+BEGIN
+    DECLARE new_id VARCHAR(255);
+    SET new_id = CONCAT('CB', LPAD(IFNULL((SELECT MAX(CAST(SUBSTRING(id, 3) AS UNSIGNED)) FROM combo), 0) + 1, 4, '0'));
+    SET NEW.id = new_id;
+END $$
+
+CREATE PROCEDURE `addOrder`(
+    p_orderStatus VARCHAR(50),
+    p_orderData TIMESTAMP,
+    p_printerID INT
+)
+BEGIN
+    INSERT INTO userOrders (orderStatus, orderDate, printerID) VALUES (p_orderStatus, p_orderData, p_printerID);
+	SELECT LAST_INSERT_ID() AS insertedId;
+END$$
+DELIMITER ;
+
+
 DROP PROCEDURE IF EXISTS add_account;
 DROP PROCEDURE IF EXISTS find_or_add_location;
 DROP PROCEDURE IF EXISTS add_customer;
@@ -31,7 +54,6 @@ DROP PROCEDURE IF EXISTS GetPrintersByIds;
 DROP PROCEDURE IF EXISTS SavePaymentDepositLog;
 DROP PROCEDURE IF EXISTS saveDepositCombo;
 DROP PROCEDURE IF EXISTS LoadCombo;
-DROP TRIGGER IF EXISTS  increase_pk_combo;
 DROP PROCEDURE IF EXISTS updatePrintingLogEndTime;
 DROP PROCEDURE IF EXISTS addPrintingLog;
 DROP PROCEDURE IF EXISTS getOrderCost;
@@ -59,6 +81,8 @@ DROP PROCEDURE IF EXISTS getOrderByPrinterID;
 DROP PROCEDURE IF EXISTS addOrder;
 DROP PROCEDURE IF EXISTS UpdateCustomerBalance;
 DROP PROCEDURE IF EXISTS getCountFromRepository;
+DROP PROCEDURE IF EXISTS userSearchTransaction;
+DROP PROCEDURE IF EXISTS SearchUserOrder;
 DELIMITER $$
 
 
@@ -232,32 +256,70 @@ BEGIN
         ON u.id = d.orderID
     LEFT JOIN cancelOrders AS c
         ON u.id = c.orderID AND c.customerID = customerID
-    WHERE (m.customerID = customerID OR c.customerID = customerID);
+    WHERE (m.customerID = customerID OR c.customerID = customerID)
+    ORDER BY orderDate DESC;
 END$$
 
 CREATE PROCEDURE getCustomerTransaction(
-	cID INT
+    IN cID INT
 )
 BEGIN
-SELECT 
-    p.paymentTime AS date_of_transaction,
-    SUM(c.numCoins) AS number_of_coins,
-    d.method AS method,
-    GROUP_CONCAT(dc.comboID) AS combo_list,
-    p.money AS charge,
-    d.note AS note
-FROM
-    depositLog AS d
-        JOIN
-    paymentLog AS p ON d.id = p.id
-        JOIN
-    depositCombo AS dc ON d.id = dc.logID
-        JOIN
-    combo AS c ON c.id = dc.comboID
-WHERE
-    d.customerID = cID
-GROUP BY p.paymentTime, d.method, d.note
-ORDER BY p.paymentTime DESC;
+    SELECT
+        date_of_transaction, number_of_coins, method, combo_list, charge, note
+    FROM
+    (
+        -- Deposit Log transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            SUM(c.numCoins) AS number_of_coins,
+            d.method AS method,
+            GROUP_CONCAT(dc.comboID) AS combo_list,
+            p.money AS charge,
+            d.note AS note
+        FROM
+            depositLog AS d
+            JOIN paymentLog AS p ON d.id = p.id
+            LEFT JOIN depositCombo AS dc ON d.id = dc.logID
+            LEFT JOIN combo AS c ON c.id = dc.comboID
+        WHERE
+            d.customerID = cID
+        GROUP BY p.paymentTime, d.method, d.note, p.money
+
+        UNION ALL
+
+        -- Make Order transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            p.money AS number_of_coins,
+            'Make Order' AS method,
+            'NULL' AS combo_list,
+            'NULL' AS charge,
+            m.note AS note
+        FROM 
+            paymentLog AS p
+            JOIN makeOrders AS m ON p.id = m.logID
+        WHERE
+            m.customerID = cID
+        GROUP BY p.paymentTime, p.money, m.note
+
+        UNION ALL
+
+        -- Cancel Order transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            p.money AS number_of_coins,
+            'Cancel Order' AS method,
+            'NULL' AS combo_list,
+            'NULL' AS charge,
+            c.note AS note
+        FROM 
+            paymentLog AS p
+            JOIN cancelOrders AS c ON p.id = c.logID
+        WHERE
+            c.customerID = cID
+        GROUP BY p.paymentTime, p.money, c.note
+    ) AS combined_transactions
+    ORDER BY date_of_transaction DESC;
 END $$
 
 CREATE PROCEDURE getOrderLog()
@@ -315,6 +377,7 @@ FROM
         LEFT JOIN
     declineOrders AS d ON m.orderID = d.orderID
 GROUP BY startTime , endTime , fileName , numberOfPage , printerID , printingStaffID , userID , status
+ORDER BY startTime DESC
 LIMIT pageSize OFFSET offset;
 END $$
 
@@ -354,7 +417,6 @@ BEGIN
 				SELECT orderID
                 FROM declineOrders
             )
-		
 	) AS CombinedLogs
     ORDER BY time DESC
     LIMIT 3;	
@@ -711,24 +773,7 @@ BEGIN
     SELECT * FROM combo;
 END $$
 
-CREATE TRIGGER increase_pk_combo
-BEFORE INSERT ON combo
-FOR EACH ROW
-BEGIN
-    DECLARE new_id VARCHAR(255);
-    SET new_id = CONCAT('CB', LPAD(IFNULL((SELECT MAX(CAST(SUBSTRING(id, 3) AS UNSIGNED)) FROM combo), 0) + 1, 4, '0'));
-    SET NEW.id = new_id;
-END $$
 
-CREATE PROCEDURE `addOrder`(
-    p_orderStatus VARCHAR(50),
-    p_orderData TIMESTAMP,
-    p_printerID INT
-)
-BEGIN
-    INSERT INTO userOrders (orderStatus, orderDate, printerID) VALUES (p_orderStatus, p_orderData, p_printerID);
-	SELECT LAST_INSERT_ID() AS insertedId;
-END$$
 
 
 
@@ -1023,5 +1068,188 @@ BEGIN
         SELECT COALESCE(balance, 0) AS balance FROM customer WHERE id = customerId;
     END IF;
 END$$
+
+
+CREATE PROCEDURE userSearchTransaction (
+	IN cID INT,
+    IN param VARCHAR(255)
+)
+BEGIN
+IF param IS NOT NULL THEN
+SELECT
+        date_of_transaction, number_of_coins, method, combo_list, charge, note
+    FROM
+    (
+        -- Deposit Log transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            SUM(c.numCoins) AS number_of_coins,
+            d.method AS method,
+            GROUP_CONCAT(dc.comboID) AS combo_list,
+            p.money AS charge,
+            d.note AS note
+        FROM
+            depositLog AS d
+            JOIN paymentLog AS p ON d.id = p.id
+            LEFT JOIN depositCombo AS dc ON d.id = dc.logID
+            LEFT JOIN combo AS c ON c.id = dc.comboID
+        WHERE
+            d.customerID = cID
+        GROUP BY p.paymentTime, d.method, d.note, p.money
+
+        UNION ALL
+
+        -- Make Order transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            p.money AS number_of_coins,
+            'Make Order' AS method,
+            'NULL' AS combo_list,
+            'NULL' AS charge,
+            m.note AS note
+        FROM 
+            paymentLog AS p
+            JOIN makeOrders AS m ON p.id = m.logID
+        WHERE
+            m.customerID = cID
+        GROUP BY p.paymentTime, p.money, m.note
+
+        UNION ALL
+
+        -- Cancel Order transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            p.money AS number_of_coins,
+            'Cancel Order' AS method,
+            'NULL' AS combo_list,
+            'NULL' AS charge,
+            c.note AS note
+        FROM 
+            paymentLog AS p
+            JOIN cancelOrders AS c ON p.id = c.logID
+        WHERE
+            c.customerID = cID
+        GROUP BY p.paymentTime, p.money, c.note
+    ) AS combined_transactions
+		WHERE note LIKE CONCAT('%', param, '%') 
+			OR method LIKE CONCAT('%', param, '%') 
+			OR combo_list LIKE CONCAT('%', param, '%')
+    ORDER BY date_of_transaction DESC;
+ELSE
+	SELECT
+        date_of_transaction, number_of_coins, method, combo_list, charge, note
+    FROM
+    (
+        -- Deposit Log transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            SUM(c.numCoins) AS number_of_coins,
+            d.method AS method,
+            GROUP_CONCAT(dc.comboID) AS combo_list,
+            p.money AS charge,
+            d.note AS note
+        FROM
+            depositLog AS d
+            JOIN paymentLog AS p ON d.id = p.id
+            LEFT JOIN depositCombo AS dc ON d.id = dc.logID
+            LEFT JOIN combo AS c ON c.id = dc.comboID
+        WHERE
+            d.customerID = cID
+        GROUP BY p.paymentTime, d.method, d.note, p.money
+
+        UNION ALL
+
+        -- Make Order transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            p.money AS number_of_coins,
+            'Make Order' AS method,
+            'NULL' AS combo_list,
+            'NULL' AS charge,
+            m.note AS note
+        FROM 
+            paymentLog AS p
+            JOIN makeOrders AS m ON p.id = m.logID
+        WHERE
+            m.customerID = cID
+        GROUP BY p.paymentTime, p.money, m.note
+
+        UNION ALL
+
+        -- Cancel Order transactions
+        SELECT 
+            p.paymentTime AS date_of_transaction,
+            p.money AS number_of_coins,
+            'Cancel Order' AS method,
+            'NULL' AS combo_list,
+            'NULL' AS charge,
+            c.note AS note
+        FROM 
+            paymentLog AS p
+            JOIN cancelOrders AS c ON p.id = c.logID
+        WHERE
+            c.customerID = cID
+        GROUP BY p.paymentTime, p.money, c.note
+    ) AS combined_transactions
+    ORDER BY date_of_transaction DESC;
+END IF;
+END $$
+
+CREATE PROCEDURE SearchUserOrder(
+    IN customerID INT,
+    IN param VARCHAR(255)
+)
+BEGIN
+    IF param IS NULL THEN
+        SELECT 
+            u.id AS orderID,
+            u.orderDate AS orderDate,
+            CASE
+                WHEN c.orderID IS NOT NULL THEN 'Cancelled'
+                WHEN d.orderID IS NOT NULL THEN 'Declined'
+                ELSE u.orderStatus
+            END AS orderStatus,
+            u.completeTime AS completeAt,
+            COALESCE(c.note, m.note) AS note
+        FROM
+            userOrders AS u
+                LEFT JOIN makeOrders AS m 
+                ON u.id = m.orderID AND m.customerID = customerID
+                LEFT JOIN declineOrders AS d 
+                ON u.id = d.orderID
+                LEFT JOIN cancelOrders AS c 
+                ON u.id = c.orderID AND c.customerID = customerID
+        WHERE
+            (m.customerID = customerID OR c.customerID = customerID)
+        ORDER BY orderDate DESC;
+    ELSE
+        SELECT 
+            u.id AS orderID,
+            u.orderDate AS orderDate,
+            CASE
+                WHEN c.orderID IS NOT NULL THEN 'Cancelled'
+                WHEN d.orderID IS NOT NULL THEN 'Declined'
+                ELSE u.orderStatus
+            END AS orderStatus,
+            u.completeTime AS completeAt,
+            COALESCE(c.note, m.note) AS note
+        FROM
+            userOrders AS u
+                LEFT JOIN makeOrders AS m 
+                ON u.id = m.orderID AND m.customerID = customerID
+                LEFT JOIN declineOrders AS d 
+                ON u.id = d.orderID
+                LEFT JOIN cancelOrders AS c 
+                ON u.id = c.orderID AND c.customerID = customerID
+        WHERE
+            (m.customerID = customerID OR c.customerID = customerID)
+            AND (
+                COALESCE(c.note, m.note) LIKE CONCAT('%', param, '%')
+                OR CAST(u.id AS CHAR) LIKE param
+                OR u.orderStatus LIKE param
+            )
+        ORDER BY orderDate DESC;
+    END IF;
+END $$
 
 DELIMITER ;
