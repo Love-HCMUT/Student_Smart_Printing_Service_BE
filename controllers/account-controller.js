@@ -1,6 +1,6 @@
 import { AccountService } from "../models/account.js";
 import { createResponse } from "../config/api-response.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export class AccountController {
   // Đăng ký tài khoản

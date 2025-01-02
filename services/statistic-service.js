@@ -102,15 +102,15 @@ export class statisticService {
             const twoMonthsAgo = currentMonth <= 2 ? 12 + (currentMonth - 2) : currentMonth - 2;
             const twoMonthsAgoYear = currentMonth <= 2 ? currentYear - 1 : currentYear;
 
-            const keys = [
-                `month-orders-${currentMonth}-${currentYear}`,
-                `month-orders-${lastMonth}-${lastMonthYear}`,
-                `month-orders-${twoMonthsAgo}-${twoMonthsAgoYear}`];
-            const cacheVal = await redis.mget(keys);
+            // const keys = [
+            //     `month-orders-${currentMonth}-${currentYear}`,
+            //     `month-orders-${lastMonth}-${lastMonthYear}`,
+            //     `month-orders-${twoMonthsAgo}-${twoMonthsAgoYear}`];
+            // const cacheVal = await redis.mget(keys);
 
-            if (cacheVal.every(val => val !== null)) {
-                return cacheVal.map(val => JSON.parse(val));
-            }
+            // if (cacheVal.every(val => val !== null)) {
+            //     return cacheVal.map(val => JSON.parse(val));
+            // }
 
             const [currentMonthData, lastMonthData, twoMonthsAgoData] = await Promise.all([
                 statisticRepository.getRecentlyMonthlyOrderFromDB(currentMonth, currentYear),
@@ -118,13 +118,13 @@ export class statisticService {
                 statisticRepository.getRecentlyMonthlyOrderFromDB(twoMonthsAgo, twoMonthsAgoYear)
             ]);
 
-            await redis.mset(
-                keys[0], JSON.stringify(currentMonthData),
-                keys[1], JSON.stringify(lastMonthData),
-                keys[2], JSON.stringify(twoMonthsAgoData)
-            );
+            // await redis.mset(
+            //     keys[0], JSON.stringify(currentMonthData),
+            //     keys[1], JSON.stringify(lastMonthData),
+            //     keys[2], JSON.stringify(twoMonthsAgoData)
+            // );
 
-            keys.forEach(key => redis.expire(key, 60 * 10));
+            // keys.forEach(key => redis.expire(key, 60 * 10));
 
             return [currentMonthData, lastMonthData, twoMonthsAgoData];
         } catch (error) {

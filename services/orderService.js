@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { orderModel } from "../models/index.js";
 
 const SALT_ROUNDS = 10;

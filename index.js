@@ -34,9 +34,9 @@ connectRedis()
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://ebc7-171-247-146-191.ngrok-free.app',],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Các method HTTP được phép
-    allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép
+    origin: ['http://localhost:5173', 'https://ebc7-171-247-146-191.ngrok-free.app'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 }));
 
