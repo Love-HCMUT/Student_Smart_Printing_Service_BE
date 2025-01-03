@@ -27,6 +27,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       
+      - name: Remove old Docker image from ECR
+        run: |
+          aws ecr batch-delete-image --repository-name assignment-backend --image-ids imageTag=latest || true
+      
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ secrets.ECR_REGISTRY }}
