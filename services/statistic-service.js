@@ -10,7 +10,7 @@ const getCountMonthOrder = async (currentMonth, currentYear) => {
         if (data === null) {
             data = await statisticRepository.getRecentlyMonthlyOrderFromDB(currentMonth, currentYear);
             await redis.set(key, JSON.stringify(data));
-            redis.expire(key, 60 * 10);
+            redis.expire(key, 60 * 60 * 24);
         }
 
         for (let i = 0; i < data.length; i++) {
@@ -33,7 +33,7 @@ const getCountMonthTransaction = async (currentMonth, currentYear) => {
         if (data === null) {
             data = await statisticRepository.getRecentlyMonthlyTransactionFromDB(currentMonth, currentYear);
             await redis.set(key, JSON.stringify(data));
-            redis.expire(key, 60 * 10);
+            redis.expire(key, 60 * 60 * 24);
         }
         for (let i = 0; i < data.length; i++) {
             total += data[i].TransactionCount
@@ -55,7 +55,7 @@ const getCountYearOrder = async (currentYear) => {
         if (data === null) {
             data = await statisticRepository.getRecentlyYearlyOrderFromDB(currentYear)
             await redis.set(key, JSON.stringify(data));
-            redis.expire(key, 60 * 10);
+            redis.expire(key, 60 * 60 * 24);
         }
         for (let i = 0; i < data.length; i++) {
             total += data[i].OrderCount
@@ -77,7 +77,7 @@ const getCountYearTransaction = async (currentYear) => {
         if (data === null) {
             data = await statisticRepository.getRecentlyYearlyTransactionFromDB(currentYear)
             await redis.set(key, JSON.stringify(data));
-            redis.expire(key, 60 * 10);
+            redis.expire(key, 60 * 60 * 24);
         }
         for (let i = 0; i < data.length; i++) {
             total += data[i].TransactionCount
@@ -102,15 +102,15 @@ export class statisticService {
             const twoMonthsAgo = currentMonth <= 2 ? 12 + (currentMonth - 2) : currentMonth - 2;
             const twoMonthsAgoYear = currentMonth <= 2 ? currentYear - 1 : currentYear;
 
-            // const keys = [
-            //     `month-orders-${currentMonth}-${currentYear}`,
-            //     `month-orders-${lastMonth}-${lastMonthYear}`,
-            //     `month-orders-${twoMonthsAgo}-${twoMonthsAgoYear}`];
-            // const cacheVal = await redis.mget(keys);
+            const keys = [
+                `month-orders-${currentMonth}-${currentYear}`,
+                `month-orders-${lastMonth}-${lastMonthYear}`,
+                `month-orders-${twoMonthsAgo}-${twoMonthsAgoYear}`];
+            const cacheVal = await redis.mget(keys);
 
-            // if (cacheVal.every(val => val !== null)) {
-            //     return cacheVal.map(val => JSON.parse(val));
-            // }
+            if (cacheVal.every(val => val !== null)) {
+                return cacheVal.map(val => JSON.parse(val));
+            }
 
             const [currentMonthData, lastMonthData, twoMonthsAgoData] = await Promise.all([
                 statisticRepository.getRecentlyMonthlyOrderFromDB(currentMonth, currentYear),
@@ -118,13 +118,13 @@ export class statisticService {
                 statisticRepository.getRecentlyMonthlyOrderFromDB(twoMonthsAgo, twoMonthsAgoYear)
             ]);
 
-            // await redis.mset(
-            //     keys[0], JSON.stringify(currentMonthData),
-            //     keys[1], JSON.stringify(lastMonthData),
-            //     keys[2], JSON.stringify(twoMonthsAgoData)
-            // );
+            await redis.mset(
+                keys[0], JSON.stringify(currentMonthData),
+                keys[1], JSON.stringify(lastMonthData),
+                keys[2], JSON.stringify(twoMonthsAgoData)
+            );
 
-            // keys.forEach(key => redis.expire(key, 60 * 10));
+            keys.forEach(key => redis.expire(key, 60 * 60 * 24));
 
             return [currentMonthData, lastMonthData, twoMonthsAgoData];
         } catch (error) {
@@ -156,7 +156,7 @@ export class statisticService {
             };
 
             await redis.set(key, JSON.stringify(currentMonthData));
-            redis.expire(key, 60 * 10);
+            redis.expire(key, 60 * 60 * 24);
 
             return currentMonthData;
         } catch (error) {
@@ -189,7 +189,7 @@ export class statisticService {
             };
 
             await redis.set(key, JSON.stringify(currentYearData));
-            redis.expire(key, 60 * 10);
+            redis.expire(key, 60 * 60 * 24);
 
             return currentYearData;
         } catch (error) {
@@ -209,7 +209,7 @@ export class statisticService {
             const data = await statisticRepository.getRecentlyYearlyOrderFromDB(currentYear);
 
             await redis.set(key, JSON.stringify(data));
-            redis.expire(key, 60 * 10);
+            redis.expire(key, 60 * 24);
 
             return data;
         } catch (error) {
